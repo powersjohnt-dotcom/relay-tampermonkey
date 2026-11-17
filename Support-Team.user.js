@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.20
+// @version      2.21
 // @description  Automatically inserts responses for Relay issues
 // @author       Julian Woolcott & Hayden Lindsey & Sheshu Venugopal
 // @match        https://paragon-na.amazon.com/hz/view-case?caseId=*
 // @grant        none
 // ==/UserScript==
+
     // Configuration object
 const dropdownMappings = {
     "Safety Score Not Compliant": { category: "Performance", categoryValue: "37058498011", code: "Dispute", codeValue: "39474112881" },
@@ -155,29 +156,6 @@ buttonGroups: [
             { id: 'auctionSupport', text: 'Auction Support' },
         ]
     },
-
-    {
-        name: 'SUPER ADMIN ISSUES',
-        backgroundColor: '#ea580c',
-        hoverColor: '#c2410c',
-        labelColor: '#ea580c',
-        buttons: [
-            { id: 'addAdminDispatcher', text: 'Add Admin/Dispatcher' },
-            { id: 'addDriver', text: 'Add Driver' },
-            { id: 'inviteNotReceived', text: 'Invite Not Received' },
-            { id: 'emailAlreadyInUse', text: 'Email Already In Use' },
-            { id: 'removeUser', text: 'Remove User' },
-            { id: 'changeUserRole', text: 'Change User Role' },
-            { id: 'dispatcherNoPayout', text: 'Dispatcher No Payout' },
-            { id: 'userMissingTrips', text: 'User Missing Trips' },
-            { id: 'portalLoginTrouble', text: 'Portal Login Trouble' },
-            { id: 'transferRole', text: 'Transfer Role' },
-            { id: 'superAdminLeftCompany', text: 'Super Admin Left Company' },
-            { id: 'driverCantLogIn', text: "Driver Can't Log In" },
-            { id: 'driverNotSeeingLoad', text: 'Driver Not Seeing Load' },
-        ]
-    },
-
     {
         name: 'SUPPORT & GENERAL',
         backgroundColor: '#6b7280',
@@ -200,6 +178,27 @@ buttonGroups: [
             { id: 'close', text: 'Close Account Verify' },
             { id: 'loadboard', text: 'Load Board Fluctuation' },
             { id: 'cancel', text: 'Close Account FRL' }
+        ]
+    },
+    {
+        name: 'SUPER ADMIN ISSUES',
+        backgroundColor: '#ea580c',
+        hoverColor: '#c2410c',
+        labelColor: '#ea580c',
+        buttons: [
+            { id: 'addAdminDispatcher', text: 'Add Admin/Dispatcher' },
+            { id: 'addDriver', text: 'Add Driver' },
+            { id: 'inviteNotReceived', text: 'Invite Not Received' },
+            { id: 'emailAlreadyInUse', text: 'Email Already In Use' },
+            { id: 'removeUser', text: 'Remove User' },
+            { id: 'changeUserRole', text: 'Change User Role' },
+            { id: 'dispatcherNoPayout', text: 'Dispatcher No Payout' },
+            { id: 'userMissingTrips', text: 'User Missing Trips' },
+            { id: 'portalLoginTrouble', text: 'Portal Login Trouble' },
+            { id: 'transferRole', text: 'Transfer Role' },
+            { id: 'superAdminLeftCompany', text: 'Super Admin Left Company' },
+            { id: 'driverCantLogIn', text: "Driver Can't Log In" },
+            { id: 'driverNotSeeingLoad', text: 'Driver Not Seeing Load' },
         ]
     },
     {
