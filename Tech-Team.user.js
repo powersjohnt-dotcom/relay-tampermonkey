@@ -1,9 +1,7 @@
 // ==UserScript==
-// @name         Amazon Relay Responses MMPM Version 2 - Grouped — Team
+// @name         Amazon Relay Responses MMPM Version 2 - Grouped — J.T. Personal
 // @namespace    http://tampermonkey.net/
-// @version      3.28
-// @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
-// @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
+// @version      3.39
 // @description  Automatically inserts responses for Relay issues - grouped and color-coded tech queue buttons
 // @author       Julian Woolcott & Hayden Lindsey & Sheshu Venugopal
 // @match        https://paragon-na.amazon.com/hz/view-case?caseId=*
@@ -50,11 +48,6 @@
                     { id: 'superAdminLeftCompany', text: 'Super Admin Left Company' },
                     { id: 'driverCantLogIn', text: "Driver Can't Log In" },
                     { id: 'driverNotSeeingLoad', text: 'Driver Not Seeing Load' },
-                    { id: 'appCrashingFreezing', text: 'App Crashing/Freezing' },
-                    { id: 'gpsLocationTracking', text: 'GPS/Location Not Tracking' },
-                    { id: 'checkInNotWorking', text: 'Check-In Not Working' },
-                    { id: 'appStatusNotUpdating', text: 'App Status Not Updating' },
-                    { id: 'driverMultipleDevices', text: 'Driver Using Multiple Devices' },
                 ]
             },
             {
@@ -695,77 +688,6 @@ You may find these optional Relay Learning Center courses helpful:
 If the load still does not appear, please reply to this case with the Load ID or VRID, the driver's email address, and a screenshot of the driver's app.
 
 Thanks for continuing to haul with Relay!`,
-        appCrashingFreezing: `Dear Carrier,
-
-If the Relay mobile app is crashing or freezing for your company's driver, we recommend the following:
-
-1. Update to the latest Relay app version (Android 7 or later, or iOS 13.1 or later).
-2. Close the app fully and restart it.
-3. Restart the phone.
-4. Check that the phone has enough storage space and a stable internet connection.
-
-You may find this optional Relay Learning Center course helpful:
-- Introduction to Primary and Secondary Devices: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=1b83c2f9-1e32-4d56-9f3c-1c8e8e988998
-
-If the issue continues, please reply to this case with the phone type, OS version, app version, a screenshot or screen recording, and the date and time it happened.
-
-Thanks for continuing to haul with Relay!`,
-        gpsLocationTracking: `Dear Carrier,
-
-For the Relay mobile app to track a trip, location services need to be turned on. We recommend the following:
-
-1. In the phone settings, set location access for the Relay app to "Always" (or "Allow all the time" on Android).
-2. Keep the app running during the trip with mobile data turned on.
-3. Turn off battery saver or low power mode for the Relay app.
-4. Update to the latest Relay app version.
-
-You may find these optional Relay Learning Center courses helpful:
-- Location Availability for Relay Mobile App: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=e4b3586d-ec7d-4791-9237-74ee9985f76b
-- Relay Navigation Features: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=7beee13c-4a63-4a05-b212-0fd479c2ba82
-
-If tracking still does not work, please reply to this case with the Load ID or VRID, the phone type and OS version, and the date and time of the issue.
-
-Thanks for continuing to haul with Relay!`,
-        checkInNotWorking: `Dear Carrier,
-
-If your company's driver is unable to check in through the Relay mobile app, we recommend the following:
-
-1. Confirm location access for the Relay app is set to "Always."
-2. Check for a stable internet connection with mobile data turned on.
-3. Close and restart the app, and update to the latest version.
-
-You may find these optional Relay Learning Center courses helpful:
-- Best Practices for Yard Check-in and Check-out: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=80591ae8-0763-4915-a68f-adedfbd33589
-- Location Availability for Relay Mobile App: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=e4b3586d-ec7d-4791-9237-74ee9985f76b
-
-If the driver still cannot check in, please reply to this case with the Load ID or VRID, the facility, a screenshot of any error message, and the date and time of the attempt.
-
-Thanks for continuing to haul with Relay!`,
-        appStatusNotUpdating: `Dear Carrier,
-
-If trip status updates are not going through in the Relay mobile app, we recommend the following:
-
-1. Check for a stable internet connection with mobile data turned on.
-2. Keep the app open and running during the trip.
-3. Close and restart the app, and update to the latest version.
-
-You may find these optional Relay Learning Center courses helpful:
-- Location Availability for Relay Mobile App: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=e4b3586d-ec7d-4791-9237-74ee9985f76b
-- Reporting Delays (LTR) for On Time Performance: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=ce2888d8-b28f-4fc2-b6be-904fdad9ff19
-
-If the status still does not update, please reply to this case with the Load ID or VRID, the stop where the issue happened, a screenshot, and the date and time.
-
-Thanks for continuing to haul with Relay!`,
-        driverMultipleDevices: `Dear Carrier,
-
-If your company's driver is logged in to the Relay mobile app on more than one phone, updates may not go through as expected. We recommend that the driver uses one primary device for the trip and logs out of any other devices.
-
-You may find this optional Relay Learning Center course helpful:
-- Introduction to Primary and Secondary Devices: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=1b83c2f9-1e32-4d56-9f3c-1c8e8e988998
-
-If the issue continues, please reply to this case with the Load ID or VRID, the phone types, and a screenshot.
-
-Thanks for continuing to haul with Relay!`,
     };
 
     // Create and insert response
@@ -833,11 +755,6 @@ Thanks for continuing to haul with Relay!`,
         "Super Admin Left Company":  { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
         "Driver Can't Log In":       { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "App Issue", codeValue: "51180030581" },
         "Driver Not Seeing Load":    { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "App Issue", codeValue: "51180030581" },
-        "App Crashing/Freezing":     { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "App Issue", codeValue: "51180030581" },
-        "GPS/Location Not Tracking": { category: "Tech-Issues-R4D-query", categoryValue: "36277959391", code: "R4D-error-gps-navigation-not-working", codeValue: "46808022731" },
-        "Check-In Not Working":      { category: "R4C-trips-issues", categoryValue: "45545173241", code: "Relay-carriers-checkin-issues-trips", codeValue: "50947790641" },
-        "App Status Not Updating":   { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "App Issue", codeValue: "51180030581" },
-        "Driver Using Multiple Devices":{ category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "App Issue", codeValue: "51180030581" },
         "RLB NoLoad":                { category: "Loadboard-suspension-queries", categoryValue: "45546793241", code: "Loadboard-Suspension-Low-Performance-carriers", codeValue: "46809635491" },
         "Suspended":                 { category: "Loadboard-suspension-queries", categoryValue: "45546793241", code: "Loadboard-Suspension-Low-Performance-carriers", codeValue: "46809635491" },
         "New Carrier Loads Visibility": { category: "Loadboard-suspension-queries", categoryValue: "45546793241", code: "Loadboard-Suspension-Low-Performance-carriers", codeValue: "46809635491" },
@@ -902,9 +819,12 @@ Thanks for continuing to haul with Relay!`,
         }, 800);
     }
 
+    // Registry of built buttons by id, so the suggestion feature can highlight one.
+    const tmButtons = {};
     // Create button element with styles - now colored by its group
     const createButton = ({ id, text }, group) => {
         const button = document.createElement('button');
+        tmButtons[id] = button;
         const style = config.buttonStyle;
 
         Object.assign(button.style, {
@@ -924,6 +844,7 @@ Thanks for continuing to haul with Relay!`,
         button.addEventListener('mouseover', () => { button.style.backgroundColor = group.hoverColor; });
         button.addEventListener('mouseout', () => { button.style.backgroundColor = group.backgroundColor; });
         button.addEventListener('click', () => {
+            try { tmLogCase(id, text); } catch (e) { console.warn('Case log failed', e); }
             insertResponse(responses[id]);
             if (crossQueueMode) {
                 console.log("Override mode - text only, dropdowns untouched: " + text);
@@ -1075,6 +996,493 @@ Thanks for continuing to haul with Relay!`,
     }
         setInterval(attachSwitchToNativeBars, 1000);
 
+    // ---- Case suggestion (v3.20): suggest-only, never auto-clicks ----
+    // Keyword lists per button id. Phrases (with a space) score 3, single
+    // words score 2. Generic buttons (Other Issue, WIP/SIM, More Info
+    // Needed) have no keywords on purpose - they are fallbacks, not
+    // something to suggest from a keyword. First-pass keywords from the
+    // Tech responses only - NOT yet tuned against real Tech cases.
+    const SUGGESTION_KEYWORDS = {
+        paymentissue: ['payment dispute', 'file a dispute', 'missing item', 'payment issue', 'did not get paid', "didn't get paid", 'not paid', 'aprelay'],
+        generalsupport: ['primary administrator', 'unlock your account', 'cannot log in', "can't log in", 'general support', 'account support', 'experiencing glitches'],
+        performance: ['performance score', 'performance dispute', 'performance tab', 'performance grade', 'performance impact', 'app malfunction', 'controllable', "shouldn't affect", 'company performance', 'carrier controllable', 'negative performance impact', 'should not impact our performance', 'does not negatively impact', 'negatively impact our performance', 'not count against our performance'],
+        insurance: ['insurance compliance'],
+        contracts: ['short-term contract', 'short term contract'],
+        assets: ['asset', 'added an asset', 'asset edit', 'tractor'],
+        RLBnoWork: ['no loads', 'cannot see loads', "can't see loads", 'less loads', 'fewer loads', 'booking limits', 'loads you see', 'supply and demand', 'did not see any load'],
+        newcarrierloadvisibility: ['new carrier', 'first few weeks', 'less than three executed loads', '7 loads per week', 'new carrier bookings'],
+        assigndrivers: ['assign drivers', 'assign driver', 'driver roster', 'invite drivers', 'invitation has expired', 'resend the invite'],
+        driverassignmentissue: ['driver assignment issue', 'cannot assign driver', 'cannot assign', "can't assign driver", 'driver not assigned', 'hard refresh', 'clear browser cache', 'prior block'],
+        driverineligible: ['driver verification', 'selfie check', 'selfie', 'verification dispute'],
+        navigation: ['unable to navigate', 'app issue', 'internet connection', 'give feedback'],
+        pageloading: ['web page', 'webpage', 'page loading', 'page not loading', 'clear the cache', 'clear browsing data', 'cached images'],
+        appissueExpBehaviour: ['gps', 'gps data', 'location data', 'force-close', 'swipe away', 'latest version'],
+        relayassistant: ['relay assistant', 'trip support'],
+        earlycheckin: ['early check', 'early checkin', 'check in', '30 minutes prior'],
+        intransit: ['stuck in transit', 'in-transit', 'in transit', 'trip completion', 'report delay', 'traffic', 'delay', 'missing ts', 'missing timestamp', 'timestamp', 'time stamp', 'still showing', "doesn't close out", 'does not close out', 'long line', 'big line', 'came as unexpected', 'came up as unexpected', 'empty move', 'too much transit time', 'schedule error', 'scheduling discrepancy', 'sufficient transit time', 'start load', 'resume button', 'eta updated', 'unloaded date', 'cannot resume', 'arrived late', 'driver arrived late', 'delay was caused by', 'delay is due to', 'is full'],
+        originarrival: ['origin arrival', 'pre-registration', 'pre registration', 'geofence', 'arriving to pickup', 'late pre-registration'],
+        suspended: ['account suspended', 'suspended', 'suspension', 'reinstatement', 'reactivation', 'account closed', 'basic scores', 'basics are within', 'account was suspended', 'was suspended', 'reinstate', 'revoked', 'status says revoked', 'motus', 'operating authority', 'lost the access', 'access to our load board', 'access disappeared', 'load board access', 'manual review', 'has been revoked', 'load board not restored', 'loadboard is disabled', 'load board is disabled', 'still suspended', 'load board reactivated', 'make my account active', 'unable to book loads', 'has not updated', 'restore access', 'previously restricted', 'access was restricted', 'not restored', 'account active'],
+        submitBol: ['submit bol', 'submit bill of lading', 'bill of lading', 'proof of delivery', 'bols for stop', 'upload the bol', 'bol for drop'],
+        CallBack: ['call back', 'callback', 'request a call', 'please call', 'call back at', 'call me', 'please confirm', 'can you confirm', 'callme', 'not able to assign'],
+        badge: ['badge access', 'badging', 'badge'],
+        uiia: ['uiia', 'intermodal', 'intermodal loads', 'intermodal certification', 'uiia certification', 'addenda', 'addendum', 'drayage', 'rail drayage', 'port drayage', 'flexivan', 'chassis addendum', 'ocean carrier', 'steamship', 'imdlcertifications'],
+        auctionSupport: ['auction support', 'relay auctions', 'auctions', 'bid on lanes', 'bidding', 'backhaul', 'backhauls', 'leading bid']
+    };
+    function getCaseTextRaw() {
+        var parts = [];
+        var corr = document.querySelector('.body_RioZc');
+        if (corr && corr.innerText) {
+            parts.push(corr.innerText);
+        } else {
+            var clone = document.body.cloneNode(true);
+            clone.querySelectorAll('#tm-main-bar, #tm-tech-bar, #tm-auctions-bar, .tm-switch-tray').forEach(function(n) { n.remove(); });
+            if (clone.innerText) { parts.push(clone.innerText.slice(0, 8000)); }
+        }
+        return parts.join('\n');
+    }
+    function getCaseText() {
+        return getCaseTextRaw().toLowerCase();
+    }
+
+    // ---- Carrier-only suggestion (v2.29/v3.32, per J.T.) ----
+    // Score only the carrier's own message, not the whole thread: the
+    // thread text in .body_RioZc also carries email headers, subject
+    // lines, transfer notices, Relay's form boilerplate and your own
+    // sent replies, and keywords were firing on all of that. If no
+    // carrier message is found, fall back to the whole thread as before,
+    // so the suggestion never has less to work with than today.
+    function extractCarrierMessage(full) {
+        var flat = (full || '').replace(/\s+/g, ' ');
+        var cutAt = function(text) {
+            var stops = ['[Company Name:', 'Attachments:', 'View translation', 'From:', 'Related Frequently Asked Questions'];
+            var end = text.length;
+            stops.forEach(function(s) {
+                var j = text.indexOf(s);
+                if (j !== -1 && j < end) { end = j; }
+            });
+            return text.slice(0, end).trim();
+        };
+        var m;
+        // 1. Support form: "Describe your issue:" ... VRID / [Company Name:
+        m = flat.match(/Describe your issue:\s*(.*?)\s*(?:VRID if applicable:|\[Company Name:)/i);
+        if (m && m[1].trim().length >= 20) { return cutAt(m[1].trim()).slice(0, 3000); }
+        // 2. Verification form: "Explain the issue here:" ...
+        m = flat.match(/Explain the issue here:\s*(.*?)\s*(?:Related Frequently Asked Questions|\[Company Name:)/i);
+        if (m && m[1].trim().length >= 20) { return cutAt(m[1].trim()).slice(0, 3000); }
+        // 3. Tech format: the message follows the VRID / Contract ID value.
+        // (In some cases the Topic label comes after the ID, with the
+        // message right behind it - strip that label too, so the topic
+        // field itself never scores.)
+        var idx = flat.search(/VRID(?:\/Tour\/Block\/Contract ID|#):/i);
+        if (idx !== -1) {
+            var rest = flat.slice(idx).replace(/^VRID(?:\/Tour\/Block\/Contract ID|#):\s*/i, '');
+            var tokens = rest.split(' ');
+            var i = 0;
+            while (i < tokens.length && /^[A-Za-z0-9\-\/]+$/.test(tokens[i]) && /\d/.test(tokens[i]) && tokens[i].length >= 5) { i++; }
+            rest = tokens.slice(i).join(' ').replace(/^Topic \(What's your issue about\?\)\s*:\s*/i, '');
+            var msg = cutAt(rest);
+            if (msg.length >= 20) { return msg.slice(0, 3000); }
+        }
+        return '';
+    }
+    function getSuggestionText(raw) {
+        raw = (raw === undefined) ? getCaseTextRaw() : raw;
+        var carrier = extractCarrierMessage(raw);
+        if (carrier) { return { text: carrier.toLowerCase(), carrierOnly: true }; }
+        return { text: raw.toLowerCase(), carrierOnly: false };
+    }
+    // Combo rule v1: an app phrase plus a trip phrase suggests the matching
+    // combo button (the combos are keywordless by design, so this is the only
+    // way they get suggested). App signal = appIssue / navigation /
+    // appissueExpBehaviour scoring 2+; trip = In-Transit or Performance
+    // scoring 2+, whichever is higher (a tie keeps the normal suggestion).
+    function comboSuggestion(scores) {
+        var byId = {};
+        scores.forEach(function(s) { byId[s.id] = s.score; });
+        var appScore = Math.max(byId.appIssue || 0, byId.navigation || 0, byId.appissueExpBehaviour || 0);
+        var inScore = byId.intransit || 0;
+        var pfScore = byId.performance || 0;
+        if (appScore < 2 || Math.max(inScore, pfScore) < 2) { return null; }
+        if (inScore === pfScore) { return null; }
+        return { id: inScore > pfScore ? 'appintransit' : 'appperformance', score: Math.max(inScore, pfScore), matched: 'combo-rule' };
+    }
+    function scoreSuggestion(text) {
+        var scores = [];
+        Object.keys(SUGGESTION_KEYWORDS).forEach(function(id) {
+            var score = 0, matched = '';
+            SUGGESTION_KEYWORDS[id].forEach(function(phrase) {
+                var needle = phrase.toLowerCase();
+                var idx = text.indexOf(needle);
+                if (idx !== -1) {
+                    score += needle.indexOf(' ') !== -1 ? 3 : 2;
+                    if (!matched) { matched = phrase; }
+                }
+            });
+            if (score > 0) { scores.push({ id: id, score: score, matched: matched }); }
+        });
+        scores.sort(function(a, b) { return b.score - a.score; });
+        if (scores.length === 0) { return null; }
+        var combo = comboSuggestion(scores);
+        if (combo) { return combo; }
+        var top = scores[0];
+        if (top.score < 2) { return null; }
+        if (scores.length > 1 && top.score - scores[1].score < 2) { return null; }
+        return top;
+    }
+    function clearSuggestionHighlight() {
+        Object.keys(tmButtons).forEach(function(id) {
+            var b = tmButtons[id];
+            b.style.outline = '';
+            b.style.boxShadow = '';
+            if (b.dataset.tmOriginalText) { b.textContent = b.dataset.tmOriginalText; delete b.dataset.tmOriginalText; }
+        });
+    }
+    let tmLastSuggestion = null;
+    function applySuggestion(container) {
+        var old = document.getElementById('tm-tech-suggestion-line');
+        if (old) { old.remove(); }
+        clearSuggestionHighlight();
+        var rawText = getCaseTextRaw();
+        var scored = getSuggestionText(rawText);
+        var text = scored.text;
+        var line = document.createElement('div');
+        line.id = 'tm-tech-suggestion-line';
+        Object.assign(line.style, { display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', fontSize: '13px', fontWeight: 'bold', backgroundColor: '#f5f3ff', border: '1px solid #a78bfa', borderRadius: '4px', marginBottom: '2px' });
+        if (rawText.replace(/\s/g, '').length < 100) {
+            line.textContent = 'Suggestion: case text not loaded yet - pick a button below.';
+            line.style.fontWeight = 'normal';
+            container.insertBefore(line, container.firstChild);
+            return false;
+        }
+        var best = scoreSuggestion(text);
+        if (!best) {
+            line.textContent = 'No clear suggestion - pick a button below.';
+            line.style.fontWeight = 'normal';
+            container.insertBefore(line, container.firstChild);
+            return false;
+        }
+        var btn = tmButtons[best.id];
+        if (!btn) {
+            line.textContent = 'No clear suggestion - pick a button below.';
+            container.insertBefore(line, container.firstChild);
+            return false;
+        }
+        best.carrierOnly = scored.carrierOnly;
+        tmLastSuggestion = best;
+        btn.dataset.tmOriginalText = btn.textContent;
+        btn.textContent = btn.textContent + ' ★ Suggested';
+        btn.style.outline = '3px solid #7c3aed';
+        btn.style.boxShadow = '0 0 8px rgba(124,58,237,0.7)';
+        var label = document.createElement('span');
+        label.textContent = 'Suggested: ' + btn.dataset.tmOriginalText + ' — matched "' + best.matched + '"';
+        line.appendChild(label);
+        var useBtn = document.createElement('button');
+        useBtn.textContent = 'Use it';
+        Object.assign(useBtn.style, { backgroundColor: '#7c3aed', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' });
+        useBtn.addEventListener('click', function() { btn.click(); });
+        line.appendChild(useBtn);
+        var dismissBtn = document.createElement('button');
+        dismissBtn.textContent = 'Dismiss';
+        Object.assign(dismissBtn.style, { backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontSize: '12px', cursor: 'pointer' });
+        dismissBtn.addEventListener('click', function() { line.remove(); clearSuggestionHighlight(); });
+        line.appendChild(dismissBtn);
+        container.insertBefore(line, container.firstChild);
+        return true;
+    }
+    // Re-score when the case text arrives late (3.25): Paragon sometimes
+    // fills .body_RioZc after the retry loop below has already given up,
+    // which is why some cases logged a 0 score even though the text was
+    // there when the logger ran later. This watcher re-runs
+    // applySuggestion when the correspondence text changes, but ONLY while
+    // no suggestion has been shown yet (tmLastSuggestion is still null) -
+    // it never replaces a shown suggestion, and never re-shows one after
+    // Dismiss (Dismiss leaves tmLastSuggestion set). It disconnects itself
+    // once a suggestion exists. v3.23 watched the .body_RioZc node itself,
+    // but Paragon replaces that node when the full thread loads, leaving
+    // the observer on a detached node that never fires again - which is
+    // why a refresh (fast, cached load) sometimes fixed a missing
+    // suggestion. 3.25 watches document.body instead, a node Paragon never
+    // swaps out, and adds a 5-second safety-net re-check so a suggestion
+    // appears within ~5s of the text arriving even if a mutation is missed
+    // entirely. Personal only - the Team script has no suggestion feature.
+    function startRescoreObserver(container) {
+        if (window.__tmTechRescoreObserver) { window.__tmTechRescoreObserver.disconnect(); }
+        if (window.__tmTechRescoreInterval) { clearInterval(window.__tmTechRescoreInterval); }
+        var lastText = '';
+        var timer = null;
+        var safetyChecks = 0;
+        var stopWatching = function() {
+            if (window.__tmTechRescoreObserver) { window.__tmTechRescoreObserver.disconnect(); }
+            if (window.__tmTechRescoreInterval) { clearInterval(window.__tmTechRescoreInterval); window.__tmTechRescoreInterval = null; }
+        };
+        var check = function() {
+            if (tmLastSuggestion) { stopWatching(); return; }
+            var corr = document.querySelector('.body_RioZc');
+            var t = corr ? (corr.innerText || '') : '';
+            if (t !== lastText) {
+                lastText = t;
+                applySuggestion(container);
+            }
+        };
+        window.__tmTechRescoreObserver = new MutationObserver(function() {
+            if (timer) { clearTimeout(timer); }
+            timer = setTimeout(check, 800);
+        });
+        window.__tmTechRescoreObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
+        // Safety net: re-check every 5s while no suggestion is shown, so
+        // a missed mutation can never leave the bar suggestion-less. Stops
+        // on its own after 10 minutes; the observer keeps watching after
+        // that. Cleared together with the observer once a suggestion shows.
+        window.__tmTechRescoreInterval = setInterval(function() {
+            safetyChecks++;
+            if (safetyChecks > 120 || tmLastSuggestion) { stopWatching(); return; }
+            check();
+        }, 5000);
+        // Tab-switch catch-up (2.30/3.33): background tabs throttle timers,
+        // so the debounced check can sit queued on a tab opened long ago.
+        // When you switch to a tab, score immediately instead of waiting
+        // for the next timer tick. Registered once per page load; the
+        // stored check always points at the current case's check, so a
+        // same-tab re-init never leaves it calling a stale container.
+        window.__tmTechCheck = check;
+        if (!window.__tmTechVisListener) {
+            window.__tmTechVisListener = true;
+            document.addEventListener('visibilitychange', function() {
+                if (!document.hidden && window.__tmTechCheck) { window.__tmTechCheck(); }
+            });
+        }
+    }
+    function runSuggestion(container) {
+        // Fresh case, fresh watcher (v3.27): tmLastSuggestion lives for the
+        // whole page load, but Paragon re-runs init() when you open
+        // another case in the same tab without reloading. Without this
+        // reset the new case inherits the previous case's 'suggestion
+        // already shown' flag and the observer + safety net shut
+        // themselves off immediately, leaving only the retry loop.
+        tmLastSuggestion = null;
+        var attempts = 0;
+        var tick = function() {
+            attempts++;
+            if (applySuggestion(container)) { return; }
+            if (attempts < 30) { setTimeout(tick, 2000); }
+        };
+        setTimeout(tick, 2500);
+        startRescoreObserver(container);
+    }
+
+    // ---- Case logger + export (v3.20) ----
+    // Everything stays in this browser's localStorage - nothing is sent
+    // anywhere. Upload the exported file to Scout yourself when you want
+    // the suggestion keywords refined.
+    const TM_LOG_KEY = 'tmTechCaseLog-v1';
+    const TM_LOG_MAX = 500;
+    function tmReadLog() {
+        try { return JSON.parse(localStorage.getItem(TM_LOG_KEY) || '[]'); } catch (e) { return []; }
+    }
+    function tmWriteLog(entries) {
+        // Keep the NEWEST 500 (entries are oldest-first): the old slice(0, 500)
+        // kept the oldest 500, so once the log filled up no new case was ever
+        // recorded. Full-text rows are bigger, so on a storage-quota failure
+        // retry with the newest 250 instead of losing the entry.
+        try { localStorage.setItem(TM_LOG_KEY, JSON.stringify(entries.slice(-TM_LOG_MAX))); } catch (e) {
+            try { localStorage.setItem(TM_LOG_KEY, JSON.stringify(entries.slice(-250))); } catch (e2) { console.warn('Case log save failed', e2); }
+        }
+    }
+    function tmCaseId() {
+        var m = location.href.match(/caseId=([^&]+)/);
+        return m ? decodeURIComponent(m[1]) : location.href;
+    }
+    const TM_REOPEN_PHRASES = ['not solved', "wasn't solved", 'still no solution', 'still waiting', "didn't work", 'did not work', 'not resolved', 'issue persists', 'still not', 'no solution', 'problem not solved', 'still unresolved', 'still facing'];
+    function tmIsReopen(text) {
+        var t = (text || '').toLowerCase();
+        return TM_REOPEN_PHRASES.some(function(p) { return t.indexOf(p) !== -1; });
+    }
+    function tmRecentlyLogged(caseId, buttonId, minutes) {
+        var cutoff = Date.now() - (minutes || 10) * 60000;
+        return tmReadLog().some(function(e) {
+            return e.caseId === caseId && e.actualButtonId === buttonId && Date.parse(e.timestamp || 0) >= cutoff;
+        });
+    }
+    // Non-canned auto-log (v3.21): watch Review clicks. A reply that does
+    // not match any canned template is logged as a "Custom reply" row with
+    // the first 500 chars of what you wrote, so Scout can see it. A canned
+    // reply already logged by its button click is skipped. Queue-guarded:
+    // this watcher only logs when the case is in this script's queue, so
+    // it cannot write into another queue's log when you switch cases.
+    function tmLogReviewClick() {
+        var q = readQueueValue();
+        if (['relay-feedback@amazon.com'].indexOf(q) === -1) { return; }
+        var ta = document.querySelector('textarea');
+        var reply = ta ? ta.value || '' : '';
+        if (reply.replace(/\s/g, '').length < 20) { return; }
+        var match = tmMatchCannedReply(reply);
+        if (match) {
+            if (tmRecentlyLogged(tmCaseId(), match.id, 10)) { return; }
+            var label = '';
+            config.buttonGroups.forEach(function(g) {
+                g.buttons.forEach(function(b) { if (b.id === match.id) { label = b.text; } });
+            });
+            tmLogCase(match.id, label || match.id);
+            return;
+        }
+        tmLogCase('custom', 'Custom reply', { replyExcerpt: reply.replace(/\s+/g, ' ').trim().slice(0, 500), outcomeOverride: 'custom' });
+    }
+    function tmWatchReviewButton() {
+        if (window.__tmTechReviewWatch) { return; }
+        window.__tmTechReviewWatch = true;
+        document.addEventListener('click', function(e) {
+            var t = e.target;
+            if (!t || !t.closest) { return; }
+            var reviewBtn = t.closest('kat-button[label="Review"]') || t.closest('kat-button[data-csm-name="reply-composer-review"]');
+            if (!reviewBtn) {
+                var b = t.closest('button');
+                if (!b || b.textContent.trim() !== 'Review') { return; }
+            }
+            try { tmLogReviewClick(); } catch (err) { console.warn('Review log failed', err); }
+        }, true);
+    }
+    function tmOutcome(actualId, suggested) {
+        if (!suggested) { return 'missed'; }
+        return suggested.id === actualId ? 'correct' : 'wrong';
+    }
+    function tmLogCase(actualId, actualText, opts) {
+        opts = opts || {};
+        var carrier = getCaseTextRaw().replace(/\s+/g, ' ').trim();
+        var suggested = tmLastSuggestion || null;
+        var entry = {
+            timestamp: new Date().toISOString(),
+            caseId: tmCaseId(),
+            queue: readQueueValue() || '',
+            carrierExcerpt: carrier.slice(0, 1000),
+            threadTail: carrier.slice(-1000),
+            fullText: carrier.slice(0, 12000),
+            carrierMessage: extractCarrierMessage(carrier).slice(0, 3000),
+            scoredCarrierOnly: suggested ? !!suggested.carrierOnly : false,
+            isReopen: tmIsReopen(carrier),
+            replyExcerpt: opts.replyExcerpt || '',
+            actualButtonId: actualId,
+            actualButton: actualText,
+            actualCategory: (dropdownMappings[actualText] || {}).category || '',
+            actualCode: (dropdownMappings[actualText] || {}).code || '',
+            suggestedButtonId: suggested ? suggested.id : '',
+            suggestedMatched: suggested ? suggested.matched : '',
+            suggestedScore: suggested ? suggested.score : 0,
+            outcome: opts.outcomeOverride || tmOutcome(actualId, suggested)
+        };
+        // Reopen rows (v3.21): keep every click as its own row instead of
+        // overwriting by case ID, so a reopen keeps its history. Only skip
+        // an exact duplicate (same case + same button within 60 seconds).
+        var log = tmReadLog().filter(function(e) {
+            if (e.caseId !== entry.caseId || e.actualButtonId !== entry.actualButtonId) { return true; }
+            var age = Date.now() - Date.parse(e.timestamp || 0);
+            return age > 60000;
+        });
+        log.push(entry);
+        tmWriteLog(log);
+        tmUpdateReportCount();
+        console.log('[Tech Script] Case logged: ' + entry.caseId + ' -> ' + actualText + ' (' + entry.outcome + ')');
+        return entry;
+    }
+    function tmMatchCannedReply(replyText) {
+        if (!replyText || replyText.length < 50) { return null; }
+        var words = function(s) {
+            var set = {};
+            (s.toLowerCase().match(/[a-z]{4,}/g) || []).forEach(function(w) { set[w] = 1; });
+            return set;
+        };
+        var replyWords = words(replyText);
+        var replyCount = Object.keys(replyWords).length;
+        var best = null;
+        Object.keys(responses).forEach(function(id) {
+            var tWords = words(responses[id]);
+            var shared = 0;
+            Object.keys(tWords).forEach(function(w) { if (replyWords[w]) { shared++; } });
+            var union = replyCount + Object.keys(tWords).length - shared;
+            var score = union ? shared / union : 0;
+            if (!best || score > best.score) { best = { id: id, score: score }; }
+        });
+        return best && best.score >= 0.25 ? best : null;
+    }
+    function tmLogThisCase() {
+        var corr = document.querySelector('.body_RioZc');
+        var text = corr ? corr.innerText : '';
+        var match = tmMatchCannedReply(text);
+        if (!match) {
+            alert('Could not match this case to a canned response. Open the case, make sure your reply is visible, and try again.');
+            return;
+        }
+        var label = '';
+        config.buttonGroups.forEach(function(g) {
+            g.buttons.forEach(function(b) { if (b.id === match.id) { label = b.text; } });
+        });
+        tmLogCase(match.id, label || match.id);
+        alert('Logged this case as: ' + (label || match.id) + ' (match ' + Math.round(match.score * 100) + '%). Total logged: ' + tmReadLog().length);
+    }
+    function tmDownload(filename, text, type) {
+        var blob = new Blob([text], { type: type || 'text/plain' });
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(function() { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    }
+    function tmExportJSON() {
+        var log = tmReadLog();
+        var date = new Date().toISOString().slice(0, 10);
+        tmDownload('relay-tech-case-log-' + date + '.json', JSON.stringify(log, null, 2), 'application/json');
+    }
+    function tmExportCSV() {
+        var log = tmReadLog();
+        var esc = function(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
+        var rows = [['timestamp', 'caseId', 'queue', 'actualButton', 'suggestedButtonId', 'suggestedMatched', 'suggestedScore', 'outcome', 'actualCategory', 'actualCode', 'carrierExcerpt', 'isReopen', 'threadTail', 'replyExcerpt'].map(esc).join(',')];
+        log.forEach(function(e) {
+            rows.push([e.timestamp, e.caseId, e.queue, e.actualButton, e.suggestedButtonId, e.suggestedMatched, e.suggestedScore, e.outcome, e.actualCategory, e.actualCode, e.carrierExcerpt.replace(/\n/g, ' '), e.isReopen, (e.threadTail || '').replace(/\n/g, ' '), (e.replyExcerpt || '').replace(/\n/g, ' ')].map(esc).join(','));
+        });
+        var date = new Date().toISOString().slice(0, 10);
+        tmDownload('relay-tech-case-log-' + date + '.csv', rows.join('\n'), 'text/csv');
+    }
+    function tmUpdateReportCount() {
+        var el = document.getElementById('tm-tech-report-count');
+        if (el) { el.textContent = 'Logged cases: ' + tmReadLog().length; }
+    }
+    function buildReportFooter(container) {
+        var footer = document.createElement('div');
+        footer.id = 'tm-tech-report-footer';
+        Object.assign(footer.style, { display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', fontSize: '12px', backgroundColor: '#f3f4f6', borderTop: '1px solid #d1d5db', borderRadius: '4px', marginTop: '2px' });
+        var count = document.createElement('span');
+        count.id = 'tm-tech-report-count';
+        count.textContent = 'Logged cases: ' + tmReadLog().length;
+        count.style.fontWeight = 'bold';
+        footer.appendChild(count);
+        var badge = document.createElement('span');
+        badge.textContent = 'J.T. Personal';
+        Object.assign(badge.style, { backgroundColor: '#7c3aed', color: 'white', borderRadius: '4px', padding: '2px 8px', fontSize: '11px', fontWeight: 'bold' });
+        footer.appendChild(badge);
+        var mkBtn = function(label, fn, bg) {
+            var b = document.createElement('button');
+            b.textContent = label;
+            Object.assign(b.style, { backgroundColor: bg || '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontSize: '12px', cursor: 'pointer' });
+            b.addEventListener('click', fn);
+            footer.appendChild(b);
+            return b;
+        };
+        mkBtn('Export JSON', tmExportJSON, '#0b66c3');
+        mkBtn('Export CSV', tmExportCSV, '#0b66c3');
+        mkBtn('Log this case', tmLogThisCase, '#2e8b57');
+        mkBtn('Clear log', function() {
+            if (confirm('Clear all ' + tmReadLog().length + ' logged cases? This cannot be undone. Export first if you want to keep them.')) {
+                tmWriteLog([]);
+                tmUpdateReportCount();
+            }
+        }, '#b91c1c');
+        var note = document.createElement('span');
+        note.textContent = 'Log stays in this browser only — upload the export to Scout to refine suggestions.';
+        note.style.color = '#4b5563';
+        footer.appendChild(note);
+        container.appendChild(footer);
+    }
+
     // Initialize - grouped button rows with a color-coded label per group
     const init = (isOverride) => {
         console.log('Script initialized');
@@ -1144,6 +1552,16 @@ Thanks for continuing to haul with Relay!`,
         // Insert at the top of the page so the sticky bar sits in the flow
         // and pushes Paragon's content down, instead of floating over it.
         document.body.insertBefore(container, document.body.firstChild);
+
+        // Case suggestion (v3.20): read the case, highlight one button if
+        // there is a clear winner. Suggest-only - it never clicks anything.
+        runSuggestion(container);
+
+        // Case logger (v3.20): report footer with export buttons.
+        buildReportFooter(container);
+
+        // Non-canned auto-log (v3.21): watch Review clicks for custom replies.
+        tmWatchReviewButton();
 
         // The sidebar is pinned by Paragon at top: 71px, so even a shifted
         // top leaves it staying still while the rest of the page moves.
