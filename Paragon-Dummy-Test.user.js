@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Paragon Dummy — GitHub Update Test
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Dummy script to test GitHub auto-updates on Paragon. Adds a small badge showing the script version and a button for a random fun message. It does not read, change, or click anything on the case.
 // @author       J.T.
 // @match        https://paragon-na.amazon.com/hz/view-case?caseId=*
