@@ -1,9 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.19
-// @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
-// @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
+// @version      2.20
 // @description  Automatically inserts responses for Relay issues
 // @author       Julian Woolcott & Hayden Lindsey & Sheshu Venugopal
 // @match        https://paragon-na.amazon.com/hz/view-case?caseId=*
@@ -68,14 +66,8 @@ const dropdownMappings = {
     "Portal Login Trouble":   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Transfer Role":          { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Super Admin Left Company":{ category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "More Info Needed":       { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Driver Can't Log In":    { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
     "Driver Not Seeing Load": { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
-    "App Crashing/Freezing":  { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
-    "GPS/Location Not Tracking":{ category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
-    "Check-In Not Working":   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
-    "App Status Not Updating":{ category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
-    "Driver Using Multiple Devices":{ category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
 
 };
 function setDropdownValue(dropdownId, value, displayName) {
@@ -166,9 +158,9 @@ buttonGroups: [
 
     {
         name: 'SUPER ADMIN ISSUES',
-        backgroundColor: '#0f766e',
-        hoverColor: '#115e59',
-        labelColor: '#0f766e',
+        backgroundColor: '#ea580c',
+        hoverColor: '#c2410c',
+        labelColor: '#ea580c',
         buttons: [
             { id: 'addAdminDispatcher', text: 'Add Admin/Dispatcher' },
             { id: 'addDriver', text: 'Add Driver' },
@@ -181,14 +173,8 @@ buttonGroups: [
             { id: 'portalLoginTrouble', text: 'Portal Login Trouble' },
             { id: 'transferRole', text: 'Transfer Role' },
             { id: 'superAdminLeftCompany', text: 'Super Admin Left Company' },
-            { id: 'moreInfoNeeded', text: 'More Info Needed' },
             { id: 'driverCantLogIn', text: "Driver Can't Log In" },
             { id: 'driverNotSeeingLoad', text: 'Driver Not Seeing Load' },
-            { id: 'appCrashingFreezing', text: 'App Crashing/Freezing' },
-            { id: 'gpsLocationTracking', text: 'GPS/Location Not Tracking' },
-            { id: 'checkInNotWorking', text: 'Check-In Not Working' },
-            { id: 'appStatusNotUpdating', text: 'App Status Not Updating' },
-            { id: 'driverMultipleDevices', text: 'Driver Using Multiple Devices' },
         ]
     },
 
@@ -1463,21 +1449,6 @@ If your Super Admin is no longer with your company, the role will need to be mov
 If you already have an open case about this, please reply on that case with these details instead of opening a new one.
 
 Thanks for continuing to haul with Relay!`,
-        moreInfoNeeded: `Dear Valued Carrier,
-
-Thank you for reaching out. To look into this further, please reply to this case with the following:
-
-- Your SCAC
-- The email address and role of the affected user
-- The Load ID or VRID, if a load is involved
-- A screenshot of the issue or error message
-- The date and time the issue happened
-- A short description of what you tried
-
-You may find this optional Relay Learning Center course helpful:
-- Guide to Relay Feedback: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=6efee27c-1057-4be5-b049-c7c3421d01c8
-
-Thanks for continuing to haul with Relay!`,
         driverCantLogIn: `Dear Valued Carrier,
 
 If your company's driver is unable to log in to the Relay mobile app, we recommend the following:
@@ -1506,77 +1477,6 @@ You may find these optional Relay Learning Center courses helpful:
 - Confirming Load Specifics: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=ab2993e7-0b0a-4baa-92a0-01d3fa58461d
 
 If the load still does not appear, please reply to this case with the Load ID or VRID, the driver's email address, and a screenshot of the driver's app.
-
-Thanks for continuing to haul with Relay!`,
-        appCrashingFreezing: `Dear Valued Carrier,
-
-If the Relay mobile app is crashing or freezing for your company's driver, we recommend the following:
-
-1. Update to the latest Relay app version (Android 7 or later, or iOS 13.1 or later).
-2. Close the app fully and restart it.
-3. Restart the phone.
-4. Check that the phone has enough storage space and a stable internet connection.
-
-You may find this optional Relay Learning Center course helpful:
-- Introduction to Primary and Secondary Devices: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=1b83c2f9-1e32-4d56-9f3c-1c8e8e988998
-
-If the issue continues, please reply to this case with the phone type, OS version, app version, a screenshot or screen recording, and the date and time it happened.
-
-Thanks for continuing to haul with Relay!`,
-        gpsLocationTracking: `Dear Valued Carrier,
-
-For the Relay mobile app to track a trip, location services need to be turned on. We recommend the following:
-
-1. In the phone settings, set location access for the Relay app to "Always" (or "Allow all the time" on Android).
-2. Keep the app running during the trip with mobile data turned on.
-3. Turn off battery saver or low power mode for the Relay app.
-4. Update to the latest Relay app version.
-
-You may find these optional Relay Learning Center courses helpful:
-- Location Availability for Relay Mobile App: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=e4b3586d-ec7d-4791-9237-74ee9985f76b
-- Relay Navigation Features: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=7beee13c-4a63-4a05-b212-0fd479c2ba82
-
-If tracking still does not work, please reply to this case with the Load ID or VRID, the phone type and OS version, and the date and time of the issue.
-
-Thanks for continuing to haul with Relay!`,
-        checkInNotWorking: `Dear Valued Carrier,
-
-If your company's driver is unable to check in through the Relay mobile app, we recommend the following:
-
-1. Confirm location access for the Relay app is set to "Always."
-2. Check for a stable internet connection with mobile data turned on.
-3. Close and restart the app, and update to the latest version.
-
-You may find these optional Relay Learning Center courses helpful:
-- Best Practices for Yard Check-in and Check-out: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=80591ae8-0763-4915-a68f-adedfbd33589
-- Location Availability for Relay Mobile App: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=e4b3586d-ec7d-4791-9237-74ee9985f76b
-
-If the driver still cannot check in, please reply to this case with the Load ID or VRID, the facility, a screenshot of any error message, and the date and time of the attempt.
-
-Thanks for continuing to haul with Relay!`,
-        appStatusNotUpdating: `Dear Valued Carrier,
-
-If trip status updates are not going through in the Relay mobile app, we recommend the following:
-
-1. Check for a stable internet connection with mobile data turned on.
-2. Keep the app open and running during the trip.
-3. Close and restart the app, and update to the latest version.
-
-You may find these optional Relay Learning Center courses helpful:
-- Location Availability for Relay Mobile App: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=e4b3586d-ec7d-4791-9237-74ee9985f76b
-- Reporting Delays (LTR) for On Time Performance: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=ce2888d8-b28f-4fc2-b6be-904fdad9ff19
-
-If the status still does not update, please reply to this case with the Load ID or VRID, the stop where the issue happened, a screenshot, and the date and time.
-
-Thanks for continuing to haul with Relay!`,
-        driverMultipleDevices: `Dear Valued Carrier,
-
-If your company's driver is logged in to the Relay mobile app on more than one phone, updates may not go through as expected. We recommend that the driver uses one primary device for the trip and logs out of any other devices.
-
-You may find this optional Relay Learning Center course helpful:
-- Introduction to Primary and Secondary Devices: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=1b83c2f9-1e32-4d56-9f3c-1c8e8e988998
-
-If the issue continues, please reply to this case with the Load ID or VRID, the phone types, and a screenshot.
 
 Thanks for continuing to haul with Relay!`,
     };
