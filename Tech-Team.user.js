@@ -1,7 +1,9 @@
 // ==UserScript==
 // @name         Amazon Relay Responses MMPM Version 2 - Grouped — Team
 // @namespace    http://tampermonkey.net/
-// @version      3.30
+// @version      3.31
+// @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
+// @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
 // @description  Automatically inserts responses for Relay issues - grouped and color-coded tech queue buttons
 // @author       Julian Woolcott & Hayden Lindsey & Sheshu Venugopal
 // @match        https://paragon-na.amazon.com/hz/view-case?caseId=*
