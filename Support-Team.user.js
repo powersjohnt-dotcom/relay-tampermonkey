@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.21
+// @version      2.22
+// @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
+// @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @description  Automatically inserts responses for Relay issues
 // @author       Julian Woolcott & Hayden Lindsey & Sheshu Venugopal
 // @match        https://paragon-na.amazon.com/hz/view-case?caseId=*
 // @grant        none
 // ==/UserScript==
-
     // Configuration object
 const dropdownMappings = {
     "Safety Score Not Compliant": { category: "Performance", categoryValue: "37058498011", code: "Dispute", codeValue: "39474112881" },
