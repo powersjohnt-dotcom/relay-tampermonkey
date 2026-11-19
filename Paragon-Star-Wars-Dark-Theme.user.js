@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Paragon — Star Wars Dark Theme
 // @namespace    http://tampermonkey.net/
-// @version      3.4
-// @description  Star Wars tactical-display theme for all of Paragon, inspired by the cockpit targeting screen J.T. sent: deep navy, bright cyan frames and data, red accents, dotted data lines, monospace text and uppercase headers - restrained, no characters or quotes, nothing cartoonish. A fixer darkens every light surface (keeping its hue, tinted navy) and flips dark text to light - including collapsed content before it ever expands, so expanded follow-up replies stay readable. The reply composer and the review screen are inverted as one piece each instead (Kat's card/input/label backgrounds live in shadow DOM and are unreachable any other way), and nothing inside them is themed element by element - mixing the two undoes both. Also runs inside the CloudFront widget iframes (follow-ups, bookmarks, contact reason) and themes them from within, with an invert fallback if injection fails. Changes the look only - no buttons, text, or functions are touched. Toggle it on/off in Tampermonkey without affecting the response scripts. Reopen/due rows get an ignited-red lightsaber wash that fades across the row, and their SLA-overdue times stay a flat bold red. The composer and review screens now render in the theme navy with readable text. The Reason Category and Reason Code dropdowns now match the theme instead of staying white. v2.5: the composer textbox and buttons render navy, not black, Review is the primary button and errors render red, and the Contact Reason panel no longer inverts into black with white dropdowns. v2.6: due/reopen rows are readable on the Lobby (inline wash + SLA red, stylesheet injected into shadow roots), and the Lobby header, table head and nav drawer are navy. v2.7: the v2.6 due-row fix never reached the Lobby rows - they are checked once, then Paragon adds the due class / peach background afterwards and the fixer never re-ran them. v2.7 re-checks due/peach rows on every pass, paints each due cell dark red itself (not just the row), reads the SLA date straight from the cell text, and themes the Lobby header/title by their text. v2.8: J.T. pasted the real row HTML - Lobby due rows are class "lobby-case-followup-overdue", NOT tr.caseDue, so no caseDue selector ever matched them; the row WAS darkened by the peach safety net but its TDs were untouched. v2.8 targets the overdue class itself, so every cell gets the dark-red wash and the SLA cell goes red. v2.9: J.T. said the red no longer looks nice - the v2.7/v2.8 per-cell gradient restarts at every cell, a repeating sawtooth fade. v2.9 puts the wash back on the row only, fading once across the whole row, with cells transparent (the v2.1/v2.2 design); the stylesheet now forces those cells transparent so the site peach cannot paint over the row. v3.0: the white buttons/panels (Transfer, Reply, Annotate, Transfer box, Contact Reason, notification) get CSS backstops and a re-check for late painting; the nav user line, Lobby icons, pagination and the active list item are themed; the "Viewing in original language." line is themed by its text; the "N Open Cases" bar is found by contains-match; the composer kat-card shadow roots get a pre-inversion stylesheet; a negative SLA-remaining duration goes red. v3.1: the Transfer panel labels, notification text and button label spans keep their dark site colour on the now-dark panels - they get light text directly; h5 joins the heading rules; the info-table toggle goes cyan; the text-based passes (composer extras, Lobby chrome, dim text) now also run on mutations, throttled, so late-appearing text is themed; the "N Open Cases" bar matches "Open Cases" with no digit requirement. v3.2: the lobby due-cell text colour is set inline by the fixer, not the stylesheet (the stylesheet's !important colour was overriding the SLA red); a due cell whose text becomes an SLA indicator later (a ticking duration, a late-filling cell) is re-checked and goes red, and the fixer now watches text changes so ticking durations are caught live; the "N Open Cases" bar matches case-insensitively. v3.3: the SLA re-check is self-healing (a cell with the SLA flag but no inline colour is re-run), text changes are traced up to the nearest TD/TH instead of only the parent, and a 30-second heartbeat keeps late content themed after the 2-minute fast net stops. v3.4: the Transfer panel labels are themed whether they are spans or labels (and inside shadow trees), the 'View translation' chips in the correspondence area get light text, and the translation info-alerts get light text.
+// @version      3.5
+// @description  Star Wars tactical-display theme for all of Paragon, inspired by the cockpit targeting screen J.T. sent: deep navy, bright cyan frames and data, red accents, dotted data lines, monospace text and uppercase headers - restrained, no characters or quotes, nothing cartoonish. A fixer darkens every light surface (keeping its hue, tinted navy) and flips dark text to light - including collapsed content before it ever expands, so expanded follow-up replies stay readable. The reply composer and the review screen are inverted as one piece each instead (Kat's card/input/label backgrounds live in shadow DOM and are unreachable any other way), and nothing inside them is themed element by element - mixing the two undoes both. Also runs inside the CloudFront widget iframes (follow-ups, bookmarks, contact reason) and themes them from within, with an invert fallback if injection fails. Changes the look only - no buttons, text, or functions are touched. Toggle it on/off in Tampermonkey without affecting the response scripts. Reopen/due rows get an ignited-red lightsaber wash that fades across the row, and their SLA-overdue times stay a flat bold red. The composer and review screens now render in the theme navy with readable text. The Reason Category and Reason Code dropdowns now match the theme instead of staying white. v2.5: the composer textbox and buttons render navy, not black, Review is the primary button and errors render red, and the Contact Reason panel no longer inverts into black with white dropdowns. v2.6: due/reopen rows are readable on the Lobby (inline wash + SLA red, stylesheet injected into shadow roots), and the Lobby header, table head and nav drawer are navy. v2.7: the v2.6 due-row fix never reached the Lobby rows - they are checked once, then Paragon adds the due class / peach background afterwards and the fixer never re-ran them. v2.7 re-checks due/peach rows on every pass, paints each due cell dark red itself (not just the row), reads the SLA date straight from the cell text, and themes the Lobby header/title by their text. v2.8: J.T. pasted the real row HTML - Lobby due rows are class "lobby-case-followup-overdue", NOT tr.caseDue, so no caseDue selector ever matched them; the row WAS darkened by the peach safety net but its TDs were untouched. v2.8 targets the overdue class itself, so every cell gets the dark-red wash and the SLA cell goes red. v2.9: J.T. said the red no longer looks nice - the v2.7/v2.8 per-cell gradient restarts at every cell, a repeating sawtooth fade. v2.9 puts the wash back on the row only, fading once across the whole row, with cells transparent (the v2.1/v2.2 design); the stylesheet now forces those cells transparent so the site peach cannot paint over the row. v3.0: the white buttons/panels (Transfer, Reply, Annotate, Transfer box, Contact Reason, notification) get CSS backstops and a re-check for late painting; the nav user line, Lobby icons, pagination and the active list item are themed; the "Viewing in original language." line is themed by its text; the "N Open Cases" bar is found by contains-match; the composer kat-card shadow roots get a pre-inversion stylesheet; a negative SLA-remaining duration goes red. v3.1: the Transfer panel labels, notification text and button label spans keep their dark site colour on the now-dark panels - they get light text directly; h5 joins the heading rules; the info-table toggle goes cyan; the text-based passes (composer extras, Lobby chrome, dim text) now also run on mutations, throttled, so late-appearing text is themed; the "N Open Cases" bar matches "Open Cases" with no digit requirement. v3.2: the lobby due-cell text colour is set inline by the fixer, not the stylesheet (the stylesheet's !important colour was overriding the SLA red); a due cell whose text becomes an SLA indicator later (a ticking duration, a late-filling cell) is re-checked and goes red, and the fixer now watches text changes so ticking durations are caught live; the "N Open Cases" bar matches case-insensitively. v3.3: the SLA re-check is self-healing (a cell with the SLA flag but no inline colour is re-run), text changes are traced up to the nearest TD/TH instead of only the parent, and a 30-second heartbeat keeps late content themed after the 2-minute fast net stops. v3.4: the Transfer panel labels are themed whether they are spans or labels (and inside shadow trees), the 'View translation' chips in the correspondence area get light text, and the translation info-alerts get light text. v3.5: kat-label elements are no longer inverted when their text is already light - the invert filter was flipping the Transfer panel's light labels dark again.
 // @author       Scout (for J.T.)
 // @match        https://paragon-na.amazon.com/*
 // @match        https://d1u16vxl4h9h9c.cloudfront.net/widget.html*
@@ -10,6 +10,137 @@
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
+
+/* UPDATES:
+   11/19/2026: v3.5 (per J.T., transfer labels STILL invisible after
+   v3.4 - he pasted the panel's DevTools HTML): ROOT CAUSE FOUND. The
+   fixer inverts every kat-label (the v1.7 rule assumed its text lives
+   in shadow DOM), but the labels' text lives in LIGHT DOM - "Another
+   queue" is a <label><span class="text"> child - and the theme CSS
+   already made it light, so the invert filter renders it dark on the
+   dark panel. A kat-label is now inverted only when its text is still
+   dark, and an inverted kat-label whose text has since gone light is
+   un-inverted (fixOne and the fixSubtree re-check). The v3.4
+   span/label broadening could not work while the inversion stood.
+/* UPDATES:
+   11/19/2026: v3.4 (per J.T., "unable to see the transfer case labels",
+   case 23245392871): the Transfer panel labels were themed only when
+   they are spans - the rule now covers label elements too, and labels
+   in shadow trees inherit (:host label). The same report showed the
+   "View translation" chips in the correspondence area are dark teal
+   text on the dark teal chip (1.00:1) and the translation info-alerts
+   are black text (1.16:1) - both get light text now; the composer
+   rule still wins inside #composer/#review by specificity. Note: the
+   Transfer panel was not open in that report, so the labels' real DOM
+   is still unconfirmed - open Transfer and re-run Diag to verify.
+   11/19/2026: v3.3 (per J.T., from the v3.3 Lobby + search reports): the Lobby SLA fix is CONFIRMED (2/2 red) but the search negative durations STILL stayed light under v3.2, and the v3.2 re-check should have caught them - the mechanism is still unproven, so v3.3 closes every hole it could be hiding in. (1) The re-check is self-healing: a due cell whose text matches an SLA indicator is re-run when it has no SLA flag OR no inline colour (a flag can survive a style reset while the colour is lost). (2) Text changes are traced up to the nearest TD/TH: the duration text may tick inside a nested span, and v3.2 only re-checked the span, never the cell. (3) A 30-second heartbeat runs fixAll forever after the 2-minute fast net stops, so a page kept open all day keeps getting checked. The Open Cases bar is dropped as a chase: the Lobby near-misses prove no "Open Cases" text exists on the Lobby at all, only "Search All Your Cases" - the bar does not exist under that wording.
+   11/19/2026: v3.2 (per J.T., from the v3.2 Lobby + v3.1 search reports): two SLA-colour bugs. (1) Lobby: the fixer HAD set the SLA cell red inline, but the stylesheet's tr.lobby-case-followup-overdue td colour #dfe9ec !important overrode it, so it computed light - the colour now lives only in the fixer's inline style, which sets every due cell's colour itself. (2) Search: the negative durations "(-03:16:34)" stayed light even though the v3.0 regex was right - the first pass ran before the text arrived (or on a positive value) and nothing ever re-ran the cells, so a due cell whose text now matches an SLA indicator but has no SLA flag is re-checked (fixOne sets data-sw-sla when it colours a cell), and the observer now watches characterData plus text-node additions inside TD/TH, so the durations ticking every second are caught live. The Open Cases match is now case-insensitive ("Open cases" would not match "Open Cases") with a longer container allowed.
+   11/19/2026: v3.1 (per J.T., from the v3.0 case + Lobby reports): v3.0 darkened the Transfer box and notification panel but their labels kept the dark site colour (#002f36 on navy) - the fixer skips text inside custom elements, so those labels get light text in CSS now; same for label spans inside buttons (inherit the button colour). h5 joins the pale-cyan heading rules (the notification heading was an unstyled h5). The info-table toggle "Show all case and seller info" was dark teal on navy - it goes cyan by its text (the table is collapsed until it is clicked, which is why the diagnostic never found its heading). The "Viewing in original language." line was still grey on the Lobby - the text-based passes only ran from fixAll, so they now also run on mutations, throttled to once a second. The "N Open Cases" bar still was not found - its count may sit in a separate element with no whitespace, so the match is now "Open Cases" with no digit requirement.
+   11/19/2026: v3.0 (per J.T., from the five Diagnostics v3.0 reports): the Transfer / Reply / Annotate buttons, Transfer box, Contact Reason panel, notification empty-state and uc-kat-button stayed white with light text - the site's class rules beat the plain button rule and the fixer had marked them checked while still transparent; CSS backstops + a re-check for late-painted buttons/panels. The nav user line, Lobby icons and pagination were dark teal on navy; the active list item / page link was cyan on bright blue; the "Viewing in original language." line was mid-grey - all now themed. The "N Open Cases" bar is found by contains-match (it carries an icon). The two kat-card shadow roots inside the composer now get a pre-inversion stylesheet. A negative SLA-remaining duration "(-HH:MM:SS)" in a due row goes red.
+   11/19/2026: v2.9 (per J.T., the red no longer looks nice): the v2.7/v2.8 per-cell gradient restarts at every cell, a repeating sawtooth fade. v2.9 puts the wash back on the row only, fading once across the whole row, with cells transparent (the v2.1/v2.2 design); the stylesheet now forces those cells transparent so the site peach cannot paint over the row, and cells already painted by v2.7/v2.8 are cleared back to transparent.
+   11/19/2026: v2.8 (per J.T.'s pasted row HTML): Lobby due rows are <tr class="lobby-case-followup-overdue">, NOT tr.caseDue - no caseDue selector ever matched them, and the SLA is a plain <td> with no class. The row itself WAS darkened by the v2.7 peach safety net (data-sw-peach, #2a0e14) but its TDs were untouched. v2.8 targets the overdue class, so every cell gets the dark-red wash and the SLA cell goes red.
+   11/19/2026: v2.7 (per J.T., Lobby still unchanged on v2.6, TM confirmed 2.6): the v2.6 due-row fix never touched the Lobby rows - they are checked once, then Paragon adds the due class/peach afterwards and the fixer never re-ran them, and the SLA on the Lobby is a plain cell, not a span. v2.7 re-checks due/peach rows on every pass, paints each due cell dark red itself, reads the SLA date from the cell text, and themes the header/title by text.
+   11/19/2026: v2.6 (per J.T., live Lobby check): due/reopen rows were unreadable - pale peach wash with white text - because the stylesheet never reached shadow-DOM tables and the fixer missed peach (green < 200). The fixer now applies the wash + SLA red inline, and the stylesheet is injected into shadow roots too. Lobby header/table/nav are navy.
+   11/19/2026: v2.5 (per J.T., from the live page check of case 23480368871): composer textbox/buttons now render navy not black, Review is the primary button and errors render red, Contact Reason no longer inverts, Case actions menu and header controls themed.
+   11/19/2026: v2.4 (per J.T.): the Reason Category / Reason Code dropdown
+   boxes stayed white. Their light-DOM parts now get the theme surface -
+   as the pre-inversion colour inside the inverted composer/review
+   (renders navy), and as the surface directly everywhere else in Paragon.
+   11/19/2026: v2.3 (per J.T.): the reply composer came out black with
+   unreadable words - the box and card inverted to black instead of the
+   theme navy, and text that inherited the theme's light body colour
+   inverted to dark-on-dark. Now the composer and review screens get their
+   background from the exact pre-inversion colour of the theme surface
+   (#e0e9ff renders as #0d142e), all text inside is forced dark
+   pre-inversion so it renders light, and placeholders get a readable
+   mid-grey at full opacity.
+   11/19/2026: v2.2 (per J.T.): the glow on the SLA-overdue times made them
+   look blurry and hurt the eyes - the glow is gone, the times stay a flat
+   bold red on the lightsaber wash.
+   11/19/2026: v2.1 (per J.T.): the lightsaber edge only ran down the first
+   cell - now the red runs the whole row, strong at the left edge and fading
+   to the faint red tint at the right end. The gradient lives on the row
+   itself (a per-cell gradient would restart at every cell), so the cells
+   are transparent and the fixer stays off the row's background.
+   11/19/2026: v2.0 (per J.T.): the reopen/due rows did not fit the theme -
+   Paragon's flat red SLA times were flipped pale by the fixer and the pink
+   row darkened into mud. Now a due row (tr.caseDue) keeps a faint red tint
+   with a red lightsaber blade edge on its first cell, and the SLA-overdue
+   times glow ignited red (white-hot core, red aura) instead of going pale.
+   The fixer leaves those spans alone; the CSS owns them.
+   11/17/2026: v1.9 (per J.T.): the Review Your Reply screen did not blend
+   in - the email card was darkened but its text was never flipped (it sits
+   inside the kat-box, so the fixer would not touch it) and the To/From/
+   Subject rows were dark on dark. Same fix as the composer in v1.8: the
+   review screen (#review) is inverted as one piece, nothing inside it is
+   themed element by element, and the CSS restores the original light
+   colours inside it so the single inversion turns them dark.
+   11/17/2026: v1.8 (per J.T.): the reply composer did not blend in - it was
+   a light island. Cause: v1.7 inverted BOTH the composer box and everything
+   inside it (the card, the radio group, the labels, the inputs), so the
+   inversions stacked and cancelled each other - dark backgrounds flipped
+   back to light, light text back to dark. Rule from now on: an inverted
+   element's whole subtree is left alone, and only LEAF Kat components
+   (buttons, checkboxes, labels, icons, spinners, dividers, status
+   indicators) are ever inverted - never a container (kat-box, kat-card,
+   kat-radiobutton, kat-input, ...). The reply composer (#composer) is the
+   one container inverted as a whole, because Kat's card/input backgrounds
+   are unreachable any other way, and the CSS below restores the original
+   light colours inside it so the single inversion turns them dark.
+   11/17/2026: v1.7 (per J.T.): expanded follow-up replies were unreadable.
+   Cause: the expanded detail only exists while collapsed (hidden, no boxes),
+   so the fixer skipped it and marked it done - then it opened with dark text
+   on the darkened row. The fixer now themes hidden content too, re-checks a
+   subtree whenever it expands, and inverts the Kat Edit/Resolve buttons and
+   the Hide-resolved checkbox (their labels live in shadow DOM). Expanded
+   regions also get a cyan edge like a console readout. Same tactical look.
+   11/17/2026: v1.6 (per J.T., from the DOM he pasted): the white Follow ups /
+   Bookmarks / Contact Reason panels are cross-origin CloudFront widget
+   iframes (d1u16vxl4h9h9c.cloudfront.net/widget.html) - the top page cannot
+   reach inside them, which is why every version missed them. The script now
+   also runs inside those frames (new @match) and themes them from within;
+   if Tampermonkey cannot inject into the sandboxed frames, the top page
+   inverts the frame instead after 3s - the frame signals it is themed via
+   postMessage so it never double-inverts. Same tactical-display look.
+   11/17/2026: v1.5 (per J.T.): restyled after the tactical-display photo he
+   sent - deep navy instead of near-black, cyan as the main accent (frames,
+   headings, links), red kept as a small accent (top line, a few starfield
+   dots), dotted cyan data lines, and big darkened surfaces get a thin cyan
+   frame like the display in the photo. Also polishes the other Paragon
+   pages (queue lists, etc.): row hover highlight, same darkening everywhere.
+   Still nothing cartoonish - no characters, no quotes, no Aurebesh.
+   11/17/2026: v1.4 (per J.T.): still white areas (Follow ups, Bookmarks,
+   Contact Reason) after v1.3 - two causes fixed: the fixer capped each pass
+   at 1,500 nodes and re-started from the top, so deep nodes were never
+   reached (now every node is checked once and re-scans are cheap), and
+   closed-shadow hosts it cannot see into now get an invert + hue-rotate
+   fallback. Also: now runs across ALL of Paragon, not just case pages, and
+   leans a bit more Star Wars computer system - monospace data text, uppercase
+   headers, a faint tactical grid - still nothing cartoonish.
+   11/17/2026: v1.3 (per J.T.): still some white areas - the Follow ups card,
+   the Bookmarks warning and the Contact Reason box. Those panels live inside
+   shadow-DOM components (and possibly frames), which the fixer could not see
+   into. The fixer now walks into shadow roots and same-origin iframes too,
+   and watches them for later changes. Same restrained Star Wars look - deep
+   space + gold + blue, no characters or quotes, nothing cartoonish.
+   11/17/2026: v1.2 (per J.T.): get rid of the white blocks - the fixer now
+   darkens EVERY light surface (white cards, sidebar panels, correspondence
+   rows, white buttons) instead of only the unreadable ones, keeps each
+   surface's hue so meaning is preserved, and flips dark text to light.
+   Slightly stronger starfield and gold underlines on section headers for a
+   bit more Star Wars, kept professional - no characters, no quotes.
+   11/17/2026: v1.1 (per J.T.): v1.0 looked terrible - the page went dark but the
+   cards stayed white while the text went light, so case info and correspondence
+   were unreadable. NEW: a fixer darkened exactly the broken surfaces (light
+   background AND light text) and left readable ones alone, the response bars
+   got a dark Star Wars treatment so they belong to the theme, and the known
+   Paragon hooks (.body_RioZc, dvr-grid) were darkened directly. The bars keep
+   their own button colors.
+   11/17/2026: v1.0 (per J.T.): first pass - deep-space dark background with a subtle
+   starfield, Star Wars gold + lightsaber-blue accents, dark form controls. CSS only;
+   the response bars keep their own colors because this script never uses !important
+   on button backgrounds (their inline styles win).
+*/
 
 (function () {
     'use strict';
@@ -471,6 +602,15 @@
         }
         return false;
     }
+    // v3.5/v1.9: the first descendant carrying visible text. A
+    // kat-label's label text lives in LIGHT DOM, not shadow DOM.
+    function firstTextDescendant(el) {
+        var nodes = el.querySelectorAll('span, label');
+        for (var i = 0; i < nodes.length; i++) {
+            if ((nodes[i].textContent || '').trim() !== '') return nodes[i];
+        }
+        return null;
+    }
 
     // Safety net for when a container is inverted after some of its
     // descendants were already themed: strip the fixer's own inline
@@ -589,6 +729,20 @@
             delete el.dataset.swInverted;
             // fall through and theme it normally below
         }
+        // v3.5/v1.9: a kat-label inverted while its text was dark,
+        // whose text has since gone light (theme CSS applied, panel
+        // rendered) - un-invert it or the label renders dark on the
+        // dark panel. Runs before the closest('[data-sw-inverted]')
+        // guard below, like the container un-invert above.
+        if (el.dataset.swInverted && tag === 'KAT-LABEL') {
+            var _klT = firstTextDescendant(el);
+            var _klC = _klT ? (window.getComputedStyle(_klT).color || '') : '';
+            if (_klC && !isDarkText(parseRgb(_klC))) {
+                el.style.filter = '';
+                delete el.dataset.swInverted;
+                // fall through and theme it normally below
+            }
+        }
         // Inside an inverted element, do nothing at all: the ancestor's
         // filter themes the whole subtree, and darkening, flipping or
         // inverting anything inside would undo it. (closest includes the
@@ -661,7 +815,18 @@
             invertOk = (v === 'tertiary' || v === 'link') && !hasVisibleLightDom(el);
         } else if (tag === 'KAT-CHECKBOX' || tag === 'KAT-RADIO') {
             invertOk = !hasVisibleLightDom(el);
-        } else if (tag === 'KAT-LABEL' || tag === 'KAT-SPINNER' ||
+        } else if (tag === 'KAT-LABEL') {
+            // v3.5/v1.9: a kat-label's text lives in LIGHT DOM - proved
+            // by the Transfer panel DevTools: "Another queue" is a
+            // <label><span class="text"> child. Inverting flips the
+            // text colour at render time, so invert ONLY when the text
+            // is still dark. When the theme CSS already made it light
+            // (inside .transfer-box), inverting renders it dark on the
+            // dark panel and the label vanishes.
+            var _klT2 = firstTextDescendant(el);
+            var _klC2 = _klT2 ? (window.getComputedStyle(_klT2).color || '') : '';
+            invertOk = !_klC2 || isDarkText(parseRgb(_klC2));
+        } else if (tag === 'KAT-SPINNER' ||
                    tag === 'KAT-STATUSINDICATOR' || tag === 'KAT-DIVIDER' ||
                    tag === 'KAT-ICON') {
             // Their text/dots live in shadow DOM or in light DOM the fixer
@@ -848,6 +1013,19 @@
                 el.style.filter = '';
                 delete el.dataset.swInverted;
                 delete el.dataset.swChecked;
+            }
+            // v3.5/v1.9: same as the fixOne un-invert above, for
+            // kat-labels already checked - fixOne will not re-run on
+            // them, so clear the inversion here when the text has
+            // gone light. No flag clear needed: the text is already
+            // light via CSS, nothing else for fixOne to do.
+            if (el.dataset.swInverted && el.tagName === 'KAT-LABEL') {
+                var _klT3 = firstTextDescendant(el);
+                var _klC3 = _klT3 ? (window.getComputedStyle(_klT3).color || '') : '';
+                if (_klC3 && !isDarkText(parseRgb(_klC3))) {
+                    el.style.filter = '';
+                    delete el.dataset.swInverted;
+                }
             }
             // v2.7: THE v2.6 miss. A row is checked once, then Paragon
             // adds the due class / peach background afterwards (async
