@@ -1,17 +1,99 @@
 // ==UserScript==
 // @name         Paragon — Batman Dark Theme
 // @namespace    http://tampermonkey.net/
-// @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Paragon-Batman-Dark-Theme.user.js
-// @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Paragon-Batman-Dark-Theme.user.js
-// @version      1.7
-// @description  Batman theme for all of Paragon. Gotham palette throughout: near-black charcoal, bat yellow frames and data, warm off-white text, strong uppercase headings in the classic Batman Forever fan font (embedded, so it works offline). Restrained, no characters or quotes, nothing cartoonish. A fixer darkens every light surface (keeping its hue, tinted charcoal) and flips dark text to light - including collapsed content before it ever expands, so expanded follow-up replies stay readable. The reply composer and the review screen are inverted as one piece each (Kat's card/input/label backgrounds live in shadow DOM and are unreachable any other way), and nothing inside them is themed element by element. Also runs inside the CloudFront widget iframes (follow-ups, bookmarks, contact reason) and themes them from within, with an invert fallback if injection fails. Changes the look only - no buttons, text, or functions are touched. Toggle it on/off in Tampermonkey without affecting the response scripts. Do not install this and the Star Wars theme at the same time - they do the same job and will fight each other. Reopen/due rows get a bat-yellow wash that fades across the row, and their SLA-overdue times stay a flat bold yellow. The composer and review screens now render in the theme charcoal with readable text. The Reason Category and Reason Code dropdowns now match the theme instead of staying white. v1.6: the Lobby due rows and SLA times are themed (the overdue class, not caseDue), the white buttons and panels get CSS backstops and a late-paint re-check, the nav icons, pagination and active item are themed, the dim text lines are themed by their text, the composer kat-card shadow roots get a pre-inversion stylesheet, and ticking SLA durations are caught live with a 30-second heartbeat after the 2-minute net. v1.7: the Translation / CIA popovers, the search header, side nav, search-type card and info alert get CSS backstops and a late-paint re-check, the Lobby header check is case-insensitive, and label spans in shadow trees inherit.
-// @author       J.T. Powers
+// @version      1.9
+// @description  Batman theme for all of Paragon. Gotham palette throughout: near-black charcoal, bat yellow frames and data, warm off-white text, strong uppercase headings in the classic Batman Forever fan font (embedded, so it works offline). Restrained, no characters or quotes, nothing cartoonish. A fixer darkens every light surface (keeping its hue, tinted charcoal) and flips dark text to light - including collapsed content before it ever expands, so expanded follow-up replies stay readable. The reply composer and the review screen are inverted as one piece each (Kat's card/input/label backgrounds live in shadow DOM and are unreachable any other way), and nothing inside them is themed element by element. Also runs inside the CloudFront widget iframes (follow-ups, bookmarks, contact reason) and themes them from within, with an invert fallback if injection fails. Changes the look only - no buttons, text, or functions are touched. Toggle it on/off in Tampermonkey without affecting the response scripts. Do not install this and the Star Wars theme at the same time - they do the same job and will fight each other. Reopen/due rows get a bat-yellow wash that fades across the row, and their SLA-overdue times stay a flat bold yellow. The composer and review screens now render in the theme charcoal with readable text. The Reason Category and Reason Code dropdowns now match the theme instead of staying white. v1.6: the Lobby due rows and SLA times are themed (the overdue class, not caseDue), the white buttons and panels get CSS backstops and a late-paint re-check, the nav icons, pagination and active item are themed, the dim text lines are themed by their text, the composer kat-card shadow roots get a pre-inversion stylesheet, and ticking SLA durations are caught live with a 30-second heartbeat after the 2-minute net. v1.7: the Translation / CIA popovers, the search header, side nav, search-type card and info alert get CSS backstops and a late-paint re-check, the Lobby header check is case-insensitive, and label spans in shadow trees inherit. v1.8: the Transfer panel labels are themed whether they are spans or labels (and inside shadow trees), the 'View translation' chips in the correspondence area get light text, and the translation info-alerts get light text. v1.9: kat-label elements are no longer inverted when their text is already light - the invert filter was flipping the Transfer panel's light labels dark again.
+// @author       Scout (for J.T.'s friend)
 // @match        https://paragon-na.amazon.com/*
 // @match        https://d1u16vxl4h9h9c.cloudfront.net/widget.html*
 // @match        https://*.cloudfront.net/widget.html*
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
+
+/* UPDATES:
+   11/19/2026: v1.9 (per J.T., Star Wars transfer labels still
+   invisible after v3.4 - same root cause ported): the fixer inverted
+   every kat-label, but its text lives in light DOM and the theme CSS
+   already made it light, so the filter rendered it dark again. A
+   kat-label is now inverted only when its text is still dark, and an
+   inverted kat-label whose text has since gone light is un-inverted.
+ (per J.T., Star Wars transfer labels invisible):
+   same fix ported from Star Wars v3.4 - the Transfer panel labels
+   are themed whether they are spans or labels, and labels in shadow
+   trees inherit (:host label). The "View translation" chips in the
+   correspondence area and the translation info-alerts get light text.
+   11/19/2026: v1.7 (per J.T., from the three v1.6 reports - case, Lobby,
+   search): the Translation / CIA popovers stayed white with light text
+   (kat-popover-content floats outside the composer and paints late),
+   and on the search page the header, side nav, search-type card and
+   "No results found" alert all stayed white - the fixer had seen them
+   transparent and they painted white later. CSS backstops theme all
+   five directly, and the late-paint re-check now covers HEADER, NAV,
+   kat-popover-content, .card and .alert. The LOBBY header check is now
+   case-insensitive (the h1 reads "Lobby", not "LOBBY", so the bar was
+   never themed). Label spans in shadow trees inherit their parent's
+   colour (:host span.text - the "Annotation" label stayed dark teal,
+   likely inside a shadow tree where 'kat-button span' cannot reach).
+   11/19/2026: v1.6 (per J.T.): everything learned from the Star Wars
+   theme's v3.0-v3.3 rounds, in Batman colours. (1) The Lobby due-row
+   patch: Lobby due rows are lobby-case-followup-overdue, NOT caseDue,
+   so they get the bat-yellow wash and their SLA cells go flat bold
+   yellow (the colour lives only in the fixer's inline style - a
+   stylesheet !important colour would override it). The peach wash is
+   detected directly as a safety net, and due cells whose text becomes
+   an SLA indicator later (ticking durations, late-filling cells) are
+   re-checked, self-healing if the flag survives a style reset.
+   (2) White buttons and panels (Transfer, Reply, Annotate, Transfer
+   box, Contact Reason, notification) get CSS backstops and a re-check
+   for late painting. (3) Nav icons, pagination, the active list item
+   and the "Viewing in original language." / info-table lines are
+   themed by text. (4) The composer kat-card shadow roots get a
+   pre-inversion stylesheet. (5) A 30-second heartbeat keeps late
+   content themed after the 2-minute fast net stops. The Review button
+   is the primary action (pale gold, dark text, pre-inversion).
+   11/19/2026: v1.5 (per J.T.): the composer still carried Star Wars
+   colouring - its links, focus rings and button hovers were Amazon blue
+   (#0066c0, rendering #51b7ff), the one blue left in the file. They now
+   use the pre-inversion colour #3d1d00, which renders as pale gold
+   #f9d9bc - the closest the invert+rotate matrix gets to bat yellow.
+   The Star Wars wording in the header description and comments is
+   cleaned up too; the file is now Batman only.
+   11/19/2026: v1.4 (per J.T.): the Reason Category / Reason Code dropdown
+   boxes stayed white. Their light-DOM parts now get the theme surface -
+   as the pre-inversion colour inside the inverted composer/review
+   (renders charcoal), and as the surface directly everywhere else in
+   Paragon.
+   11/19/2026: v1.3 (per J.T.): the reply composer came out black with
+   unreadable words - the box and card inverted to black instead of the
+   theme charcoal, and text that inherited the theme's light body colour
+   inverted to dark-on-dark. Now the composer and review screens get their
+   background from the exact pre-inversion colour of the theme surface
+   (#eaeaef renders as #141419), all text inside is forced dark
+   pre-inversion so it renders light, and placeholders get a readable
+   mid-grey at full opacity.
+   11/19/2026: v1.2 (per J.T.): reopen/due rows - a bat-yellow wash runs
+   the whole row, strong at the left edge and fading to the faint yellow
+   tint at the right end, and the SLA-overdue times stay a flat bold
+   yellow (no glow - it blurred the text). The gradient lives on the row
+   itself; the cells are transparent.
+   11/17/2026: v1.1 (per J.T.): headings now use the classic Batman font.
+   There is no official Batman font - the logo was hand-lettered - so this
+   is the fan-made "Batman Forever" (BatmanForeverAlternate), the closest
+   match to the 1989/1995 movie logo lettering, embedded as base64 so it
+   works offline (free for personal use). Headings only - body text stays
+   in the clean sans, because a display font is unreadable as body text.
+   11/17/2026: v1.0 (per J.T., for his friend - a huge Batman fan): Gotham
+   palette - near-black charcoal, bat yellow (#ffd500) as the accent, warm
+   off-white text, strong uppercase headings, a faint bat-signal glow at
+   the top of the page. All the hard-won fixes ride along from day one: the fixer themes hidden
+   content too (expanded replies stay readable), only LEAF Kat components
+   are ever inverted and an inverted element's subtree is left alone, the
+   reply composer and the review screen are inverted as one piece each,
+   and the CloudFront widget iframes (follow-ups, bookmarks, contact
+   reason) are themed from within with an invert fallback. Restrained -
+   no characters, no quotes, nothing cartoonish.
+*/
 
 (function () {
     'use strict';
@@ -286,7 +368,22 @@
            get light text directly here. Same reason for the label spans
            inside buttons: they carry their own dark colour, so they
            inherit the button's. */
-        '.transfer-box span { color: ' + BODY_TEXT + ' !important; }',
+        '.transfer-box span, .transfer-box label { color: ' + BODY_TEXT + ' !important; }',
+        /* v3.4/v1.8: the "View translation" chips in the correspondence
+           area are span.default OUTSIDE the composer - dark teal text
+           on the dark teal chip (1.00:1, invisible). The composer rule
+           below is more specific, so it still wins inside
+           #composer/#review. The translation info-alerts are black
+           text on a transparent background (1.16:1) - same fix. */
+        'span.default { color: ' + BODY_TEXT + ' !important; }',
+        '.info-alert { color: ' + BODY_TEXT + ' !important; }',
+        /* v3.4/v1.8: labels in shadow trees inherit their parent's
+           colour - a 'kat-button span' style rule cannot match inside
+           a shadow tree, where the host is outside. Inert at top level
+           (:host matches nothing outside a shadow tree); active in the
+           stylesheet injected into open shadow roots. Insurance for
+           the Transfer panel labels if they live in a shadow tree. */
+        ':host label { color: inherit !important; }',
         '.uc-notification-empty * { color: ' + BODY_TEXT + ' !important; }',
         'button span, button .text, kat-button span, kat-button .text { color: inherit !important; }',
 
@@ -428,6 +525,15 @@
         }
         return false;
     }
+    // v3.5/v1.9: the first descendant carrying visible text. A
+    // kat-label's label text lives in LIGHT DOM, not shadow DOM.
+    function firstTextDescendant(el) {
+        var nodes = el.querySelectorAll('span, label');
+        for (var i = 0; i < nodes.length; i++) {
+            if ((nodes[i].textContent || '').trim() !== '') return nodes[i];
+        }
+        return null;
+    }
 
     // Safety net for when a container is inverted after some of its
     // descendants were already themed: strip the fixer's own inline
@@ -561,6 +667,20 @@
             delete el.dataset.batInverted;
             // fall through and theme it normally below
         }
+        // v3.5/v1.9: a kat-label inverted while its text was dark,
+        // whose text has since gone light (theme CSS applied, panel
+        // rendered) - un-invert it or the label renders dark on the
+        // dark panel. Runs before the closest('[data-bat-inverted]')
+        // guard below, like the container un-invert above.
+        if (el.dataset.batInverted && tag === 'KAT-LABEL') {
+            var _klT = firstTextDescendant(el);
+            var _klC = _klT ? (window.getComputedStyle(_klT).color || '') : '';
+            if (_klC && !isDarkText(parseRgb(_klC))) {
+                el.style.filter = '';
+                delete el.dataset.batInverted;
+                // fall through and theme it normally below
+            }
+        }
         // Inside an inverted element, do nothing at all: the ancestor's
         // filter themes the whole subtree, and darkening, flipping or
         // inverting anything inside would undo it. (closest includes the
@@ -632,7 +752,18 @@
             invertOk = (v === 'tertiary' || v === 'link') && !hasVisibleLightDom(el);
         } else if (tag === 'KAT-CHECKBOX' || tag === 'KAT-RADIO') {
             invertOk = !hasVisibleLightDom(el);
-        } else if (tag === 'KAT-LABEL' || tag === 'KAT-SPINNER' ||
+        } else if (tag === 'KAT-LABEL') {
+            // v3.5/v1.9: a kat-label's text lives in LIGHT DOM - proved
+            // by the Transfer panel DevTools: "Another queue" is a
+            // <label><span class="text"> child. Inverting flips the
+            // text colour at render time, so invert ONLY when the text
+            // is still dark. When the theme CSS already made it light
+            // (inside .transfer-box), inverting renders it dark on the
+            // dark panel and the label vanishes.
+            var _klT2 = firstTextDescendant(el);
+            var _klC2 = _klT2 ? (window.getComputedStyle(_klT2).color || '') : '';
+            invertOk = !_klC2 || isDarkText(parseRgb(_klC2));
+        } else if (tag === 'KAT-SPINNER' ||
                    tag === 'KAT-STATUSINDICATOR' || tag === 'KAT-DIVIDER' ||
                    tag === 'KAT-ICON') {
             // Their text/dots live in shadow DOM or in light DOM the fixer
@@ -733,6 +864,19 @@
                     el.style.filter = '';
                     delete el.dataset.batInverted;
                     delete el.dataset.batChecked;
+                }
+                // v3.5/v1.9: same as the fixOne un-invert above, for
+                // kat-labels already checked - fixOne will not re-run on
+                // them, so clear the inversion here when the text has
+                // gone light. No flag clear needed: the text is already
+                // light via CSS, nothing else for fixOne to do.
+                if (el.dataset.batInverted && el.tagName === 'KAT-LABEL') {
+                    var _klT3 = firstTextDescendant(el);
+                    var _klC3 = _klT3 ? (window.getComputedStyle(_klT3).color || '') : '';
+                    if (_klC3 && !isDarkText(parseRgb(_klC3))) {
+                        el.style.filter = '';
+                        delete el.dataset.batInverted;
+                    }
                 }
                 var _cls7 = (el.className && typeof el.className === 'string') ? el.className : '';
                 var _due7 = _cls7.indexOf('caseDue') !== -1 ||
