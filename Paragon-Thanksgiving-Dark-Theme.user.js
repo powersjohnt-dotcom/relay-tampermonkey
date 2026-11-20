@@ -1,11 +1,9 @@
 // ==UserScript==
 // @name         Paragon — Thanksgiving Dark Theme
 // @namespace    http://tampermonkey.net/
-// @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/Theme/Paragon-Thanksgiving-Dark-Theme.user.js
-// @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/Theme/Paragon-Thanksgiving-Dark-Theme.user.js
-// @version      1.1
-// @description  Thanksgiving autumn theme for all of Paragon: deep espresso brown, harvest amber frames and data, cranberry SLA times, warm cream text, monospace text and uppercase headers - restrained, with a fun turkey in the corner — click it for a Thanksgiving fact. No grid background, per J.T. - the page stays a flat warm brown. A fixer darkens every light surface (keeping its hue, tinted warm brown) and flips dark text to light - including collapsed content before it ever expands, so expanded follow-up replies stay readable. The reply composer and the review screen are inverted as one piece each instead (Kat's card/input/label backgrounds live in shadow DOM and are unreachable any other way), and nothing inside them is themed element by element - mixing the two undoes both. Also runs inside the CloudFront widget iframes (follow-ups, bookmarks, contact reason) and themes them from within, with an invert fallback if injection fails. Changes the look only - no buttons, text, or functions are touched. Toggle it on/off in Tampermonkey without affecting the response scripts. Do not install this and the Star Wars, Batman, Lavender or Thanksgiving Light theme at the same time - they do the same job and will fight each other. Reopen/due rows get a harvest-amber wash that fades across the row, and their SLA-overdue times stay a flat bold cranberry. The composer and review screens now render in the theme brown with readable text. Built from the Star Wars v3.5 codebase, so it carries every lesson through v3.5: due/reopen rows readable on the Lobby (inline wash + SLA cranberry, stylesheet injected into shadow roots), white buttons/panels backstopped, nav/icons/pagination themed, Transfer labels themed, kat-labels inverted only when their text is still dark, and a 30-second heartbeat after the 2-minute fast net.
-// @author       Scout (for J.T.)
+// @version      1.2
+// @description  Thanksgiving autumn theme for all of Paragon: deep espresso brown, harvest amber frames and data, cranberry SLA times, warm cream text, monospace text and uppercase headers - restrained, with a fun turkey in the corner — click him to tickle him: gobbles, facts, and good wishes, shuffled so it never feels the same twice. No grid background, per J.T. - the page stays a flat warm brown. A fixer darkens every light surface (keeping its hue, tinted warm brown) and flips dark text to light - including collapsed content before it ever expands, so expanded follow-up replies stay readable. The reply composer and the review screen are inverted as one piece each instead (Kat's card/input/label backgrounds live in shadow DOM and are unreachable any other way), and nothing inside them is themed element by element - mixing the two undoes both. Also runs inside the CloudFront widget iframes (follow-ups, bookmarks, contact reason) and themes them from within, with an invert fallback if injection fails. Changes the look only - no buttons, text, or functions are touched. Toggle it on/off in Tampermonkey without affecting the response scripts.
+// @author       J.T. Powers
 // @match        https://paragon-na.amazon.com/*
 // @match        https://d1u16vxl4h9h9c.cloudfront.net/widget.html*
 // @match        https://*.cloudfront.net/widget.html*
@@ -61,7 +59,7 @@
            inside the widget iframes (Bookmarks, Contact Reason, the
            Scout dialogue). Click it for a Thanksgiving fact - 12 facts,
            all different from the light theme's set. */
-        '/* v1.1: clickable turkey, main page only */',
+        '/* v1.2: ticklish turkey, endless quotes */',
         '#tg-turkey {',
         '  position: fixed;',
         '  right: 20px;',
@@ -95,6 +93,15 @@
         '  display: none;',
         '}',
         '#tg-turkey-fact.tg-show { display: block; }',
+        '@keyframes tg-tickle {',
+        '  0% { transform: rotate(0deg) translateY(0); }',
+        '  20% { transform: rotate(-6deg) translateY(-4px); }',
+        '  40% { transform: rotate(5deg) translateY(-2px); }',
+        '  60% { transform: rotate(-4deg) translateY(-4px); }',
+        '  80% { transform: rotate(3deg) translateY(-1px); }',
+        '  100% { transform: rotate(0deg) translateY(0); }',
+        '}',
+        '#tg-turkey.tg-tickle { animation: tg-tickle 0.6s ease; }',
 
         /* No grid background (per J.T., Nov 19): the page stays a flat
            warm brown — the dotted grid from the Star Wars theme is gone. */
@@ -1200,7 +1207,42 @@
         "Most \u2018yams\u2019 in American stores are actually sweet potatoes.",
         "FDR moved Thanksgiving in 1939 \u2014 \u2018Franksgiving\u2019 \u2014 and Congress fixed it to the fourth Thursday in 1941."
     ];
-    var tgLastFact = -1;
+    var TG_GOBBLES = [
+        "Gobble gobble!",
+        "Gobble gobble gobble!",
+        "Gobble! Gobble! Gobble!",
+        "Gobble gobble... gobble?",
+        "GOBBLE!",
+        "Gluck gluck! Gobble!"
+    ];
+    var TG_CHEER = [
+        "Happy Thanksgiving!",
+        "Grateful for you today \u2014 yes, you!",
+        "Pass the gravy!",
+        "Save room for pie!",
+        "Family, food, and football. That\u2019s the whole holiday.",
+        "May your turkey be moist and your naps be long.",
+        "Thankful for good people and good gravy.",
+        "Eat, nap, repeat.",
+        "Gobble \u2019til you wobble!",
+        "There\u2019s always room for one more slice of pie.",
+        "Warm wishes and full plates!",
+        "Today we feast!"
+    ];
+    // One shuffled deck of everything - facts, gobbles, good wishes -
+    // so nothing repeats until you have seen the whole lot. Feels
+    // endless; it is 30 deep, then it reshuffles.
+    var tgDeck = [];
+    function tgNextItem() {
+        if (tgDeck.length === 0) {
+            tgDeck = TG_FACTS.concat(TG_GOBBLES, TG_CHEER);
+            for (var i = tgDeck.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var t = tgDeck[i]; tgDeck[i] = tgDeck[j]; tgDeck[j] = t;
+            }
+        }
+        return tgDeck.pop();
+    }
     var tgFactTimer = null;
     function addTurkey() {
         // Main page only: widget iframes (Bookmarks, Contact Reason,
@@ -1209,16 +1251,18 @@
         if (!document.body || document.getElementById('tg-turkey')) return;
         var turkey = document.createElement('div');
         turkey.id = 'tg-turkey';
-        turkey.title = 'Click for a Thanksgiving fact';
+        turkey.title = 'Click to tickle the turkey';
         var fact = document.createElement('div');
         fact.id = 'tg-turkey-fact';
         fact.title = 'Click to hide';
         function showFact() {
-            var i;
-            do { i = Math.floor(Math.random() * TG_FACTS.length); }
-            while (TG_FACTS.length > 1 && i === tgLastFact);
-            tgLastFact = i;
-            fact.textContent = TG_FACTS[i];
+            // Tickle: the turkey wiggles, then says something.
+            turkey.classList.remove('tg-tickle');
+            void turkey.offsetWidth;
+            turkey.classList.add('tg-tickle');
+            var item = tgNextItem();
+            if (TG_FACTS.indexOf(item) !== -1 && Math.random() < 0.3) item += ' Gobble gobble!';
+            fact.textContent = item;
             fact.classList.add('tg-show');
             if (tgFactTimer) clearTimeout(tgFactTimer);
             tgFactTimer = setTimeout(function () { fact.classList.remove('tg-show'); }, 8000);
