@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Paragon — Thanksgiving Dark Theme
 // @namespace    http://tampermonkey.net/
-// @version      1.4
+// @version      1.5
 // @author       J.T. Powers
 // @match        https://paragon-na.amazon.com/*
 // @match        https://d1u16vxl4h9h9c.cloudfront.net/widget.html*
@@ -9,7 +9,6 @@
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
-
 (function () {
     'use strict';
 
@@ -58,7 +57,7 @@
            inside the widget iframes (Bookmarks, Contact Reason, the
            Scout dialogue). Click it for a Thanksgiving fact - 12 facts,
            all different from the light theme's set. */
-        '/* v1.4: reply box accents amber, grey panels browned */',
+        '/* v1.5: attachments label, kat-dropdowns, kat-table, message rows */',
         '#tg-turkey {',
         '  position: fixed;',
         '  right: 20px;',
@@ -263,6 +262,24 @@
         '.select-header .header-row-text, .select-header kat-icon, .select-header i { color: inherit !important; }',
         '.select-options .option-inner-container { background-color: transparent !important; }',
 
+        /* v1.5, full-page outerHTML (case 23510503891, 11/20): the v1.4
+           rules missed the visible surfaces - the Attachments bar is a
+           .custom-file-label (the wrapper div v1.4 covered sits behind
+           it), the Reason fields are kat-dropdown elements (not
+           kat-select), the top case-info panel is a kat-table whose grey
+           lives in its shadow DOM (the host is transparent, so the fixer
+           never fires on it), and the Correspondence message-header rows
+           are .row--gray buttons the darken rule only took to #403b36.
+           Pre-inversion colours inside the composer; direct surface
+           outside it. */
+        '#composer .custom-file-label, #review .custom-file-label { background-color: #e3c8b3 !important; color: #211602 !important; }',
+        '#composer .custom-file-label::after, #review .custom-file-label::after { background-color: #cbaa93 !important; color: #211602 !important; }',
+        '#composer kat-dropdown, #review kat-dropdown { background-color: #e3c8b3 !important; color: #211602 !important; border-color: #904800 !important; }',
+        'kat-dropdown { background-color: ' + SURFACE + ' !important; color: ' + BODY_TEXT + ' !important; border-color: ' + STEEL + ' !important; }',
+        'kat-table { background-color: ' + SURFACE + ' !important; }',
+        '.row--gray_gsx5D, [class*="row--gray"] { background-color: ' + SURFACE + ' !important; color: ' + BODY_TEXT + ' !important; }',
+        'button[data-paragon-element-id^="correspondence-row-"] { background-color: ' + SURFACE + ' !important; color: ' + BODY_TEXT + ' !important; }',
+
         /* v2.5, live page check: if ANY container is inverted (a pm-card
            that loaded empty and got inverted, an iframe fallback), its
            dropdowns / inputs / headings must use the pre-inversion
@@ -270,7 +287,7 @@
            the light text inverts to dark grey - exactly the Contact
            Reason panel on case 23480368871 (black panel, white
            dropdowns, unreadable headings). */
-        '[data-tg-inverted] .kat-select-container, [data-tg-inverted] .select-header, [data-tg-inverted] .select-options, [data-tg-inverted] input, [data-tg-inverted] textarea, [data-tg-inverted] select { background: #e3c8b3 !important; color: #211602 !important; }',
+        '[data-tg-inverted] .kat-select-container, [data-tg-inverted] .select-header, [data-tg-inverted] .select-options, [data-tg-inverted] kat-dropdown, [data-tg-inverted] input, [data-tg-inverted] textarea, [data-tg-inverted] select { background: #e3c8b3 !important; color: #211602 !important; }',
         '[data-tg-inverted] h1, [data-tg-inverted] h2, [data-tg-inverted] h3, [data-tg-inverted] h4, [data-tg-inverted] h5 { color: #211602 !important; }',
         'pm-card[data-tg-inverted] { background: #e3c8b3 !important; }',
         'pm-card[data-tg-inverted] * { color: #211602 !important; }',
@@ -860,6 +877,7 @@
     var composerShadowCss = [
         ':host { background-color: #e3c8b3 !important; color: #211602 !important; border-color: #904800 !important; }',
         '.kat-select-container, .select-header, .select-options { background-color: #e3c8b3 !important; color: #211602 !important; }',
+        '[class*="dropdown"], [class*="select"] { background-color: #e3c8b3 !important; color: #211602 !important; }',
         'input, textarea, select, button { background-color: #e3c8b3 !important; color: #211602 !important; border-color: #cbaa93 !important; }',
         'h1, h2, h3, h4, h5 { color: #211602 !important; }',
         'a { color: #904800 !important; }'
