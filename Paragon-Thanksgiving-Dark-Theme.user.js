@@ -1,8 +1,7 @@
 // ==UserScript==
 // @name         Paragon — Thanksgiving Dark Theme
 // @namespace    http://tampermonkey.net/
-// @version      1.2
-// @description  Thanksgiving autumn theme for all of Paragon: deep espresso brown, harvest amber frames and data, cranberry SLA times, warm cream text, monospace text and uppercase headers - restrained, with a fun turkey in the corner — click him to tickle him: gobbles, facts, and good wishes, shuffled so it never feels the same twice. No grid background, per J.T. - the page stays a flat warm brown. A fixer darkens every light surface (keeping its hue, tinted warm brown) and flips dark text to light - including collapsed content before it ever expands, so expanded follow-up replies stay readable. The reply composer and the review screen are inverted as one piece each instead (Kat's card/input/label backgrounds live in shadow DOM and are unreachable any other way), and nothing inside them is themed element by element - mixing the two undoes both. Also runs inside the CloudFront widget iframes (follow-ups, bookmarks, contact reason) and themes them from within, with an invert fallback if injection fails. Changes the look only - no buttons, text, or functions are touched. Toggle it on/off in Tampermonkey without affecting the response scripts.
+// @version      1.3
 // @author       J.T. Powers
 // @match        https://paragon-na.amazon.com/*
 // @match        https://d1u16vxl4h9h9c.cloudfront.net/widget.html*
@@ -10,6 +9,7 @@
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
+
 
 (function () {
     'use strict';
@@ -56,9 +56,10 @@
 
         /* v1.1: the turkey is a real element (not body::after), so it
            can be clicked - and it only exists on the main page, never
-           inside the widget iframes (Bookmarks, Contact Reason). Click it for a Thanksgiving fact - 12 facts,
+           inside the widget iframes (Bookmarks, Contact Reason, the
+           Scout dialogue). Click it for a Thanksgiving fact - 12 facts,
            all different from the light theme's set. */
-        '/* v1.2: ticklish turkey, endless quotes */',
+        '/* v1.3: reply box renders warm brown, not black */',
         '#tg-turkey {',
         '  position: fixed;',
         '  right: 20px;',
@@ -199,39 +200,42 @@
            inside them, so the single inversion turns them dark. Nothing
            inside #composer or #review is themed element by element. */
         '#composer textarea, #review textarea, #composer input, #review input, #composer select, #review select {',
-        '  background-color: #f6ead3 !important;',
-        '  color: #232f3e !important;',
-        '  border-color: #232f3e !important;',
+        '  background-color: #e3c8b3 !important;',
+        '  color: #211602 !important;',
+        '  border-color: #cbaa93 !important;',
         '}',
         '#composer input:focus, #review input:focus, #composer textarea:focus, #review textarea:focus, #composer select:focus, #review select:focus {',
-        '  border-color: #8a5a1e !important;',
+        '  border-color: #904800 !important;',
         '}',
         '#composer button, #review button {',
-        '  background-color: #f6ead3 !important;',
-        '  color: #232f3e !important;',
-        '  border-color: #232f3e !important;',
+        '  background-color: #e3c8b3 !important;',
+        '  color: #211602 !important;',
+        '  border-color: #cbaa93 !important;',
         '}',
-        '#composer button:hover, #review button:hover { border-color: #8a5a1e !important; color: #8a5a1e !important; }',
+        '#composer button:hover, #review button:hover { border-color: #904800 !important; color: #904800 !important; }',
         '#composer h1, #review h1, #composer h2, #review h2, #composer h3, #review h3, #composer h4, #review h4, #composer h5, #review h5 {',
-        '  color: #232f3e !important;',
+        '  color: #211602 !important;',
         '  border-bottom-color: transparent !important;',
         '}',
-        '#composer a, #review a { color: #8a5a1e !important; }',
-        '#composer ::-webkit-scrollbar-track, #review ::-webkit-scrollbar-track { background: #ffffff !important; }',
-        '#composer ::-webkit-scrollbar-thumb, #review ::-webkit-scrollbar-thumb { background: #aab0b8 !important; }',
+        '#composer a, #review a { color: #904800 !important; }',
+        '#composer ::-webkit-scrollbar-track, #review ::-webkit-scrollbar-track { background: #e3c8b3 !important; }',
+        '#composer ::-webkit-scrollbar-thumb, #review ::-webkit-scrollbar-thumb { background: #cbaa93 !important; }',
 
-        /* Composer / review readability (v2.3): the inverted box came out
-           black instead of the theme brown, and text that inherited the
-           theme's light body colour inverted to dark-on-dark. So inside
-           #composer / #review everything is forced dark pre-inversion
-           (which renders light), placeholders get a readable mid-grey at
-           full opacity, and the box and card get their background from the
-           exact pre-inversion colour of the theme surface (#f6ead3 renders as a dark warm brown through invert + hue-rotate), so they render brown.
-           The #composer a rule still wins for links (higher specificity). */
-        '#composer, #review { background: #f6ead3 !important; }',
-        '#composer kat-card, #review kat-card { background: #f6ead3 !important; }',
-        '#composer *, #review * { color: #232f3e !important; }',
-        '#composer textarea::placeholder, #composer input::placeholder, #review textarea::placeholder, #review input::placeholder { color: #5a5a5a !important; opacity: 1 !important; }',
+        /* Composer / review readability (v1.3, per J.T.: the reply box
+           came out black with Star Wars-coloured text): the v2.3
+           pre-inversion colours were wrong on the math - #f6ead3 renders
+           rgb(31,19,0), near-black, and #232f3e renders rgb(199,211,226),
+           pale blue-grey, i.e. the Star Wars look. The colours below are
+           now solved from the exact invert + hue-rotate(180) matrix, so
+           the box renders warm brown #4a2f1a with warm cream text
+           #f2e7d3, amber links, and a warm tan placeholder. Pre-inversion
+           values: bg #e3c8b3, text #211602, links #904800 (blue clamped,
+           renders rgb(235,163,91)), placeholder #826a44. The #composer a
+           rule still wins for links (higher specificity). */
+        '#composer, #review { background: #e3c8b3 !important; }',
+        '#composer kat-card, #review kat-card { background: #e3c8b3 !important; }',
+        '#composer *, #review * { color: #211602 !important; }',
+        '#composer textarea::placeholder, #composer input::placeholder, #review textarea::placeholder, #review input::placeholder { color: #826a44 !important; opacity: 1 !important; }',
 
         /* Dropdowns (v2.4): the Reason Category / Reason Code boxes stayed
            white. Their light-DOM parts get the theme surface - as the
@@ -240,7 +244,8 @@
            (the scoped rule wins inside by specificity). Text inside the
            header inherits the light colour outside; inside, the #composer *
            rule already forces it dark pre-inversion (renders light). */
-        '#composer .kat-select-container, #review .kat-select-container, #composer .select-header, #review .select-header, #composer .select-options, #review .select-options { background: #f6ead3 !important; }',
+        '#composer .kat-select-container, #review .kat-select-container, #composer .select-header, #review .select-header, #composer .select-options, #review .select-options { background: #e3c8b3 !important; }',
+        '#composer .kat-radiobutton-icon, #review .kat-radiobutton-icon, #composer .kat-checkbox-icon, #review .kat-checkbox-icon { background-color: #e3c8b3 !important; }',
         '.kat-select-container, .select-header, .select-options { background-color: ' + SURFACE + ' !important; color: ' + BODY_TEXT + ' !important; }',
         '.select-header .header-row-text, .select-header kat-icon, .select-header i { color: inherit !important; }',
         '.select-options .option-inner-container { background-color: transparent !important; }',
@@ -252,10 +257,10 @@
            the light text inverts to dark grey - exactly the Contact
            Reason panel on case 23480368871 (black panel, white
            dropdowns, unreadable headings). */
-        '[data-tg-inverted] .kat-select-container, [data-tg-inverted] .select-header, [data-tg-inverted] .select-options, [data-tg-inverted] input, [data-tg-inverted] textarea, [data-tg-inverted] select { background: #f6ead3 !important; color: #232f3e !important; }',
-        '[data-tg-inverted] h1, [data-tg-inverted] h2, [data-tg-inverted] h3, [data-tg-inverted] h4, [data-tg-inverted] h5 { color: #232f3e !important; }',
-        'pm-card[data-tg-inverted] { background: #f6ead3 !important; }',
-        'pm-card[data-tg-inverted] * { color: #232f3e !important; }',
+        '[data-tg-inverted] .kat-select-container, [data-tg-inverted] .select-header, [data-tg-inverted] .select-options, [data-tg-inverted] input, [data-tg-inverted] textarea, [data-tg-inverted] select { background: #e3c8b3 !important; color: #211602 !important; }',
+        '[data-tg-inverted] h1, [data-tg-inverted] h2, [data-tg-inverted] h3, [data-tg-inverted] h4, [data-tg-inverted] h5 { color: #211602 !important; }',
+        'pm-card[data-tg-inverted] { background: #e3c8b3 !important; }',
+        'pm-card[data-tg-inverted] * { color: #211602 !important; }',
 
         /* v2.5: Contact Reason panel when it is NOT inverted - brown panel,
            pale-amber headings, brown dropdowns (the fixer handles the rest). */
@@ -299,7 +304,7 @@
         /* Inside the inverted composer/review the pre-inversion rule
            above still wins (higher specificity), so composer buttons
            keep rendering brown, not the bar brown. */
-        '#composer button.tertiary, #review button.tertiary, #composer button.link, #review button.link { background-color: #f6ead3 !important; color: #232f3e !important; }',
+        '#composer button.tertiary, #review button.tertiary, #composer button.link, #review button.link { background-color: #e3c8b3 !important; color: #211602 !important; }',
 
         /* v3.0: the Transfer panel, the Contact Reason panel, the
            notification empty-state and the uc-kat-button stayed white -
@@ -360,7 +365,7 @@
            light through the inversion, so it stays unreadable. Give it
            pre-inversion colours: dark chip renders light, light text
            renders brown. */
-        '#composer .default, #review .default { background-color: #232f3e !important; color: #f6ead3 !important; }',
+        '#composer .default, #review .default { background-color: #e9d8c5 !important; color: #211602 !important; }',
 
         /* Dark scrollbars */
         '::-webkit-scrollbar { width: 10px; height: 10px; }',
@@ -798,13 +803,13 @@
     // have no theme <style> inside - fixSubtree never walks into the
     // inverted composer, so injectCssIntoRoot never reaches them.
     // Inject a small stylesheet with PRE-inversion colours (the
-    // ancestor filter inverts them): #f6ead3 renders as the theme
-    // surface, #232f3e renders as light text.
+    // ancestor filter inverts them): v1.3 recalibrated - #e3c8b3
+    // renders warm brown #4a2f1a, #211602 renders warm cream #f2e7d3.
     var composerShadowCss = [
-        ':host { background-color: #f6ead3 !important; color: #232f3e !important; }',
-        'input, textarea, select, button { background-color: #f6ead3 !important; color: #232f3e !important; border-color: #232f3e !important; }',
-        'h1, h2, h3, h4, h5 { color: #232f3e !important; }',
-        'a { color: #8a5a1e !important; }'
+        ':host { background-color: #e3c8b3 !important; color: #211602 !important; }',
+        'input, textarea, select, button { background-color: #e3c8b3 !important; color: #211602 !important; border-color: #cbaa93 !important; }',
+        'h1, h2, h3, h4, h5 { color: #211602 !important; }',
+        'a { color: #904800 !important; }'
     ].join('\n');
     var injectedComposerRoots = new WeakSet();
     function injectComposerShadowCss() {
@@ -1245,7 +1250,7 @@
     var tgFactTimer = null;
     function addTurkey() {
         // Main page only: widget iframes (Bookmarks, Contact Reason,
-        // never get a turkey.
+        // Scout dialogue) never get a turkey.
         if (window.parent !== window) return;
         if (!document.body || document.getElementById('tg-turkey')) return;
         var turkey = document.createElement('div');
