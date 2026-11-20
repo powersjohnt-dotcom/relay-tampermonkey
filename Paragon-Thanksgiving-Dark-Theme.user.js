@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Paragon — Thanksgiving Dark Theme
 // @namespace    http://tampermonkey.net/
-// @version      1.5
+// @version      1.6
 // @author       J.T. Powers
 // @match        https://paragon-na.amazon.com/*
 // @match        https://d1u16vxl4h9h9c.cloudfront.net/widget.html*
@@ -57,7 +57,7 @@
            inside the widget iframes (Bookmarks, Contact Reason, the
            Scout dialogue). Click it for a Thanksgiving fact - 12 facts,
            all different from the light theme's set. */
-        '/* v1.5: attachments label, kat-dropdowns, kat-table, message rows */',
+        '/* v1.6: header search box, filter toolbar, modal browns */',
         '#tg-turkey {',
         '  position: fixed;',
         '  right: 20px;',
@@ -279,6 +279,17 @@
         'kat-table { background-color: ' + SURFACE + ' !important; }',
         '.row--gray_gsx5D, [class*="row--gray"] { background-color: ' + SURFACE + ' !important; color: ' + BODY_TEXT + ' !important; }',
         'button[data-paragon-element-id^="correspondence-row-"] { background-color: ' + SURFACE + ' !important; color: ' + BODY_TEXT + ' !important; }',
+
+        /* v1.6, case 739512000 pastes (11/20): the header Search Text box
+           is still black (its input has no inline style - the site
+           stylesheet gives it a dark box), the filter toolbar container
+           is darkened grey rgb(66,62,57) (its header is BAR_BG already),
+           and kat-modal content/header are darkened grey instead of
+           brown. All three get the surface directly. */
+        '.textInput_vXoUr { background-color: ' + SURFACE + ' !important; color: ' + BODY_TEXT + ' !important; border: 1px solid ' + STEEL + ' !important; }',
+        '.searchButton_PdzGV { background-color: ' + BAR_BG + ' !important; }',
+        '.theme-toolbar_ub9Ne { background-color: ' + SURFACE + ' !important; }',
+        'kat-modal-content, kat-modal-header { background-color: ' + SURFACE + ' !important; }',
 
         /* v2.5, live page check: if ANY container is inverted (a pm-card
            that loaded empty and got inverted, an iframe fallback), its
