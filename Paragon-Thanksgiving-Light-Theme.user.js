@@ -57,8 +57,7 @@
 
         /* v2.2: the turkey is a real element now (not body::after), so it
            can be clicked - and it only exists on the main page, never
-           inside the widget iframes (Bookmarks, Contact Reason, the
-           Scout dialogue). Click it for a Thanksgiving fact. */
+           inside the widget iframes (Bookmarks, Contact Reason). Click it for a Thanksgiving fact. */
         '/* v2.3: ticklish turkey, endless quotes */',
         '#tg-turkey {',
         '  position: fixed;',
@@ -1031,7 +1030,7 @@
        The turkey is a real element now, not a body::after overlay, so it
        can be clicked - and it is only created on the main page. The old
        body::after version rendered inside every widget iframe too
-       (Bookmarks, Contact Reason, the Scout dialogue), because this
+       (Bookmarks, Contact Reason), because this
        script runs in those frames as well. Click the turkey for a
        Thanksgiving fact; click again for another one. ---------------------- */
     var TG_FACTS = [
@@ -1087,7 +1086,7 @@
     var tgFactTimer = null;
     function addTurkey() {
         // Main page only: widget iframes (Bookmarks, Contact Reason,
-        // Scout dialogue) never get a turkey.
+        // never get a turkey.
         if (window.parent !== window) return;
         if (!document.body || document.getElementById('tg-turkey')) return;
         var turkey = document.createElement('div');
