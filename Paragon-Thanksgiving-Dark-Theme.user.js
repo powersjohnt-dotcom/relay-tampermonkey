@@ -56,8 +56,7 @@
 
         /* v1.1: the turkey is a real element (not body::after), so it
            can be clicked - and it only exists on the main page, never
-           inside the widget iframes (Bookmarks, Contact Reason, the
-           Scout dialogue). Click it for a Thanksgiving fact - 12 facts,
+           inside the widget iframes (Bookmarks, Contact Reason). Click it for a Thanksgiving fact - 12 facts,
            all different from the light theme's set. */
         '/* v1.2: ticklish turkey, endless quotes */',
         '#tg-turkey {',
@@ -1246,7 +1245,7 @@
     var tgFactTimer = null;
     function addTurkey() {
         // Main page only: widget iframes (Bookmarks, Contact Reason,
-        // Scout dialogue) never get a turkey.
+        // never get a turkey.
         if (window.parent !== window) return;
         if (!document.body || document.getElementById('tg-turkey')) return;
         var turkey = document.createElement('div');
