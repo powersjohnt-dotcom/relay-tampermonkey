@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Paragon — Thanksgiving Dark Theme
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @author       J.T. Powers
 // @match        https://paragon-na.amazon.com/*
 // @match        https://d1u16vxl4h9h9c.cloudfront.net/widget.html*
@@ -9,7 +9,6 @@
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
-
 
 (function () {
     'use strict';
@@ -59,7 +58,7 @@
            inside the widget iframes (Bookmarks, Contact Reason, the
            Scout dialogue). Click it for a Thanksgiving fact - 12 facts,
            all different from the light theme's set. */
-        '/* v1.3: reply box renders warm brown, not black */',
+        '/* v1.4: reply box accents amber, grey panels browned */',
         '#tg-turkey {',
         '  position: fixed;',
         '  right: 20px;',
@@ -246,6 +245,20 @@
            rule already forces it dark pre-inversion (renders light). */
         '#composer .kat-select-container, #review .kat-select-container, #composer .select-header, #review .select-header, #composer .select-options, #review .select-options { background: #e3c8b3 !important; }',
         '#composer .kat-radiobutton-icon, #review .kat-radiobutton-icon, #composer .kat-checkbox-icon, #review .kat-checkbox-icon { background-color: #e3c8b3 !important; }',
+        /* v1.4, live case check (case 23510852331, 11/20): the reply box
+           itself is warm brown now, but its accents were still Kat teal
+           (radio rings, dividers, left border), the To row / Attachments
+           bar rendered black (white site backgrounds the composer CSS did
+           not cover), and the Reason fields pale cream with cream text.
+           All pre-inversion colours here - the composer filter renders
+           them amber / brown / cream. */
+        '#composer, #review { border-color: #904800 !important; }',
+        '#composer kat-box, #review kat-box { border-color: #904800 !important; }',
+        '#composer .kat-radiobutton-icon, #review .kat-radiobutton-icon, #composer .kat-checkbox-icon, #review .kat-checkbox-icon { border-color: #904800 !important; }',
+        '#composer kat-divider, #review kat-divider, #composer hr, #review hr, #composer [class*="divider" i], #review [class*="divider" i] { border-color: #904800 !important; }',
+        '#composer .b-form-tags, #review .b-form-tags, #composer .input-group-text, #review .input-group-text, #composer .katal-input-group-tags-label, #review .katal-input-group-tags-label { background-color: #e3c8b3 !important; color: #211602 !important; }',
+        '#composer .b-form-tag, #review .b-form-tag { background-color: #904800 !important; color: #211602 !important; }',
+        '#composer input[type="file"], #review input[type="file"], #composer [class*="upload" i], #review [class*="upload" i], #composer [class*="attach" i], #review [class*="attach" i] { background-color: #e3c8b3 !important; }',
         '.kat-select-container, .select-header, .select-options { background-color: ' + SURFACE + ' !important; color: ' + BODY_TEXT + ' !important; }',
         '.select-header .header-row-text, .select-header kat-icon, .select-header i { color: inherit !important; }',
         '.select-options .option-inner-container { background-color: transparent !important; }',
@@ -431,6 +444,20 @@
 
     function isLightBg(c) {
         return c && c.a >= 0.6 && c.r >= 200 && c.g >= 200 && c.b >= 200;
+    }
+
+    // v1.4, live case check 11/20: mid-grey panels and near-black bars
+    // (top case-info panel ~#555, message-header rows ~#555-#666, the
+    // Correspondence filter bar ~#111) are neither light (isLightBg
+    // needs all channels >= 200) nor dark enough for the black-button
+    // rule, so the fixer left them grey with dark text - off-palette
+    // and low contrast. Grey = all channels 55-175 with little spread.
+    function isMidGreyBg(c) {
+        return c && c.a >= 0.6 && c.r >= 55 && c.r <= 175 && c.g >= 55 && c.g <= 175 && c.b >= 55 && c.b <= 175 &&
+            Math.max(c.r, c.g, c.b) - Math.min(c.r, c.g, c.b) <= 30;
+    }
+    function isNearBlackBg(c) {
+        return c && c.a >= 0.6 && c.r < 40 && c.g < 40 && c.b < 40;
     }
 
     // v2.6, Lobby check: Paragon's due-row wash is pale peach/salmon
@@ -666,6 +693,16 @@
                 el.style.filter = 'invert(1) hue-rotate(180deg)';
                 el.dataset.tgInverted = '1';
                 unthemeDescendants(el);
+                // v1.4: any descendant the fixer inverted BEFORE the
+                // composer got its filter is double-inverted back to its
+                // site colours (the cyan radio rings / dividers). Strip
+                // those filters now - the composer's own filter themes
+                // them once, correctly.
+                var _d = el.querySelectorAll('[data-tg-inverted]');
+                for (var _i = 0; _i < _d.length; _i++) {
+                    _d[_i].style.filter = '';
+                    delete _d[_i].dataset.tgInverted;
+                }
             }
             return;
         }
@@ -707,6 +744,21 @@
                 el.style.outline = '1px solid rgba(240,168,62,0.28)';
                 el.style.outlineOffset = '-1px';
             }
+        }
+        // v1.4, live case check 11/20: mid-grey panels and near-black
+        // bars (top case-info panel, message-header rows, Correspondence
+        // filter bar). Theme them directly: grey -> surface, near-black
+        // -> bar brown, dark text -> cream. Buttons keep their own
+        // black-button rule below; bars and composer interiors are
+        // excluded by the guards above.
+        if (!el.dataset.tgDarkened && tag !== 'BUTTON' && isMidGreyBg(bg)) {
+            el.style.backgroundColor = SURFACE;
+            if (isDarkText(fg) || fg) el.style.color = LIGHT_TEXT;
+            el.dataset.tgDarkened = '1';
+        } else if (!el.dataset.tgDarkened && tag !== 'BUTTON' && isNearBlackBg(bg)) {
+            el.style.backgroundColor = BAR_BG;
+            if (isDarkText(fg) || fg) el.style.color = LIGHT_TEXT;
+            el.dataset.tgDarkened = '1';
         }
         // Inverted leaves only. A custom element whose UI lives in shadow
         // DOM (possibly closed) cannot be reached, so invert the host and
@@ -806,7 +858,8 @@
     // ancestor filter inverts them): v1.3 recalibrated - #e3c8b3
     // renders warm brown #4a2f1a, #211602 renders warm cream #f2e7d3.
     var composerShadowCss = [
-        ':host { background-color: #e3c8b3 !important; color: #211602 !important; }',
+        ':host { background-color: #e3c8b3 !important; color: #211602 !important; border-color: #904800 !important; }',
+        '.kat-select-container, .select-header, .select-options { background-color: #e3c8b3 !important; color: #211602 !important; }',
         'input, textarea, select, button { background-color: #e3c8b3 !important; color: #211602 !important; border-color: #cbaa93 !important; }',
         'h1, h2, h3, h4, h5 { color: #211602 !important; }',
         'a { color: #904800 !important; }'
