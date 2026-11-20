@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Paragon — Thanksgiving Dark Theme
 // @namespace    http://tampermonkey.net/
-// @version      1.6
+// @version      1.7
 // @author       J.T. Powers
 // @match        https://paragon-na.amazon.com/*
 // @match        https://d1u16vxl4h9h9c.cloudfront.net/widget.html*
@@ -57,7 +57,7 @@
            inside the widget iframes (Bookmarks, Contact Reason, the
            Scout dialogue). Click it for a Thanksgiving fact - 12 facts,
            all different from the light theme's set. */
-        '/* v1.6: header search box, filter toolbar, modal browns */',
+        '/* v1.7: message rows also green, header search, filter, modal */',
         '#tg-turkey {',
         '  position: fixed;',
         '  right: 20px;',
@@ -277,7 +277,7 @@
         '#composer kat-dropdown, #review kat-dropdown { background-color: #e3c8b3 !important; color: #211602 !important; border-color: #904800 !important; }',
         'kat-dropdown { background-color: ' + SURFACE + ' !important; color: ' + BODY_TEXT + ' !important; border-color: ' + STEEL + ' !important; }',
         'kat-table { background-color: ' + SURFACE + ' !important; }',
-        '.row--gray_gsx5D, [class*="row--gray"] { background-color: ' + SURFACE + ' !important; color: ' + BODY_TEXT + ' !important; }',
+        '.row--gray_gsx5D, [class*="row--gray"], [class*="row--green"] { background-color: ' + SURFACE + ' !important; color: ' + BODY_TEXT + ' !important; }',
         'button[data-paragon-element-id^="correspondence-row-"] { background-color: ' + SURFACE + ' !important; color: ' + BODY_TEXT + ' !important; }',
 
         /* v1.6, case 739512000 pastes (11/20): the header Search Text box
