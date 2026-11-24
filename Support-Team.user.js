@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.26
+// @version      2.27
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @description  Automatically inserts responses for Relay issues
@@ -9,6 +9,102 @@
 // @match        https://paragon-na.amazon.com/hz/view-case?caseId=*
 // @grant        none
 // ==/UserScript==
+    /*UPDATES:
+    11/24/2026: Transfer-on-Send fix (v2.27, per J.T.): the send-completion signal is now the REVIEW YOUR REPLY preview closing, not the Send button disappearing. Live test on case 23584543611 proved a Send button stays findable on the page after the send (second 'Send button found' in the console, then the 20s abort) - the reply went out fine but the transfer never ran. The preview heading is the right signal: it closes on a good send and stays if the send fails. The watcher also stops looking for Send buttons once Send was clicked, and the reply-open check now uses the Review button or the preview heading. The Test button stays so the fix can be re-tested live. Tech-Team v3.35 carries the same fix. v2.26 is untouched as the fallback.
+    11/24/2026: TEST button (v2.26, per J.T., temporary): one 'Test' button in a new TEST group (bottom) that inserts the standard transfer message and arms a transfer to r4c-support@amazon.com, so the Transfer-on-Send route can be proved on a live case. The button id starts with xfer, so the existing arm logic picks it up with no other code change. Remove the button once the live test passes. Tech-Team v3.34 is untouched. v2.25 is untouched as the fallback.
+    11/24/2026: Transfer-on-Send (v2.25, per J.T.): a TRANSFERS button click now arms the transfer - it inserts the reply and, once the agent clicks Send on the review preview, the script opens the Transfer panel, picks Another queue, searches the destination alias, clicks the matching option and clicks Transfer Case, then checks the Queue value changed. The script never clicks Send itself. Discarding the reply or clicking another button drops the armed transfer; any failed or timed-out step aborts and logs with a [Transfers] prefix instead of transferring blindly. Destination routing is the verified live list (Driver Verification clicks the short name relay-driver-verification-checks; Payment Support has no destination). Tech-Team v3.34 carries the same automation minus the App & Web Portal destination (plain, no suggestion or logging). Personal is untouched. v2.24 is untouched as the fallback.
+    11/24/2026: NEW group TRANSFERS (v2.24, per J.T.): 12 buttons from the Transfer Protocol sheet, one per destination queue - Trip Disputes, Driver Verification, App & Web Portal, Contracts, Insurance, Assets, Site Escalations, Driver Assignment, Auctions, Safety Rewards, Suspension Appeals, Account Verification - each inserts "Dear Valued Carrier, We are transferring you to the correct team. Thanks for continuing to haul with Relay!" Dropdown mappings are best-fit copies of the existing button covering the same topic (generic account mapping where no topic code exists) - correct them if Paragon offers better codes. Payment Support is NOT included (the sheet says not yet transferrable). The buttons send the reply only; the actual queue transfer (the route) is still to be worked out. Tech-Team v3.33 carries the same group minus the App & Web Portal button (plain, no suggestion or logging). Personal is untouched - no transfer buttons there yet. v2.23 is untouched as the fallback.
+    11/21/2026: NEW "Performance Final" and "Account Access" buttons (2.23, per J.T.): same as Support Personal v2.39 - Performance Final (SUPPORT & GENERAL, next to Performance) and Account Access (SUPER ADMIN ISSUES, next to Portal Login Trouble), with the same responses and dropdown mappings. Plain Team port: no suggestion keywords or logging.
+    11/21/2026: EditSignature click fix (2.23, per J.T.): same as Support Personal v2.39 - the signature toggle click is now wrapped in try/catch so the 2-second signature fill still runs if the click throws.
+    11/17/2026: Button groups re-sorted most buttons on top (2.21, per J.T.): ACCOUNT & COMPLIANCE (18), SUPPORT & GENERAL (16), SUPER ADMIN ISSUES (13), TRIPS & OPERATIONS (12). Fixed rule from now on: groups always run most buttons first.
+    11/17/2026: Super Admin row (2.20, per J.T.): removed 6 duplicates - More Info Needed, App Crashing/Freezing, GPS/Location Not Tracking, Check-In Not Working, App Status Not Updating, Driver Using Multiple Devices - and recolored the row orange (was teal, too close to green).
+    11/17/2026: NEW "Super Admin Issues" row (2.19, per J.T.): 19 buttons, his texts verbatim (Support greeting "Dear Valued Carrier,").
+    11/17/2026: Winter weather signature block (2.18, per J.T.): US + Canadian notices with Relay Learning links, added to the signature.
+    11/12/2026: Trailer Defect port + line breaks (2.17, per J.T.): Team Support now has the Trailer Defect button Personal has had since v2.19 - button in TRIPS & OPERATIONS after Call Back, response and dropdown mapping (In-Transit Issues / On-Site Issues (ROC), same as Assets) copied verbatim from Personal. Also the same line-break fixes as Personal v2.27 in the UIIA and Auction Support responses (headers stand alone, footer links on separate lines). No suggestion or logging in this file - plain, as before. Support-JT-Personal-v2.27 carries the line-break fixes (it already had Trailer Defect), per the standing both-versions rule. v2.16 is untouched as the fallback.
+    11/11/2026: NEW button "Auction Support" (2.16, per J.T.): overview of Amazon Relay Auctions - how bidding works, who can access them, the Learning Center course link, and the Relay Auction Support topic for technical issues. Message adapted per queue: Support opens "Dear Valued Carrier," as given; Tech opens "Dear Carrier," per Tech's standard greeting; the body is otherwise identical and verbatim from his message. Placed at the end of the account group after UIIA. Dropdown mapping is a best-fit copy - no auction-specific code was found in the taxonomy (Support: generic account mapping RLB Tech Issue / Carrier Account, same as Other; Tech: General Support mapping Relay-account-category-main-category / Other) - correct it if Paragon offers a better code. Not added to the Auctions (RFA) scripts - he asked for Support and Tech only. Support-JT-Personal-v2.26 carries the same button/response/mapping plus suggestion keywords for Auction Support, per the standing both-versions rule. v2.15 is untouched as the fallback.
+    11/11/2026: NEW button "UIIA" (2.15, per J.T.): intermodal certification canned message, his text verbatim (opens "Dear Valued Carrier," as given). Placed at the end of the account group (Support ACCOUNT & COMPLIANCE / Tech ACCOUNT & REDIRECTS). Dropdown mapping is a best-fit copy - no UIIA/intermodal-specific code was found in the taxonomy (Support: generic account mapping RLB Tech Issue / Carrier Account, same as Other; Tech: General Support mapping Relay-account-category-main-category / Other) - correct it if Paragon offers a better code. Support-JT-Personal-v2.25 carries the same button/response/mapping plus suggestion keywords for UIIA, per the standing both-versions rule. v2.14 is untouched as the fallback.
+    11/10/2026: TEAM VERSION (per J.T.): this is the plain team build - the v2.14 code exactly as it was, with NO suggestion feature and NO case logging or data collection of any kind. @name is now "... — Team" and the file is named Support-Team-v2.14.user.js so it cannot be confused with J.T.'s personal build (Support-JT-Personal-v2.21.user.js, which has the suggestion + logging). The code below is byte-identical to v2.14 apart from this label: anyone already running v2.14 does NOT need to reinstall. Do NOT install this alongside the Personal Support script - they would build two bars on the same queue.
+    11/04/2026: Safety Score button (v2.14, per J.T.): renamed the BASICs button to 'Safety Score Not Compliant' (same id basicsCompliant, so no duplicate button), re-keyed its dropdown mapping to the new button text, and replaced its canned response with the expanded FMCSA version. Dropdown values unchanged: Performance / Dispute.
+    11/04/2026: 3-way switch (per J.T.): generalized from 2-way to Support / Tech / Auctions. Switch buttons now live in a shared bottom-right tray inside any native bar, so two switches never overlap. Back button returns to whichever bar was hidden. Bar chrome unified (sticky full-width, same switch/back styling). Buttons, responses, dropdown mappings and signatures unchanged — dropdown work is still to come.
+    11/04/2026: Second gate (v2.12, per J.T.): added rcm-support@amazon.com
+    as a second allowed queue, so the Support bar now also builds natively
+    on RCM cases (previously only r4c-support@amazon.com passed the gate,
+    so RCM cases showed neither bar). Tech script is untouched — its gate
+    is relay-feedback@amazon.com, so no double-bar conflict on RCM.
+    10/31/2026: Squished-buttons fix (v2.11, per J.T.): unhideOtherBar
+    used to restore a hidden native bar with display='' (block), losing its
+    flex column layout — so after switching back, the groups collapsed and
+    the buttons looked squished together. It now restores display='flex'
+    explicitly, so the bar comes back with its original layout intact.
+    10/31/2026: Back button location (v2.10, per J.T.): the top-left "Back to"
+    button in the override bar is removed. Instead, the override bar gets a
+    single button at its bottom-right corner, labelled "Back to Tech
+    responses", in the same spot as the original switch button. Clicking it
+    restores the native bar, whose original switch button (hidden with it)
+    becomes visible again. Override clicks remain text-only.
+    10/31/2026: Switch button location (v2.9, per J.T.): page bottom-right chip
+    removed. The switch now lives ONLY inside the native bar, at its bottom-right
+    corner, as an out-of-flow (absolute) button — so it does not add a row,
+    change the bar height, or change the spacing of the existing buttons.
+    Override clicks remain text-only.
+    10/31/2026: Switch button back to bottom-right (v2.8, per J.T.'s preference):
+    the top strip is replaced by a small fixed button at the bottom-right
+    corner, labelled "Switch to Support responses". The switch button inside
+    the native bar (v2.7) is kept as well. Chip is still always shown on load.
+    Override clicks remain text-only.
+    10/31/2026: Switch button inside the native bar (v2.7): the top strip could
+    be wiped by a page re-render even when the native bar survived. This
+    version also polls for the other script's bar and, when it appears,
+    appends an orange "Switch to Support responses" button inside that bar
+    itself (at the bottom), so the switch lives with the bar that survives.
+    Clicking it still builds this bar, hides the native bar, and the Back
+    button restores it. Override clicks remain text-only.
+    10/31/2026: Override chip always shown (v2.6): the chip no longer depends on
+    the queue gate to appear — it is shown on page load on every case, so a
+    gate-read failure cannot hide it. Clicking it still builds this bar,
+    hides the native bar, and the Back button restores it. Override clicks
+    remain text-only.
+    10/31/2026: Override chip moved to top (v2.5): the switch button was a small
+    bottom-right chip and could be missed or covered. It is now a bright,
+    full-width strip at the very top of the page, labelled "Switch to Support
+    responses". Clicking it still builds this bar, hides the native bar, and
+    the Back button restores it. Override clicks remain text-only.
+    10/31/2026: Override text-only (v2.4): when the override chip has been used,
+    a button click now only inserts the canned message — it does not touch
+    the Reason Category / Reason Code dropdowns and does not click Review.
+    Native (non-override) buttons are unchanged: insert + auto-select + Review.
+    10/31/2026: Override chip (v2.3): when the queue gate does not match, a small
+    "Show Support responses anyway" chip appears (bottom-right). Clicking it
+    builds this bar on the other queue's case, hiding the native bar (not
+    removing it). A "Back to Tech responses" button at the top of the
+    override bar restores the native bar. Override bars skip the lock-case
+    step (the native script already locked the case). As of v2.4, override
+    button clicks are text-only (see above); native buttons keep their
+    normal insert + auto-select + Review flow.
+    10/30/2026: Text cleanup (v2.2): canned messages only — misspellings,
+    grammar, and sentence/paragraph spacing fixed; greetings standardized
+    to "Dear Valued Carrier," and endings to "Thanks for continuing to
+    haul with Relay!" (including moving the Thanks line to the end in
+    Background Check and Driver Verification). No button text, mapping,
+    URL, email, or code changed.
+    10/30/2026: Bar height match (v2.1): the support bar has only 3 rows
+    against the tech bar's 5, so it was noticeably shorter. The container
+    now has minHeight 154px (the tech bar's measured height on his page)
+    with its rows spread evenly, so both bars stand the same height.
+    10/30/2026: Same page-move changes as tech v3.7 (v2.0): sticky full-width
+    bar inserted at the top of the page flow so Paragon content shifts down
+    below it, and #page-sidebar is unpinned (position: absolute) and shifted
+    down by the bar's height via a MutationObserver, so the whole page moves
+    as one instead of the sidebar staying still.
+    10/29/2026: Queue gate (v1.9): the script now reads the Queue field and only
+    builds its bar / locks a case when the queue is r4c-support@amazon.com,
+    so it can stay enabled alongside the tech script without showing two bars.
+    If that queue does not appear within 15 seconds, it stays silent.
+    8/28/2026: when buttons are clicked the Reason Category and Reason Code are selected automatically.
+    08/14/2026 Organized buttons into categories and color coded them.
+    06/02/2025 After sev 2 paragon, fixed it to work properly (hope).
+    05/29/2025: Added Remove CC'd Emails to script. Added auto-height to signature and response fields.
+    */
     // Configuration object
 const dropdownMappings = {
     "Safety Score Not Compliant": { category: "Performance", categoryValue: "37058498011", code: "Dispute", codeValue: "39474112881" },
@@ -1669,7 +1765,10 @@ const insertResponse = (response) => {
 // Discarding the reply, or clicking another button, drops the armed
 // transfer. Any failed or timed-out step aborts and logs with a
 // [Transfers] prefix - never retried blindly, never sent to the
-// wrong queue. Selectors are role + visible text, mirroring the
+// wrong queue. Send completion is the REVIEW YOUR REPLY preview
+// closing - a Send button can persist on the page after the send
+// (proven live Nov 24 on case 23584543611). Selectors are role +
+// visible text, mirroring the
 // existing Review-button finder (live inspection could not see raw HTML).
 var TRANSFER_CFG = { pollMs: 250, sendWaitMs: 20000, stepWaitMs: 10000, queueWaitMs: 30000 };
     var TRANSFER_DESTINATIONS = {
@@ -1796,8 +1895,25 @@ function xferFindSendButton() {
     return xferFindKatButton('Send');
 }
 
+function xferPreviewHeading() {
+    var heads = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    for (var i = 0; i < heads.length; i++) {
+        if (heads[i].textContent.trim() === 'REVIEW YOUR REPLY') { return heads[i]; }
+    }
+    return null;
+}
+
+function xferSendSuccessSeen() {
+    var els = document.querySelectorAll('*');
+    for (var i = 0; i < els.length; i++) {
+        var t = els[i].textContent || '';
+        if (t.indexOf('Email was sent successfully') !== -1) { return true; }
+    }
+    return false;
+}
+
 function xferReplyOpen() {
-    return !!xferFindKatButton('Review') || !!xferFindSendButton();
+    return !!xferFindKatButton('Review') || !!xferPreviewHeading();
 }
 
 function xferWaitFor(check, timeoutMs, pollMs) {
@@ -1848,7 +1964,7 @@ function xferStopWatch() {
 function xferWatchTick() {
     if (!pendingTransfer) { xferStopWatch(); return; }
     if (xferReplyOpen()) { transferSawReply = true; }
-    var sendBtn = xferFindSendButton();
+    var sendBtn = transferSendClicked ? null : xferFindSendButton();
     if (sendBtn && !sendBtn.__xferTracked) {
         sendBtn.__xferTracked = true;
         sendBtn.addEventListener('click', function() {
@@ -1866,14 +1982,14 @@ function xferWatchTick() {
 
 function xferWaitForSendDone(dest) {
     xferWaitFor(function() {
-        return xferFindSendButton() ? null : true;
+        return xferPreviewHeading() ? null : true;
     }, TRANSFER_CFG.sendWaitMs, TRANSFER_CFG.pollMs).then(function(done) {
         if (!done) {
-            console.warn('[Transfers] ABORT: reply did not finish sending within ' + (TRANSFER_CFG.sendWaitMs / 1000) + 's - transfer NOT run. If the reply went out, transfer manually.');
+            console.warn('[Transfers] ABORT: review preview did not close within ' + (TRANSFER_CFG.sendWaitMs / 1000) + 's - transfer NOT run. If the reply went out, transfer manually.');
             disarmTransfer('send not confirmed');
             return;
         }
-        console.log('[Transfers] Reply sent - running transfer to ' + dest.option);
+        console.log('[Transfers] Reply sent - running transfer to ' + dest.option + (xferSendSuccessSeen() ? ' (success banner seen)' : ' (no success banner seen)'));
         disarmTransfer('transfer running');
         xferRunTransfer(dest).then(function(ok) {
             if (ok) {
