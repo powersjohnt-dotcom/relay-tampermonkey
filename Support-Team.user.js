@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.28
+// @version      2.29
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @description  Automatically inserts responses for Relay issues
@@ -10,6 +10,7 @@
 // @grant        none
 // ==/UserScript==
     /*UPDATES:
+    11/24/2026: Transfer-on-Send fix (v2.29, per J.T.): the destination list is a native select, not a role=option listbox - J.T.'s pasted markup shows a plain select with option children, which the old finder never matched, so the transfer stalled with the option listed but unclicked. The finder now matches native options by value or text, and the click also sets the option selected and fires change on the select so the page registers the choice. The Test button stays so the fix can be re-tested live. Tech-Team v3.37 carries the same fix. v2.28 is untouched as the fallback.
     11/24/2026: Transfer-on-Send fix (v2.28, per J.T.): the Another queue radio is now found through its label's for-attribute. J.T.'s pasted markup proved the label holds the text but no input inside it, and the radio itself carries no label - the old finder matched neither, so the transfer stalled with the panel open. The click also goes through the label first, and the script now waits for the search box to appear after the radio is selected. The Test button stays so the fix can be re-tested live. Tech-Team v3.36 carries the same fix. v2.27 is untouched as the fallback.
     11/24/2026: Transfer-on-Send fix (v2.27, per J.T.): the send-completion signal is now the REVIEW YOUR REPLY preview closing, not the Send button disappearing. Live test on case 23584543611 proved a Send button stays findable on the page after the send (second 'Send button found' in the console, then the 20s abort) - the reply went out fine but the transfer never ran. The preview heading is the right signal: it closes on a good send and stays if the send fails. The watcher also stops looking for Send buttons once Send was clicked, and the reply-open check now uses the Review button or the preview heading. The Test button stays so the fix can be re-tested live. Tech-Team v3.35 carries the same fix. v2.26 is untouched as the fallback.
     11/24/2026: TEST button (v2.26, per J.T., temporary): one 'Test' button in a new TEST group (bottom) that inserts the standard transfer message and arms a transfer to r4c-support@amazon.com, so the Transfer-on-Send route can be proved on a live case. The button id starts with xfer, so the existing arm logic picks it up with no other code change. Remove the button once the live test passes. Tech-Team v3.34 is untouched. v2.25 is untouched as the fallback.
@@ -1886,7 +1887,33 @@ function xferFindOption(text) {
     for (var j = 0; j < alts.length; j++) {
         if (alts[j].textContent.trim() === text) { return alts[j]; }
     }
+    var natives = document.querySelectorAll('option');
+    for (var k = 0; k < natives.length; k++) {
+        var nv = natives[k].value || natives[k].getAttribute('value') || '';
+        if (nv === text || natives[k].textContent.trim() === text) { return natives[k]; }
+    }
     return null;
+}
+
+function xferClickOption(el) {
+    if (!el) { return false; }
+    el.click();
+    if (el.tagName === 'OPTION') {
+        el.selected = true;
+        var sel = el.parentElement;
+        while (sel && sel.tagName !== 'SELECT') { sel = sel.parentElement; }
+        if (sel) {
+            try {
+                var setter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, 'value').set;
+                setter.call(sel, el.value);
+            } catch (e) {
+                sel.value = el.value;
+            }
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
+            sel.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+    return true;
 }
 
 function xferListOptionTexts() {
@@ -1894,6 +1921,10 @@ function xferListOptionTexts() {
     var opts = document.querySelectorAll('[role="option"]');
     for (var i = 0; i < opts.length && out.length < 10; i++) {
         out.push(opts[i].textContent.trim());
+    }
+    var natives = document.querySelectorAll('option');
+    for (var j = 0; j < natives.length && out.length < 10; j++) {
+        out.push(natives[j].value || natives[j].textContent.trim());
     }
     return out.join(' | ');
 }
@@ -2052,7 +2083,7 @@ async function xferRunTransfer(dest) {
         console.warn('[Transfers] ABORT: no destination option matching "' + dest.option + '" (options now: ' + xferListOptionTexts() + ')');
         return false;
     }
-    option.click();
+    xferClickOption(option);
     console.log('[Transfers] Destination selected: ' + dest.option);
     var caseBtn = await xferWaitFor(function() {
         var b = xferFindKatButton('Transfer Case');
