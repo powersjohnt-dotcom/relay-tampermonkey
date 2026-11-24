@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.27
+// @version      2.28
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @description  Automatically inserts responses for Relay issues
@@ -10,6 +10,7 @@
 // @grant        none
 // ==/UserScript==
     /*UPDATES:
+    11/24/2026: Transfer-on-Send fix (v2.28, per J.T.): the Another queue radio is now found through its label's for-attribute. J.T.'s pasted markup proved the label holds the text but no input inside it, and the radio itself carries no label - the old finder matched neither, so the transfer stalled with the panel open. The click also goes through the label first, and the script now waits for the search box to appear after the radio is selected. The Test button stays so the fix can be re-tested live. Tech-Team v3.36 carries the same fix. v2.27 is untouched as the fallback.
     11/24/2026: Transfer-on-Send fix (v2.27, per J.T.): the send-completion signal is now the REVIEW YOUR REPLY preview closing, not the Send button disappearing. Live test on case 23584543611 proved a Send button stays findable on the page after the send (second 'Send button found' in the console, then the 20s abort) - the reply went out fine but the transfer never ran. The preview heading is the right signal: it closes on a good send and stays if the send fails. The watcher also stops looking for Send buttons once Send was clicked, and the reply-open check now uses the Review button or the preview heading. The Test button stays so the fix can be re-tested live. Tech-Team v3.35 carries the same fix. v2.26 is untouched as the fallback.
     11/24/2026: TEST button (v2.26, per J.T., temporary): one 'Test' button in a new TEST group (bottom) that inserts the standard transfer message and arms a transfer to r4c-support@amazon.com, so the Transfer-on-Send route can be proved on a live case. The button id starts with xfer, so the existing arm logic picks it up with no other code change. Remove the button once the live test passes. Tech-Team v3.34 is untouched. v2.25 is untouched as the fallback.
     11/24/2026: Transfer-on-Send (v2.25, per J.T.): a TRANSFERS button click now arms the transfer - it inserts the reply and, once the agent clicks Send on the review preview, the script opens the Transfer panel, picks Another queue, searches the destination alias, clicks the matching option and clicks Transfer Case, then checks the Queue value changed. The script never clicks Send itself. Discarding the reply or clicking another button drops the armed transfer; any failed or timed-out step aborts and logs with a [Transfers] prefix instead of transferring blindly. Destination routing is the verified live list (Driver Verification clicks the short name relay-driver-verification-checks; Payment Support has no destination). Tech-Team v3.34 carries the same automation minus the App & Web Portal destination (plain, no suggestion or logging). Personal is untouched. v2.24 is untouched as the fallback.
@@ -1811,6 +1812,21 @@ function xferFindRadio(name) {
         if (labels[i].textContent.trim() === name) {
             var input = labels[i].querySelector('input[type="radio"]');
             if (input) { return input; }
+            var forId = labels[i].getAttribute('for');
+            if (forId) {
+                var target = document.getElementById(forId);
+                if (target) { return target; }
+            }
+        }
+    }
+    var katLabels = document.querySelectorAll('kat-label');
+    for (var k = 0; k < katLabels.length; k++) {
+        if ((katLabels[k].getAttribute('text') || '').trim() === name) {
+            var kFor = katLabels[k].getAttribute('for');
+            if (kFor) {
+                var kTarget = document.getElementById(kFor);
+                if (kTarget) { return kTarget; }
+            }
         }
     }
     var radios = document.querySelectorAll('[role="radio"], input[type="radio"], kat-radio');
@@ -1825,6 +1841,11 @@ function xferFindRadio(name) {
 function xferClickRadio(name) {
     var r = xferFindRadio(name);
     if (!r) { return false; }
+    var id = r.id || (r.getAttribute && r.getAttribute('id')) || '';
+    if (id) {
+        var lab = document.querySelector('label[for="' + id + '"]');
+        if (lab) { lab.click(); }
+    }
     r.click();
     return true;
 }
@@ -2015,6 +2036,12 @@ async function xferRunTransfer(dest) {
         return false;
     }
     xferClickRadio('Another queue');
+    console.log('[Transfers] Another queue selected - waiting for the search box');
+    var searchBox = await xferWaitFor(function() { return xferFindSearchBox(); }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+    if (!searchBox) {
+        console.warn('[Transfers] ABORT: destination search box did not appear after selecting Another queue');
+        return false;
+    }
     if (!xferSetSearch(dest.search)) {
         console.warn('[Transfers] ABORT: destination search box not found');
         return false;
