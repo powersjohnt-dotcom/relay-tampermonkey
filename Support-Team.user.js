@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.29
+// @version      2.31
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @description  Automatically inserts responses for Relay issues
@@ -9,104 +9,7 @@
 // @match        https://paragon-na.amazon.com/hz/view-case?caseId=*
 // @grant        none
 // ==/UserScript==
-    /*UPDATES:
-    11/24/2026: Transfer-on-Send fix (v2.29, per J.T.): the destination list is a native select, not a role=option listbox - J.T.'s pasted markup shows a plain select with option children, which the old finder never matched, so the transfer stalled with the option listed but unclicked. The finder now matches native options by value or text, and the click also sets the option selected and fires change on the select so the page registers the choice. The Test button stays so the fix can be re-tested live. Tech-Team v3.37 carries the same fix. v2.28 is untouched as the fallback.
-    11/24/2026: Transfer-on-Send fix (v2.28, per J.T.): the Another queue radio is now found through its label's for-attribute. J.T.'s pasted markup proved the label holds the text but no input inside it, and the radio itself carries no label - the old finder matched neither, so the transfer stalled with the panel open. The click also goes through the label first, and the script now waits for the search box to appear after the radio is selected. The Test button stays so the fix can be re-tested live. Tech-Team v3.36 carries the same fix. v2.27 is untouched as the fallback.
-    11/24/2026: Transfer-on-Send fix (v2.27, per J.T.): the send-completion signal is now the REVIEW YOUR REPLY preview closing, not the Send button disappearing. Live test on case 23584543611 proved a Send button stays findable on the page after the send (second 'Send button found' in the console, then the 20s abort) - the reply went out fine but the transfer never ran. The preview heading is the right signal: it closes on a good send and stays if the send fails. The watcher also stops looking for Send buttons once Send was clicked, and the reply-open check now uses the Review button or the preview heading. The Test button stays so the fix can be re-tested live. Tech-Team v3.35 carries the same fix. v2.26 is untouched as the fallback.
-    11/24/2026: TEST button (v2.26, per J.T., temporary): one 'Test' button in a new TEST group (bottom) that inserts the standard transfer message and arms a transfer to r4c-support@amazon.com, so the Transfer-on-Send route can be proved on a live case. The button id starts with xfer, so the existing arm logic picks it up with no other code change. Remove the button once the live test passes. Tech-Team v3.34 is untouched. v2.25 is untouched as the fallback.
-    11/24/2026: Transfer-on-Send (v2.25, per J.T.): a TRANSFERS button click now arms the transfer - it inserts the reply and, once the agent clicks Send on the review preview, the script opens the Transfer panel, picks Another queue, searches the destination alias, clicks the matching option and clicks Transfer Case, then checks the Queue value changed. The script never clicks Send itself. Discarding the reply or clicking another button drops the armed transfer; any failed or timed-out step aborts and logs with a [Transfers] prefix instead of transferring blindly. Destination routing is the verified live list (Driver Verification clicks the short name relay-driver-verification-checks; Payment Support has no destination). Tech-Team v3.34 carries the same automation minus the App & Web Portal destination (plain, no suggestion or logging). Personal is untouched. v2.24 is untouched as the fallback.
-    11/24/2026: NEW group TRANSFERS (v2.24, per J.T.): 12 buttons from the Transfer Protocol sheet, one per destination queue - Trip Disputes, Driver Verification, App & Web Portal, Contracts, Insurance, Assets, Site Escalations, Driver Assignment, Auctions, Safety Rewards, Suspension Appeals, Account Verification - each inserts "Dear Valued Carrier, We are transferring you to the correct team. Thanks for continuing to haul with Relay!" Dropdown mappings are best-fit copies of the existing button covering the same topic (generic account mapping where no topic code exists) - correct them if Paragon offers better codes. Payment Support is NOT included (the sheet says not yet transferrable). The buttons send the reply only; the actual queue transfer (the route) is still to be worked out. Tech-Team v3.33 carries the same group minus the App & Web Portal button (plain, no suggestion or logging). Personal is untouched - no transfer buttons there yet. v2.23 is untouched as the fallback.
-    11/21/2026: NEW "Performance Final" and "Account Access" buttons (2.23, per J.T.): same as Support Personal v2.39 - Performance Final (SUPPORT & GENERAL, next to Performance) and Account Access (SUPER ADMIN ISSUES, next to Portal Login Trouble), with the same responses and dropdown mappings. Plain Team port: no suggestion keywords or logging.
-    11/21/2026: EditSignature click fix (2.23, per J.T.): same as Support Personal v2.39 - the signature toggle click is now wrapped in try/catch so the 2-second signature fill still runs if the click throws.
-    11/17/2026: Button groups re-sorted most buttons on top (2.21, per J.T.): ACCOUNT & COMPLIANCE (18), SUPPORT & GENERAL (16), SUPER ADMIN ISSUES (13), TRIPS & OPERATIONS (12). Fixed rule from now on: groups always run most buttons first.
-    11/17/2026: Super Admin row (2.20, per J.T.): removed 6 duplicates - More Info Needed, App Crashing/Freezing, GPS/Location Not Tracking, Check-In Not Working, App Status Not Updating, Driver Using Multiple Devices - and recolored the row orange (was teal, too close to green).
-    11/17/2026: NEW "Super Admin Issues" row (2.19, per J.T.): 19 buttons, his texts verbatim (Support greeting "Dear Valued Carrier,").
-    11/17/2026: Winter weather signature block (2.18, per J.T.): US + Canadian notices with Relay Learning links, added to the signature.
-    11/12/2026: Trailer Defect port + line breaks (2.17, per J.T.): Team Support now has the Trailer Defect button Personal has had since v2.19 - button in TRIPS & OPERATIONS after Call Back, response and dropdown mapping (In-Transit Issues / On-Site Issues (ROC), same as Assets) copied verbatim from Personal. Also the same line-break fixes as Personal v2.27 in the UIIA and Auction Support responses (headers stand alone, footer links on separate lines). No suggestion or logging in this file - plain, as before. Support-JT-Personal-v2.27 carries the line-break fixes (it already had Trailer Defect), per the standing both-versions rule. v2.16 is untouched as the fallback.
-    11/11/2026: NEW button "Auction Support" (2.16, per J.T.): overview of Amazon Relay Auctions - how bidding works, who can access them, the Learning Center course link, and the Relay Auction Support topic for technical issues. Message adapted per queue: Support opens "Dear Valued Carrier," as given; Tech opens "Dear Carrier," per Tech's standard greeting; the body is otherwise identical and verbatim from his message. Placed at the end of the account group after UIIA. Dropdown mapping is a best-fit copy - no auction-specific code was found in the taxonomy (Support: generic account mapping RLB Tech Issue / Carrier Account, same as Other; Tech: General Support mapping Relay-account-category-main-category / Other) - correct it if Paragon offers a better code. Not added to the Auctions (RFA) scripts - he asked for Support and Tech only. Support-JT-Personal-v2.26 carries the same button/response/mapping plus suggestion keywords for Auction Support, per the standing both-versions rule. v2.15 is untouched as the fallback.
-    11/11/2026: NEW button "UIIA" (2.15, per J.T.): intermodal certification canned message, his text verbatim (opens "Dear Valued Carrier," as given). Placed at the end of the account group (Support ACCOUNT & COMPLIANCE / Tech ACCOUNT & REDIRECTS). Dropdown mapping is a best-fit copy - no UIIA/intermodal-specific code was found in the taxonomy (Support: generic account mapping RLB Tech Issue / Carrier Account, same as Other; Tech: General Support mapping Relay-account-category-main-category / Other) - correct it if Paragon offers a better code. Support-JT-Personal-v2.25 carries the same button/response/mapping plus suggestion keywords for UIIA, per the standing both-versions rule. v2.14 is untouched as the fallback.
-    11/10/2026: TEAM VERSION (per J.T.): this is the plain team build - the v2.14 code exactly as it was, with NO suggestion feature and NO case logging or data collection of any kind. @name is now "... — Team" and the file is named Support-Team-v2.14.user.js so it cannot be confused with J.T.'s personal build (Support-JT-Personal-v2.21.user.js, which has the suggestion + logging). The code below is byte-identical to v2.14 apart from this label: anyone already running v2.14 does NOT need to reinstall. Do NOT install this alongside the Personal Support script - they would build two bars on the same queue.
-    11/04/2026: Safety Score button (v2.14, per J.T.): renamed the BASICs button to 'Safety Score Not Compliant' (same id basicsCompliant, so no duplicate button), re-keyed its dropdown mapping to the new button text, and replaced its canned response with the expanded FMCSA version. Dropdown values unchanged: Performance / Dispute.
-    11/04/2026: 3-way switch (per J.T.): generalized from 2-way to Support / Tech / Auctions. Switch buttons now live in a shared bottom-right tray inside any native bar, so two switches never overlap. Back button returns to whichever bar was hidden. Bar chrome unified (sticky full-width, same switch/back styling). Buttons, responses, dropdown mappings and signatures unchanged — dropdown work is still to come.
-    11/04/2026: Second gate (v2.12, per J.T.): added rcm-support@amazon.com
-    as a second allowed queue, so the Support bar now also builds natively
-    on RCM cases (previously only r4c-support@amazon.com passed the gate,
-    so RCM cases showed neither bar). Tech script is untouched — its gate
-    is relay-feedback@amazon.com, so no double-bar conflict on RCM.
-    10/31/2026: Squished-buttons fix (v2.11, per J.T.): unhideOtherBar
-    used to restore a hidden native bar with display='' (block), losing its
-    flex column layout — so after switching back, the groups collapsed and
-    the buttons looked squished together. It now restores display='flex'
-    explicitly, so the bar comes back with its original layout intact.
-    10/31/2026: Back button location (v2.10, per J.T.): the top-left "Back to"
-    button in the override bar is removed. Instead, the override bar gets a
-    single button at its bottom-right corner, labelled "Back to Tech
-    responses", in the same spot as the original switch button. Clicking it
-    restores the native bar, whose original switch button (hidden with it)
-    becomes visible again. Override clicks remain text-only.
-    10/31/2026: Switch button location (v2.9, per J.T.): page bottom-right chip
-    removed. The switch now lives ONLY inside the native bar, at its bottom-right
-    corner, as an out-of-flow (absolute) button — so it does not add a row,
-    change the bar height, or change the spacing of the existing buttons.
-    Override clicks remain text-only.
-    10/31/2026: Switch button back to bottom-right (v2.8, per J.T.'s preference):
-    the top strip is replaced by a small fixed button at the bottom-right
-    corner, labelled "Switch to Support responses". The switch button inside
-    the native bar (v2.7) is kept as well. Chip is still always shown on load.
-    Override clicks remain text-only.
-    10/31/2026: Switch button inside the native bar (v2.7): the top strip could
-    be wiped by a page re-render even when the native bar survived. This
-    version also polls for the other script's bar and, when it appears,
-    appends an orange "Switch to Support responses" button inside that bar
-    itself (at the bottom), so the switch lives with the bar that survives.
-    Clicking it still builds this bar, hides the native bar, and the Back
-    button restores it. Override clicks remain text-only.
-    10/31/2026: Override chip always shown (v2.6): the chip no longer depends on
-    the queue gate to appear — it is shown on page load on every case, so a
-    gate-read failure cannot hide it. Clicking it still builds this bar,
-    hides the native bar, and the Back button restores it. Override clicks
-    remain text-only.
-    10/31/2026: Override chip moved to top (v2.5): the switch button was a small
-    bottom-right chip and could be missed or covered. It is now a bright,
-    full-width strip at the very top of the page, labelled "Switch to Support
-    responses". Clicking it still builds this bar, hides the native bar, and
-    the Back button restores it. Override clicks remain text-only.
-    10/31/2026: Override text-only (v2.4): when the override chip has been used,
-    a button click now only inserts the canned message — it does not touch
-    the Reason Category / Reason Code dropdowns and does not click Review.
-    Native (non-override) buttons are unchanged: insert + auto-select + Review.
-    10/31/2026: Override chip (v2.3): when the queue gate does not match, a small
-    "Show Support responses anyway" chip appears (bottom-right). Clicking it
-    builds this bar on the other queue's case, hiding the native bar (not
-    removing it). A "Back to Tech responses" button at the top of the
-    override bar restores the native bar. Override bars skip the lock-case
-    step (the native script already locked the case). As of v2.4, override
-    button clicks are text-only (see above); native buttons keep their
-    normal insert + auto-select + Review flow.
-    10/30/2026: Text cleanup (v2.2): canned messages only — misspellings,
-    grammar, and sentence/paragraph spacing fixed; greetings standardized
-    to "Dear Valued Carrier," and endings to "Thanks for continuing to
-    haul with Relay!" (including moving the Thanks line to the end in
-    Background Check and Driver Verification). No button text, mapping,
-    URL, email, or code changed.
-    10/30/2026: Bar height match (v2.1): the support bar has only 3 rows
-    against the tech bar's 5, so it was noticeably shorter. The container
-    now has minHeight 154px (the tech bar's measured height on his page)
-    with its rows spread evenly, so both bars stand the same height.
-    10/30/2026: Same page-move changes as tech v3.7 (v2.0): sticky full-width
-    bar inserted at the top of the page flow so Paragon content shifts down
-    below it, and #page-sidebar is unpinned (position: absolute) and shifted
-    down by the bar's height via a MutationObserver, so the whole page moves
-    as one instead of the sidebar staying still.
-    10/29/2026: Queue gate (v1.9): the script now reads the Queue field and only
-    builds its bar / locks a case when the queue is r4c-support@amazon.com,
-    so it can stay enabled alongside the tech script without showing two bars.
-    If that queue does not appear within 15 seconds, it stays silent.
-    8/28/2026: when buttons are clicked the Reason Category and Reason Code are selected automatically.
-    08/14/2026 Organized buttons into categories and color coded them.
-    06/02/2025 After sev 2 paragon, fixed it to work properly (hope).
-    05/29/2025: Added Remove CC'd Emails to script. Added auto-height to signature and response fields.
-    */
+
     // Configuration object
 const dropdownMappings = {
     "Safety Score Not Compliant": { category: "Performance", categoryValue: "37058498011", code: "Dispute", codeValue: "39474112881" },
@@ -157,7 +60,6 @@ const dropdownMappings = {
     "UIIA":                   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Auction Support":        { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Transfer to Trip Disputes":        { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
-    "Test":                             { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Transfer to Driver Verification":  { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Transfer to App & Web Portal":     { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
     "Transfer to Contracts":            { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Contracts", codeValue: "48827581941" },
@@ -169,20 +71,6 @@ const dropdownMappings = {
     "Transfer to Safety Rewards":       { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Transfer to Suspension Appeals":   { category: "RLB Access", categoryValue: "39778217681", code: "Suspended", codeValue: "39474112901" },
     "Transfer to Account Verification": { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Add Admin/Dispatcher":   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Add Driver":             { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Invite Not Received":    { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Email Already In Use":   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Remove User":            { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Change User Role":       { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Dispatcher No Payout":   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "User Missing Trips":     { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Portal Login Trouble":   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Account Access":        { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Transfer Role":          { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Super Admin Left Company":{ category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Driver Can't Log In":    { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
-    "Driver Not Seeing Load": { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
 
 };
 function setDropdownValue(dropdownId, value, displayName) {
@@ -296,28 +184,6 @@ buttonGroups: [
         ]
     },
     {
-        name: 'SUPER ADMIN ISSUES',
-        backgroundColor: '#ea580c',
-        hoverColor: '#c2410c',
-        labelColor: '#ea580c',
-        buttons: [
-            { id: 'addAdminDispatcher', text: 'Add Admin/Dispatcher' },
-            { id: 'addDriver', text: 'Add Driver' },
-            { id: 'inviteNotReceived', text: 'Invite Not Received' },
-            { id: 'emailAlreadyInUse', text: 'Email Already In Use' },
-            { id: 'removeUser', text: 'Remove User' },
-            { id: 'changeUserRole', text: 'Change User Role' },
-            { id: 'dispatcherNoPayout', text: 'Dispatcher No Payout' },
-            { id: 'userMissingTrips', text: 'User Missing Trips' },
-            { id: 'portalLoginTrouble', text: 'Portal Login Trouble' },
-            { id: 'accountAccess', text: 'Account Access' },
-            { id: 'transferRole', text: 'Transfer Role' },
-            { id: 'superAdminLeftCompany', text: 'Super Admin Left Company' },
-            { id: 'driverCantLogIn', text: "Driver Can't Log In" },
-            { id: 'driverNotSeeingLoad', text: 'Driver Not Seeing Load' },
-        ]
-    },
-    {
         name: 'TRIPS & OPERATIONS',
         backgroundColor: '#2e8b57',
         hoverColor: '#22663f',
@@ -356,15 +222,6 @@ buttonGroups: [
             { id: 'xferSuspensionAppeals', text: 'Transfer to Suspension Appeals' },
             { id: 'xferAccountVerification', text: 'Transfer to Account Verification' }
         ]
-    },
-    {
-        name: 'TEST',
-        backgroundColor: '#0f766e',
-        hoverColor: '#115e59',
-        labelColor: '#0f766e',
-        buttons: [
-            { id: 'xferTest', text: 'Test' }
-        ]
     }
 ],
 buttonStyle: {
@@ -402,11 +259,6 @@ containerStyle: {
     // Response templates
     const responses = {
         xferTripDisputes: `Dear Valued Carrier,
-
-We are transferring you to the correct team.
-
-Thanks for continuing to haul with Relay!`,
-        xferTest: `Dear Valued Carrier,
 
 We are transferring you to the correct team.
 
@@ -1567,150 +1419,6 @@ If you are unable to locate the BOL through your Relay account, please reply to 
 For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
 
 Thanks for continuing to haul with Relay!`,
-        addAdminDispatcher: `Dear Valued Carrier,
-
-As the Super Admin, you can invite Admins and Dispatchers to your company's Relay account. Log in to relay.amazon.com, go to your user management area and send the invite to the person's email address. They will receive an email to finish setting up their account.
-
-If the invite does not arrive, ask them to check their spam folder before you send it again.
-
-You may find this optional Relay Learning Center course helpful:
-- Get started with Relay 101: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=70c8bf62-bd37-48a8-bef4-34128b223a60
-
-Thanks for continuing to haul with Relay!`,
-        addDriver: `Dear Valued Carrier,
-
-You can invite drivers from the Driver Roster page at relay.amazon.com. Once the driver accepts, they can log in to the Relay mobile app with the same email address.
-
-We recommend that drivers use the latest Relay app version on Android 7 or later, or iOS 13.1 or later.
-
-You may find these optional Relay Learning Center resources helpful:
-- Driver Background Check Guide: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=4bcb6fd6-9383-4834-bdb5-20bce34da56b
-- How to avoid Automatic Rejections: Asset Not Assigned & No Driver Assigned: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=948c6d87-d6b8-4a91-8a9c-834182a49336
-
-Thanks for continuing to haul with Relay!`,
-        inviteNotReceived: `Dear Valued Carrier,
-
-If a user or driver did not receive their Relay invite, we recommend the following:
-
-1. Ask them to check their spam or junk folder.
-2. Confirm the email address on the invite is spelled correctly.
-3. Send the invite again from relay.amazon.com.
-
-If the invite still does not arrive, please reply to this case with the user's email address, their role (Admin, Dispatcher, or Driver), and the date you sent the invite.
-
-Thanks for continuing to haul with Relay!`,
-        emailAlreadyInUse: `Dear Valued Carrier,
-
-A Relay login can be linked to more than one carrier account or role. If you see a message that the email is already in use, the person may already have a Relay account under that email.
-
-We recommend asking the user to log in with their existing credentials. If they need a separate login for your company, please invite them with a different email address.
-
-If the issue continues, please reply to this case with the email address, the role you are trying to assign, and a screenshot of the message.
-
-Thanks for continuing to haul with Relay!`,
-        removeUser: `Dear Valued Carrier,
-
-As the Super Admin, you can remove Admins, Dispatchers, and drivers from your company's Relay account at relay.amazon.com. We recommend reviewing your user list regularly so that only current users have access.
-
-If you are unable to remove a user, please reply to this case with the user's email address, their role, and a screenshot of what you see.
-
-You may find this optional Relay Learning Center course helpful:
-- Get started with Relay 101: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=70c8bf62-bd37-48a8-bef4-34128b223a60
-
-Thanks for continuing to haul with Relay!`,
-        changeUserRole: `Dear Valued Carrier,
-
-Each user on your account has a role: Admin, Dispatcher, or Driver. Admins can see payout information for loads; Dispatchers cannot. Before changing a role, consider what each person needs to see.
-
-As the Super Admin, you can update a user's access at relay.amazon.com. If you are unable to change the role, please reply to this case with the user's email address, the current role, the role you would like, and a screenshot.
-
-You may find this optional Relay Learning Center course helpful:
-- Get started with Relay 101: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=70c8bf62-bd37-48a8-bef4-34128b223a60
-
-Thanks for continuing to haul with Relay!`,
-        dispatcherNoPayout: `Dear Valued Carrier,
-
-This is expected. Admins can see payout information for loads, but Dispatchers cannot. If this person needs to see payouts, you may consider inviting them as an Admin instead.
-
-Thanks for continuing to haul with Relay!`,
-        userMissingTrips: `Dear Valued Carrier,
-
-If domiciles are assigned to a user on the Carrier Profile or Driver Roster page, that user will only see trips that start in those domiciles. As the Super Admin, you can review and update each user's domiciles there.
-
-If the domiciles are correct and trips are still missing, please reply to this case with the Load ID, the user's role, and a screenshot.
-
-Thanks for continuing to haul with Relay!`,
-        portalLoginTrouble: `Dear Valued Carrier,
-
-If you are having trouble logging in to relay.amazon.com, we recommend the following:
-
-1. Use the "Forgot password" option on the login page.
-2. Clear your browser cache and cookies, then do a hard refresh.
-3. Try a different browser.
-
-If you still cannot log in, please reply to this case with your SCAC, the email address on the account, a screenshot of any error message, and the date and time of the attempt.
-
-You may find this optional Relay Learning Center course helpful:
-- Get started with Relay 101: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=70c8bf62-bd37-48a8-bef4-34128b223a60
-
-Thanks for continuing to haul with Relay!`,
-        accountAccess: `Dear Carrier,
-
-Thank you for reaching out, and we're sorry for the trouble signing in. The right fix depends on what is blocking your sign-in:
-
-If you can still sign in on another device, update the phone number first: sign in at amazon.com with the same email and password you use for Relay, go to Account & Lists, then Your Account, then Login & security. Next to Mobile number, select Edit, enter the new number, and enter the verification code sent to that number. If you are still signed in to the Relay mobile app, please stay signed in for now — signing out may prevent you from getting back in until the phone number is updated.
-
-If your company's DOT and MC numbers appear to be linked to a different Relay account, this has to be reviewed by the team that handles account verification. Please email atscompliance@amazon.com with your company's DOT and MC numbers, the email address you're trying to sign in with, and any other email address that may have been used to register the account.
-
-If your Primary Administrator can't sign in because their Amazon.com account is suspended, the quickest way to restore access is to resolve that suspension first: have the Primary Administrator contact Amazon.com Customer Service about the Amazon.com account suspension and follow the steps provided to restore access.
-
-For other account issues, including problems related to sign-in, unauthorized access, or account security concerns, you can reach out to amazon-engagement@amazon.com for assistance. Please note that Amazon will never request personal information such as passwords, OTPs, or credit card numbers via phone or email.
-
-Thanks for continuing to haul with Relay!`,
-        transferRole: `Dear Valued Carrier,
-
-Each Relay account has one Super Admin. To move the role to someone else, please open a case in the Relay Support Center at relay.amazon.com and include your SCAC, the current Super Admin's email, and the new Super Admin's email.
-
-If you already have an open case about this, please reply on that case with these details instead of opening a new one.
-
-Thanks for continuing to haul with Relay!`,
-        superAdminLeftCompany: `Dear Valued Carrier,
-
-If your Super Admin is no longer with your company, the role will need to be moved to a new person. Please open a case in the Relay Support Center at relay.amazon.com and include your SCAC, the former Super Admin's email, and the new Super Admin's name and email.
-
-If you already have an open case about this, please reply on that case with these details instead of opening a new one.
-
-Thanks for continuing to haul with Relay!`,
-        driverCantLogIn: `Dear Valued Carrier,
-
-If your company's driver is unable to log in to the Relay mobile app, we recommend the following:
-
-1. Confirm the driver accepted their invite and is using the same email address the invite was sent to.
-2. Use the "Forgot password" option on the app login screen.
-3. Update to the latest Relay app version (Android 7 or later, or iOS 13.1 or later).
-4. Close and restart the app, and check for a stable internet connection.
-
-You may find this optional Relay Learning Center course helpful:
-- Introduction to Primary and Secondary Devices: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=1b83c2f9-1e32-4d56-9f3c-1c8e8e988998
-
-If the driver still cannot log in, please reply to this case with the driver's email address, phone type and OS version, a screenshot of any error message, and the date and time of the attempt.
-
-Thanks for continuing to haul with Relay!`,
-        driverNotSeeingLoad: `Dear Valued Carrier,
-
-If your company's driver cannot see an assigned load in the Relay mobile app, we recommend the following:
-
-1. Confirm the driver is assigned to the load on the Trips page at relay.amazon.com.
-2. Have the driver log out and back in, then refresh the app.
-3. Update to the latest Relay app version.
-
-You may find these optional Relay Learning Center courses helpful:
-- How to avoid Automatic Rejections: Asset Not Assigned & No Driver Assigned: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=948c6d87-d6b8-4a91-8a9c-834182a49336
-- Confirming Load Specifics: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=ab2993e7-0b0a-4baa-92a0-01d3fa58461d
-
-If the load still does not appear, please reply to this case with the Load ID or VRID, the driver's email address, and a screenshot of the driver's app.
-
-Thanks for continuing to haul with Relay!`,
     };
     // Create and insert response
     var replyClicked = false;
@@ -1785,8 +1493,7 @@ var TRANSFER_CFG = { pollMs: 250, sendWaitMs: 20000, stepWaitMs: 10000, queueWai
         xferAuctions: { search: 'relay-auctions-suppport@amazon.com', option: 'relay-auctions-suppport@amazon.com' },
         xferSafetyRewards: { search: 'relay-safety-rewards-queue@amazon.com', option: 'relay-safety-rewards-queue@amazon.com' },
         xferSuspensionAppeals: { search: 'relay-am@amazon.com', option: 'relay-am@amazon.com' },
-        xferAccountVerification: { search: 'relay-account-verification@amazon.com', option: 'relay-account-verification@amazon.com' },
-        xferTest: { search: 'r4c-support@amazon.com', option: 'r4c-support@amazon.com' }
+        xferAccountVerification: { search: 'relay-account-verification@amazon.com', option: 'relay-account-verification@amazon.com' }
     };
 var pendingTransfer = null;
 var transferWatchTimer = null;
