@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.32
+// @version      2.33
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @description  Automatically inserts responses for Relay issues
@@ -9,7 +9,6 @@
 // @match        https://paragon-na.amazon.com/hz/view-case?caseId=*
 // @grant        none
 // ==/UserScript==
-
     // Configuration object
 const dropdownMappings = {
     "Safety Score Not Compliant": { category: "Performance", categoryValue: "37058498011", code: "Dispute", codeValue: "39474112881" },
@@ -2016,9 +2015,12 @@ button.addEventListener('click', () => {
             if (!tray) {
                 tray = document.createElement('div');
                 tray.className = 'tm-switch-tray';
-                Object.assign(tray.style, { display: 'flex', gap: '6px', justifyContent: 'flex-end', width: '100%', boxSizing: 'border-box' });
                 nativeBar.appendChild(tray);
             }
+            // Re-assert in-flow layout on every tick: an older script
+            // version may have created this tray with absolute
+            // positioning, which floats it over the last row's buttons.
+            Object.assign(tray.style, { position: '', bottom: '', right: '', zIndex: '', display: 'flex', gap: '6px', justifyContent: 'flex-end', width: '100%', boxSizing: 'border-box', marginTop: '10px' });
             if (tray.querySelector('#tm-switch-to-support')) { return; }
             const btn = document.createElement('button');
             btn.id = 'tm-switch-to-support';
@@ -2051,7 +2053,7 @@ if (crossQueueMode) {
     const backBtn = document.createElement('button');
     backBtn.id = hiddenBarId ? 'tm-back-to-' + hiddenBarLabel.toLowerCase() : 'tm-back-to-other';
     backBtn.textContent = hiddenBarLabel ? 'Back to ' + hiddenBarLabel + ' responses' : 'Back to responses';
-    Object.assign(backBtn.style, { alignSelf: 'flex-end', order: '99', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' });
+    Object.assign(backBtn.style, { alignSelf: 'flex-end', order: '99', marginTop: '10px', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' });
     backBtn.addEventListener('click', switchBackFromOverride);
     container.appendChild(backBtn);
 }
