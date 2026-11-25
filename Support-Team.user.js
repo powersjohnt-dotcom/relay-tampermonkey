@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.33
+// @version      2.35
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @description  Automatically inserts responses for Relay issues
@@ -58,7 +58,7 @@ const dropdownMappings = {
     "Update Bank Info":       { category: "Payment Related", categoryValue: "37058498001", code: "Update Banking Info", codeValue: "39474112991" },
     "UIIA":                   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Auction Support":        { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Transfer to Trip Disputes":        { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
+    "Transfer to Trip Completion Dispute":        { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
     "Transfer to Driver Verification":  { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Transfer to App & Web Portal":     { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
     "Transfer to Contracts":            { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Contracts", codeValue: "48827581941" },
@@ -208,7 +208,7 @@ buttonGroups: [
         hoverColor: '#115e59',
         labelColor: '#0f766e',
         buttons: [
-            { id: 'xferTripDisputes', text: 'Transfer to Trip Disputes' },
+            { id: 'xferTripDisputes', text: 'Transfer to Trip Completion Dispute' },
             { id: 'xferDriverVerification', text: 'Transfer to Driver Verification' },
             { id: 'xferAppPortal', text: 'Transfer to App & Web Portal' },
             { id: 'xferContracts', text: 'Transfer to Contracts' },
@@ -259,64 +259,126 @@ containerStyle: {
     const responses = {
         xferTripDisputes: `Dear Valued Carrier,
 
-We are transferring you to the correct team.
+We are transferring your case to the Trip Completion Dispute team so they can help you with this issue.
 
-Thanks for continuing to haul with Relay!`,
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay Trip Completion Status Dispute
+
+Thank you for continuing to haul with Relay!`,
         xferDriverVerification: `Dear Valued Carrier,
 
-We are transferring you to the correct team.
+We are transferring your case to the Driver Verification team so they can help you with this issue.
 
-Thanks for continuing to haul with Relay!`,
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay Driver Verification Dispute
+
+Thank you for continuing to haul with Relay!`,
         xferAppPortal: `Dear Valued Carrier,
 
-We are transferring you to the correct team.
+We are transferring your case to the App & Web Portal team so they can help you with this issue.
 
-Thanks for continuing to haul with Relay!`,
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay App & Web Portal Tech Support
+
+Thank you for continuing to haul with Relay!`,
         xferContracts: `Dear Valued Carrier,
 
-We are transferring you to the correct team.
+We are transferring your case to the Contracts team so they can help you with this issue.
 
-Thanks for continuing to haul with Relay!`,
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Short-Term Contracts
+
+Thank you for continuing to haul with Relay!`,
         xferInsurance: `Dear Valued Carrier,
 
-We are transferring you to the correct team.
+We are transferring your case to the Insurance team so they can help you with this issue.
 
-Thanks for continuing to haul with Relay!`,
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Insurance Compliance
+
+Thank you for continuing to haul with Relay!`,
         xferAssets: `Dear Valued Carrier,
 
-We are transferring you to the correct team.
+We are transferring your case to the Assets team so they can help you with this issue.
 
-Thanks for continuing to haul with Relay!`,
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Asset Edit
+
+Thank you for continuing to haul with Relay!`,
         xferSiteEscalations: `Dear Valued Carrier,
 
-We are transferring you to the correct team.
+We are transferring your case to the Site Escalations team so they can help you with this issue.
 
-Thanks for continuing to haul with Relay!`,
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Site Escalations
+
+Thank you for continuing to haul with Relay!`,
         xferDriverAssignment: `Dear Valued Carrier,
 
-We are transferring you to the correct team.
+We are transferring your case to the Driver Assignment team so they can help you with this issue.
 
-Thanks for continuing to haul with Relay!`,
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay Driver Assignment Support
+
+Thank you for continuing to haul with Relay!`,
         xferAuctions: `Dear Valued Carrier,
 
-We are transferring you to the correct team.
+We are transferring your case to the Auctions team so they can help you with this issue.
 
-Thanks for continuing to haul with Relay!`,
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay Actions Support
+
+Thank you for continuing to haul with Relay!`,
         xferSafetyRewards: `Dear Valued Carrier,
 
-We are transferring you to the correct team.
+We are transferring your case to the Safety Rewards team so they can help you with this issue.
 
-Thanks for continuing to haul with Relay!`,
+Next time, you can reach them directly:
+
+1. Click on the "Rewards" button on the left side of the screen.
+
+Thank you for continuing to haul with Relay!`,
         xferSuspensionAppeals: `Dear Valued Carrier,
 
-We are transferring you to the correct team.
+We are transferring your case to the team that handles suspension appeals so they can review your appeal.
 
-Thanks for continuing to haul with Relay!`,
+You don't need to do anything else. They will pick up this same case.
+
+Thank you for continuing to haul with Relay!`,
         xferAccountVerification: `Dear Valued Carrier,
 
-We are transferring you to the correct team.
+We are transferring your case to the Account Verification team so they can help you with this issue.
 
-Thanks for continuing to haul with Relay!`,
+You don't need to do anything else. They will pick up this same case.
+
+Thank you for continuing to haul with Relay!`,
         assets: `Dear Valued Carrier,
 
 Thank you for reaching out. For inquiries related to assets, please navigate to the Relay Support Center via your Relay account and create a case under the Topic: Asset. Our support team will review your case and follow up accordingly.
