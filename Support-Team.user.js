@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.31
+// @version      2.32
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @description  Automatically inserts responses for Relay issues
@@ -2016,7 +2016,7 @@ button.addEventListener('click', () => {
             if (!tray) {
                 tray = document.createElement('div');
                 tray.className = 'tm-switch-tray';
-                Object.assign(tray.style, { position: 'absolute', bottom: '4px', right: '8px', zIndex: '10001', display: 'flex', gap: '6px' });
+                Object.assign(tray.style, { display: 'flex', gap: '6px', justifyContent: 'flex-end', width: '100%', boxSizing: 'border-box' });
                 nativeBar.appendChild(tray);
             }
             if (tray.querySelector('#tm-switch-to-support')) { return; }
@@ -2051,7 +2051,7 @@ if (crossQueueMode) {
     const backBtn = document.createElement('button');
     backBtn.id = hiddenBarId ? 'tm-back-to-' + hiddenBarLabel.toLowerCase() : 'tm-back-to-other';
     backBtn.textContent = hiddenBarLabel ? 'Back to ' + hiddenBarLabel + ' responses' : 'Back to responses';
-    Object.assign(backBtn.style, { position: 'absolute', bottom: '4px', right: '8px', zIndex: '10001', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' });
+    Object.assign(backBtn.style, { alignSelf: 'flex-end', order: '99', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' });
     backBtn.addEventListener('click', switchBackFromOverride);
     container.appendChild(backBtn);
 }
