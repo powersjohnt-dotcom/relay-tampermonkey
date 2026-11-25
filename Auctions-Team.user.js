@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses RFA Auctions Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.7
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Auctions-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Auctions-Team.user.js
 // @description  Automatically inserts responses for Relay Auctions Support issues
@@ -16,19 +16,27 @@
     // Configuration object
     const config = {
         buttonConfigs: [
+            { id: 'appIssue', text: 'App Issue' },
             { id: 'canada', text: 'Canada' },
             { id: 'deniedBid', text: 'Denied Bid' },
             { id: 'renewal', text: 'Renewal/Extend' },
             { id: 'updateAssets', text: 'Update Assets' },
-            { id: 'cancellations', text: 'Cancellations' },
-            { id: 'untendered', text: 'Untendered' },
+            { id: 'wrongDriverType', text: 'Wrong Driver Type' },
+            { id: 'cancellations', text: 'Cancellations/Rejections' },
+            { id: 'untendered', text: 'Untendered Contracts' },
             { id: 'performance', text: 'Performance' },
             { id: 'payment', text: 'Payment' },
             { id: 'suspended', text: 'Suspended' },
             { id: 'cancellationFollowup', text: 'Cancel Follow-up' },
             { id: 'tenderedFollowup', text: 'Tendered Follow-up' },
             { id: 'awardedContract', text: 'Awarded Contract' },
-            { id: 'moreinfo', text: 'More Info' }
+            { id: 'moreinfo', text: 'More Information' },
+            { id: 'inTransit', text: 'In-Transit' },
+            { id: 'contractId', text: 'Contract ID' },
+            { id: 'overlapping', text: 'Overlapping' },
+            { id: 'missingWrongTrailer', text: '(Missing/Wrong) Trailer' },
+            { id: 'cancelledLoads', text: 'Cancelled Loads' },
+            { id: 'loadBoardWip', text: 'Load Board WIP' }
         ],
         buttonStyle: {
             backgroundColor: '#1a8a8a',
@@ -61,35 +69,69 @@
 
     // Response templates
     const responses = {
+        appIssue: `Dear Carrier,
+
+Thank you for reaching out. This queue is designated for Relay Auctions support, which handles requests such as contract cancellations, missing VRIDs from awarded contracts, right-sizing contracts, incorrect configuration reports, and contract extensions.
+
+Please follow the below steps if you are facing issues with the app:
+
+1. Swipe/close the app completely and then restart it
+2. Restart the device
+3. Ensure you have the app updated.
+4. Ensure that you have a device with the proper operative system:
+a. If Android, must have at least Android 7 or higher version. The latest is Android OS 11.
+b. If iPhone, must have at least iOS 9 or higher version. The latest is iOS 14.
+If possible, please ensure you share the problem through “Give Feedback” option within the app
+selecting “Relay App” and sharing the issue.
+
+If you continue to have issues with the app or website, please navigate to Relay Support Center and create a case under the Topic: Relay App & Web Portal Tech Support.`,
+
         canada: `Dear Carrier,
 
 Thank you for reaching out.
 
-This queue supports US-based operations. For all Canada-related inquiries, please reach out to rpm-canada@amazon.com for further assistance.
+This queue supports US-based operations. For all Canada-related inquiries, please reach out to rpm-canada@amazon.com for further assistance.
 
 Thank you for your continued partnership with Relay.
 
-For additional support, please visit the Relay Support Center at: https://relay.amazon.ca/cases/sc/help
+For additional support, please visit the Relay Support Center at: https://relay.amazon.ca/cases/sc/help
 
-For additional resources, please visit the Relay Learning Center at: https://relay.amazon.ca/cases/sc/learning`,
+For additional resources, please visit the Relay Learning Center at: https://relay.amazon.ca/cases/sc/learning`,
 
         deniedBid: `Dear Carrier,
-
 Those contracts are currently undergoing adjustments and are not designated for public auction at this time. While they may still appear in the system, they are not active listings. Please feel free to continue placing bids on other available opportunities.`,
 
         renewal: `Dear Carrier,
 
-If your company is eligible, you'll receive an email with an offer to renew an existing dedicated lane or domicile-based contracts. Renewal offers are based on performance during the contract. They're sent three weeks before the contract expires, and you'll have one day to accept or reject the offer.`,
+Thank you for reaching out regarding your extension request of contract: (insert contract).
+
+We have received your request and are currently reviewing it. Our team is working to process this as quickly as possible, and we will follow up with a resolution shortly.
+
+If you have any additional details or questions in the meantime, please reply to this case or visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
+
+Thanks for continuing to haul with Relay.`,
 
         updateAssets: `Dear Carrier,
 
-Add any equipment you plan to use for Amazon loads that's not already listed in your Assets page.
-You'll get an email if you need to provide additional documentation about any of your listed assets.
+Thank you for reaching out. This queue is designated for Relay Auctions support, which handles requests such as contract cancellations, missing VRIDs from awarded contracts, right-sizing contracts, incorrect configuration reports, and contract extensions.
 
+
+Add any equipment you plan to use for Amazon loads that’s not already listed in your Assets page.
+You’ll get an email if you need to provide additional documentation about any of your listed assets.
 This course will cover asset import and verification, as well as gate rejections from unverified equipment:
-Managing Assets with Amazon Relay: https://relay.amazon.com/cases/sc/help/search/details?detailProps=JTdCJTIydHlwZSUyMiUzQSUyMkNPVVJTRSUyMiUyQyUyMmlkJTIyJTNBJTIyMzI1YmIyZTItNTJhYS00MGU1LWIyMzMtOGNhNTA3NWI4M2Q4JTIyJTdE
+Managing Assets with Amazon Relay:
+https://relay.amazon.com/cases/sc/help/search/details?detailProps=JTdCJTIydHlwZSUyMiUzQSUyMkNPVVJTRSUyMiUyQyUyMmlkJTIyJTNBJTIyMzI1YmIyZTItNTJhYS00MGU1LWIyMzMtOGNhNTA3NWI4M2Q4JTIyJTdE
+For issues  related to Assets, please navigate to Relay Support Center and create a case  under the Topic: Asset Edit.`,
 
-For issues related to Assets, please navigate to Relay Support Center and create a case under the Topic: Asset Edit.`,
+        wrongDriverType: `Dear Carrier,
+
+Thank you for reaching out regarding your wrong driver type request for contract(s) (insert contract).
+
+We have received your request and are currently reviewing it. Our team is working to process this as quickly as possible, and we will follow up with a resolution shortly.
+
+If you have any additional details or questions in the meantime, please reply to this case or visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
+
+Thanks for continuing to haul with Relay.`,
 
         cancellations: `Dear Carrier,
 
@@ -113,28 +155,26 @@ Thanks for continuing to haul with Relay.`,
 
         performance: `Dear Carrier,
 
+Thank you for reaching out. This queue is designated for Relay Auctions support, which handles requests such as contract cancellations, missing VRIDs from awarded contracts, right-sizing contracts, incorrect configuration reports, and contract extensions.
+
 If you believe your performance score was impacted unfairly, you may submit performance disputes for individual VRIDs by navigating to the Performance page and clicking the Dispute button next to the applicable Tour ID/ VRID. You must submit within 14 days of load completion and provide objective proof as to why the issue was not carrier-controllable.
+The performance dispute team will review and decide whether or not to approve that the issue was not carrier controllable. Carriers may appeal a performance dispute one time if they don’t agree with the initial result by replying on the same case.
 
-The performance dispute team will review and decide whether or not to approve that the issue was not carrier controllable. Carriers may appeal a performance dispute one time if they don't agree with the initial result by replying on the same case.
-
-For additional training on Performance Disputes:
+For additional training on Performance Disputes :
 https://relay.amazon.com/cases/sc/help/search/details?detailProps=JTdCJTIydHlwZSUyMiUzQSUyMkNPVVJTRSUyMiUyQyUyMmlkJTIyJTNBJTIyZjI0YzMwNTYtOWJkMi00ZmUxLThkOGMtMWM2MmFiYjUxNmE2JTIyJTdE
-
 If you have any additional details or questions in the meantime, please reply to this case or visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
 
 Thanks for continuing to haul with Relay.`,
 
         payment: `Dear Carrier,
 
+Thank you for reaching out. This queue is designated for Relay Auctions support, which handles requests such as contract cancellations, missing VRIDs from awarded contracts, right-sizing contracts, incorrect configuration reports, and contract extensions.
+
 Please file a payment dispute through the Relay portal and follow below steps:
-
 Go to Relay > Payments > File a dispute > Continue to file a dispute (from dialog box) > Select number of items or loads from invoice > Proceed to dispute.
-
-If you want to add the "Missing item":
+If you want to add the “Missing item”
 Go to Relay > Payments > Missing Item > Load > Enter Load Id > Add to dispute.
-
 Once you file a dispute, please follow-up with prelay@amazon.com.
-
 If you have any additional details or questions in the meantime, please reply to this case or visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
 
 Thanks for continuing to haul with Relay.`,
@@ -144,7 +184,6 @@ Thanks for continuing to haul with Relay.`,
 Relay Auction Support is not responsible for assisting with suspended account issues and will not have answers to your questions regarding your suspended account.
 
 You will need to reach out directly to relay-am@amazon.com for further assistance as our department cannot restore any suspended account.
-
 If you have any additional details or questions in the meantime, please reply to this case or visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
 
 Thanks for continuing to haul with Relay.`,
@@ -155,13 +194,13 @@ Thank you for your patience and we apologize for the delayed response.
 
 Your contracts have been CANCELLED:
 
-(insert contract)
+- (insert contract)
 
 These changes should reflect in your account shortly. If you do not see the update within 24 hours, please reply to this case and we will investigate further.
 
 For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
 
-Thanks for continuing to haul with Relay.`,
+Thanks for continuing to haul with Relay`,
 
         tenderedFollowup: `Dear Carrier,
 
@@ -169,17 +208,15 @@ Thank you for your patience and we apologize for the delayed response.
 
 Your contracts have been TENDERED:
 
-(insert contract)
+- (insert contract)
 
 These changes should reflect in your account shortly. If you do not see the update within 24 hours, please reply to this case and we will investigate further.
 
 For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
 
-Thanks for continuing to haul with Relay.`,
+Thanks for continuing to haul with Relay`,
 
         awardedContract: `Dear Carrier,
-
-Thank you for reaching out regarding contract(s): (insert contract)
 
 We'd like to help clarify the contract confirmation process for awarded auctions:
 
@@ -207,13 +244,119 @@ Thanks for continuing to haul with Relay.`,
 
 Thanks for reaching out.
 
-Could you please share any screenshot(s) and more details of the issue faced so that we can investigate further.
+Could you please share any screenshot(s), Contract IDs, and more details of the issue faced so that we can investigate further.
 
 Thank you for your continued partnership with Relay.
 
+For additional support, please visit the Relay Support Center at: https://relay.amazon.ca/cases/sc/help
+
+For additional resources, please visit the Relay Learning Center at: https://relay.amazon.ca/cases/sc/learning`,
+
+        inTransit: `Dear Valued Carrier,
+
+Thank you for reaching out. This queue is designated for Relay Auctions support, which handles requests such as contract cancellations, missing VRIDs from awarded contracts, right-sizing contracts, incorrect configuration reports, and contract extensions.
+
+For issues related to In-Transit Trips please take the following steps:
+
+1. Go to your "Trips" and then "In Transit.".
+2. Identify the Trip/VRID needing support.
+3. Use the dropdown options to complete the delay report.
+4. Describe the issue and follow the prompts.
+
+For Trip Completion issues (request a timestamp)
+
+1. Go to your "Trips" and then "In Transit.".
+2. Identify the VRID and select "Request trip support" under it..
+3. Select "Create a new case" in the right side panel..
+4. Choose "Trip Completion Status Dispute" and provide details about the issue..
+
+You can report a delay in Amazon Relay. Go to Trips > In Transit, and then click on the trip that is delayed. Click Report delay, and fill in the form with the new ETA and the reason for the delay.
+
+Relay Assistant for In-Transit Trips: https://relay.amazon.com/learning?filterCriteria=Relay%20Assistant%3A%20Trip%20Support&openCourse=4eb24a0b-6896-4d50-8dee-5c4451b93841&ref=owp_nav_learning_center
 For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
 
-For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning`
+For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning
+
+Thanks for continuing to haul with Relay!`,
+
+        contractId: `Dear Carrier,
+
+We'd like to look into this for you. To help us investigate and locate the contracts in question, could you please provide the following:
+
+Please provide CONTRACT ID(s)
+
+This information will allow us to verify the award status and determine why the contracts may not be appearing in your Relay account.
+
+Thanks for continuing to haul with Relay!
+
+For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
+
+For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning`,
+
+        overlapping: `Dear Valued Carrier,
+
+We understand your concern about multiple loads being assigned on the same day. To clarify how contract load frequency works:
+
+Contracts state "up to X loads per week." This means loads may be distributed in any combination throughout the week — for example, all loads could be assigned on the same day, or spread across multiple days.
+As the contract holder, your company is expected to be able to cover the load volume you signed up for, regardless of how the loads are distributed within the week.
+If you are unable to cover the assigned loads, we recommend the following:
+
+Reject the VRID(s) you cannot fulfill as soon as possible so they can be re-tendered.
+Request a contract cancellation if the overall volume or scheduling no longer works for your operation. You can submit that request through this queue.
+We appreciate your proactive communication. Please let us know if you would like to proceed with a contract cancellation or if you have any additional questions.
+
+For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
+
+For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning
+
+Thanks for continuing to haul with Relay!`,
+
+        missingWrongTrailer: `Dear Carrier,
+
+We understand the frustration caused by consecutive cancellations, especially when your trailers are being provided on time. We are looking into the cancellations and will work to determine the root cause.
+
+Regarding Your (Missing/Wrong) Trailer Escalation
+
+Please email the following team directly so they can investigate and locate your equipment:
+
+Email: 3p-priority-empty-trailers@amazon.com
+
+This team handles third-party trailer misuse and missing equipment cases and will be able to assist with tracking down your trailer.
+
+Additionally, if you experience any future instances where the site attaches an Amazon (AZNG) trailer instead of using your trailer pool, you can contact the same team using this adjusted subject format:
+
+Subject Line Format: 3P1W[(SCAC)][(SITE)](Missing/Wrong) Trailer Attached
+Thanks for continuing to haul with Relay.`,
+
+        cancelledLoads: `Dear Carrier,
+
+We understand this can be frustrating, especially with an active contract in place. Load cancellations on dedicated contracts are driven by network need — meaning that volume on a given lane may fluctuate from week to week based on demand at the origin and destination sites. While your contract remains active through January, the number of loads tendered each week may vary depending on current network requirements.
+
+Here is what you can expect going forward:
+
+- Loads will continue to be tendered as network demand requires. Some weeks may have higher volume than others.
+- Your contract status is not affected by these cancellations — your lane and equipment assignment remain in place.
+- If volume consistently does not meet expectations, we recommend reaching out so we can review the lane activity with the planning team.
+We appreciate your flexibility and commitment to hauling on this lane. If you have additional questions or concerns, please do not hesitate to reply to this case.
+
+Thanks for continuing to haul with Relay.`,
+
+        loadBoardWip: `Hello,
+
+Thank you for your patience while we worked on the recent technical issue that affected the Relay Load Board.
+
+The issue is now resolved, and the Load Board should be working normally again. Any auctions affected by the disruption have been reposted, so your company can view and bid on available loads as usual.
+
+If your team is still having trouble with the Load Board, we recommend these steps:
+
+- Refresh your browser or sign out of Relay and sign back in.
+- Clear your browser cache, or try a different browser.
+- If the issue continues, open a case through the Relay Support Center: relay.amazon.com/cases/sc/help
+We're sorry for any inconvenience this caused, and we appreciate your understanding.
+
+Thanks for continuing to haul with Relay,
+
+The Amazon Relay team`
     };
 
 
@@ -241,7 +384,11 @@ For additional resources, please visit the Relay Learning Center at: https://rel
         console.log("Edit Signature 2");
         var signatureButton = document.querySelectorAll('[class="email-button py-0 selected"]')[0];
         if (!signatureButton.textContent.includes("Discard")) {
-            signatureButton.click();
+            try {
+                signatureButton.click();
+            } catch (e) {
+                console.log('[Auctions script] EditSignature: signature toggle click failed, filling signature anyway. Error: ' + (e && e.message ? e.message : e));
+            }
             setTimeout(function() {
                 var signatureBox = document.getElementsByClassName("shadow-none")[1];
                 if (signatureBox) {
@@ -399,9 +546,12 @@ For additional resources, please visit the Relay Learning Center at: https://rel
             if (!tray) {
                 tray = document.createElement('div');
                 tray.className = 'tm-switch-tray';
-                Object.assign(tray.style, { position: 'absolute', bottom: '4px', right: '8px', zIndex: '10001', display: 'flex', gap: '6px' });
                 nativeBar.appendChild(tray);
             }
+            // Re-assert in-flow layout on every tick: an older script
+            // version may have created this tray with absolute
+            // positioning, which floats it over the last row's buttons.
+            Object.assign(tray.style, { position: '', bottom: '', right: '', zIndex: '', display: 'flex', gap: '6px', justifyContent: 'flex-end', width: '100%', boxSizing: 'border-box', marginTop: '10px' });
             if (tray.querySelector('#tm-switch-to-auctions')) { return; }
             const btn = document.createElement('button');
             btn.id = 'tm-switch-to-auctions';
@@ -428,7 +578,7 @@ For additional resources, please visit the Relay Learning Center at: https://rel
             const backBtn = document.createElement('button');
             backBtn.id = hiddenBarId ? 'tm-back-to-' + hiddenBarLabel.toLowerCase() : 'tm-back-to-other';
             backBtn.textContent = hiddenBarLabel ? 'Back to ' + hiddenBarLabel + ' responses' : 'Back to responses';
-            Object.assign(backBtn.style, { position: 'absolute', bottom: '4px', right: '8px', zIndex: '10001', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' });
+            Object.assign(backBtn.style, { alignSelf: 'flex-end', order: '99', marginTop: '10px', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' });
             backBtn.addEventListener('click', switchBackFromOverride);
             container.appendChild(backBtn);
         }
