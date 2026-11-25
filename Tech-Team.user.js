@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses MMPM Version 2 - Grouped — Team
 // @namespace    http://tampermonkey.net/
-// @version      3.31
+// @version      3.39
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
 // @description  Automatically inserts responses for Relay issues - grouped and color-coded tech queue buttons
@@ -16,23 +16,21 @@
     const config = {
         buttonGroups: [
             {
-                name: 'SUPER ADMIN ISSUES',
-                backgroundColor: '#334155',
-                hoverColor: '#1e293b',
+                name: 'TRANSFERS',
+                backgroundColor: '#0b66c3',
+                hoverColor: '#084a8c',
                 buttons: [
-                    { id: 'addAdminDispatcher', text: 'Add Admin/Dispatcher' },
-                    { id: 'addDriver', text: 'Add Driver' },
-                    { id: 'inviteNotReceived', text: 'Invite Not Received' },
-                    { id: 'emailAlreadyInUse', text: 'Email Already In Use' },
-                    { id: 'removeUser', text: 'Remove User' },
-                    { id: 'changeUserRole', text: 'Change User Role' },
-                    { id: 'dispatcherNoPayout', text: 'Dispatcher No Payout' },
-                    { id: 'userMissingTrips', text: 'User Missing Trips' },
-                    { id: 'portalLoginTrouble', text: 'Portal Login Trouble' },
-                    { id: 'transferRole', text: 'Transfer Role' },
-                    { id: 'superAdminLeftCompany', text: 'Super Admin Left Company' },
-                    { id: 'driverCantLogIn', text: "Driver Can't Log In" },
-                    { id: 'driverNotSeeingLoad', text: 'Driver Not Seeing Load' },
+                    { id: 'xferTripDisputes', text: 'Transfer to Trip Disputes' },
+                    { id: 'xferDriverVerification', text: 'Transfer to Driver Verification' },
+                    { id: 'xferContracts', text: 'Transfer to Contracts' },
+                    { id: 'xferInsurance', text: 'Transfer to Insurance' },
+                    { id: 'xferAssets', text: 'Transfer to Assets' },
+                    { id: 'xferSiteEscalations', text: 'Transfer to Site Escalations' },
+                    { id: 'xferDriverAssignment', text: 'Transfer to Driver Assignment' },
+                    { id: 'xferAuctions', text: 'Transfer to Auctions' },
+                    { id: 'xferSafetyRewards', text: 'Transfer to Safety Rewards' },
+                    { id: 'xferSuspensionAppeals', text: 'Transfer to Suspension Appeals' },
+                    { id: 'xferAccountVerification', text: 'Transfer to Account Verification' }
                 ]
             },
             {
@@ -132,6 +130,61 @@
 
     // Response templates - unchanged from MMPM Version 2
     const responses = {
+        xferTripDisputes: `Dear Carrier,
+
+We are transferring you to the correct team.
+
+Thanks for continuing to haul with Relay!`,
+        xferDriverVerification: `Dear Carrier,
+
+We are transferring you to the correct team.
+
+Thanks for continuing to haul with Relay!`,
+        xferContracts: `Dear Carrier,
+
+We are transferring you to the correct team.
+
+Thanks for continuing to haul with Relay!`,
+        xferInsurance: `Dear Carrier,
+
+We are transferring you to the correct team.
+
+Thanks for continuing to haul with Relay!`,
+        xferAssets: `Dear Carrier,
+
+We are transferring you to the correct team.
+
+Thanks for continuing to haul with Relay!`,
+        xferSiteEscalations: `Dear Carrier,
+
+We are transferring you to the correct team.
+
+Thanks for continuing to haul with Relay!`,
+        xferDriverAssignment: `Dear Carrier,
+
+We are transferring you to the correct team.
+
+Thanks for continuing to haul with Relay!`,
+        xferAuctions: `Dear Carrier,
+
+We are transferring you to the correct team.
+
+Thanks for continuing to haul with Relay!`,
+        xferSafetyRewards: `Dear Carrier,
+
+We are transferring you to the correct team.
+
+Thanks for continuing to haul with Relay!`,
+        xferSuspensionAppeals: `Dear Carrier,
+
+We are transferring you to the correct team.
+
+Thanks for continuing to haul with Relay!`,
+        xferAccountVerification: `Dear Carrier,
+
+We are transferring you to the correct team.
+
+Thanks for continuing to haul with Relay!`,
         RLBnoWork: `Dear Carrier,
 
 Thank you for reaching out. However, this queue is meant for technical support needed with issues using the Relay app/portal.
@@ -559,137 +612,6 @@ Relay Support Center: https://relay.amazon.com/cases/sc/help
 Relay Learning Center: https://relay.amazon.com/cases/sc/learning
 
 Thanks for continuing to haul with Relay!`,
-        addAdminDispatcher: `Dear Carrier,
-
-As the Super Admin, you can invite Admins and Dispatchers to your company's Relay account. Log in to relay.amazon.com, go to your user management area and send the invite to the person's email address. They will receive an email to finish setting up their account.
-
-If the invite does not arrive, ask them to check their spam folder before you send it again.
-
-You may find this optional Relay Learning Center course helpful:
-- Get started with Relay 101: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=70c8bf62-bd37-48a8-bef4-34128b223a60
-
-Thanks for continuing to haul with Relay!`,
-        addDriver: `Dear Carrier,
-
-You can invite drivers from the Driver Roster page at relay.amazon.com. Once the driver accepts, they can log in to the Relay mobile app with the same email address.
-
-We recommend that drivers use the latest Relay app version on Android 7 or later, or iOS 13.1 or later.
-
-You may find these optional Relay Learning Center resources helpful:
-- Driver Background Check Guide: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=4bcb6fd6-9383-4834-bdb5-20bce34da56b
-- How to avoid Automatic Rejections: Asset Not Assigned & No Driver Assigned: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=948c6d87-d6b8-4a91-8a9c-834182a49336
-
-Thanks for continuing to haul with Relay!`,
-        inviteNotReceived: `Dear Carrier,
-
-If a user or driver did not receive their Relay invite, we recommend the following:
-
-1. Ask them to check their spam or junk folder.
-2. Confirm the email address on the invite is spelled correctly.
-3. Send the invite again from relay.amazon.com.
-
-If the invite still does not arrive, please reply to this case with the user's email address, their role (Admin, Dispatcher, or Driver), and the date you sent the invite.
-
-Thanks for continuing to haul with Relay!`,
-        emailAlreadyInUse: `Dear Carrier,
-
-A Relay login can be linked to more than one carrier account or role. If you see a message that the email is already in use, the person may already have a Relay account under that email.
-
-We recommend asking the user to log in with their existing credentials. If they need a separate login for your company, please invite them with a different email address.
-
-If the issue continues, please reply to this case with the email address, the role you are trying to assign, and a screenshot of the message.
-
-Thanks for continuing to haul with Relay!`,
-        removeUser: `Dear Carrier,
-
-As the Super Admin, you can remove Admins, Dispatchers, and drivers from your company's Relay account at relay.amazon.com. We recommend reviewing your user list regularly so that only current users have access.
-
-If you are unable to remove a user, please reply to this case with the user's email address, their role, and a screenshot of what you see.
-
-You may find this optional Relay Learning Center course helpful:
-- Get started with Relay 101: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=70c8bf62-bd37-48a8-bef4-34128b223a60
-
-Thanks for continuing to haul with Relay!`,
-        changeUserRole: `Dear Carrier,
-
-Each user on your account has a role: Admin, Dispatcher, or Driver. Admins can see payout information for loads; Dispatchers cannot. Before changing a role, consider what each person needs to see.
-
-As the Super Admin, you can update a user's access at relay.amazon.com. If you are unable to change the role, please reply to this case with the user's email address, the current role, the role you would like, and a screenshot.
-
-You may find this optional Relay Learning Center course helpful:
-- Get started with Relay 101: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=70c8bf62-bd37-48a8-bef4-34128b223a60
-
-Thanks for continuing to haul with Relay!`,
-        dispatcherNoPayout: `Dear Carrier,
-
-This is expected. Admins can see payout information for loads, but Dispatchers cannot. If this person needs to see payouts, you may consider inviting them as an Admin instead.
-
-Thanks for continuing to haul with Relay!`,
-        userMissingTrips: `Dear Carrier,
-
-If domiciles are assigned to a user on the Carrier Profile or Driver Roster page, that user will only see trips that start in those domiciles. As the Super Admin, you can review and update each user's domiciles there.
-
-If the domiciles are correct and trips are still missing, please reply to this case with the Load ID, the user's role, and a screenshot.
-
-Thanks for continuing to haul with Relay!`,
-        portalLoginTrouble: `Dear Carrier,
-
-If you are having trouble logging in to relay.amazon.com, we recommend the following:
-
-1. Use the "Forgot password" option on the login page.
-2. Clear your browser cache and cookies, then do a hard refresh.
-3. Try a different browser.
-
-If you still cannot log in, please reply to this case with your SCAC, the email address on the account, a screenshot of any error message, and the date and time of the attempt.
-
-You may find this optional Relay Learning Center course helpful:
-- Get started with Relay 101: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=70c8bf62-bd37-48a8-bef4-34128b223a60
-
-Thanks for continuing to haul with Relay!`,
-        transferRole: `Dear Carrier,
-
-Each Relay account has one Super Admin. To move the role to someone else, please open a case in the Relay Support Center at relay.amazon.com and include your SCAC, the current Super Admin's email, and the new Super Admin's email.
-
-If you already have an open case about this, please reply on that case with these details instead of opening a new one.
-
-Thanks for continuing to haul with Relay!`,
-        superAdminLeftCompany: `Dear Carrier,
-
-If your Super Admin is no longer with your company, the role will need to be moved to a new person. Please open a case in the Relay Support Center at relay.amazon.com and include your SCAC, the former Super Admin's email, and the new Super Admin's name and email.
-
-If you already have an open case about this, please reply on that case with these details instead of opening a new one.
-
-Thanks for continuing to haul with Relay!`,
-        driverCantLogIn: `Dear Carrier,
-
-If your company's driver is unable to log in to the Relay mobile app, we recommend the following:
-
-1. Confirm the driver accepted their invite and is using the same email address the invite was sent to.
-2. Use the "Forgot password" option on the app login screen.
-3. Update to the latest Relay app version (Android 7 or later, or iOS 13.1 or later).
-4. Close and restart the app, and check for a stable internet connection.
-
-You may find this optional Relay Learning Center course helpful:
-- Introduction to Primary and Secondary Devices: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=1b83c2f9-1e32-4d56-9f3c-1c8e8e988998
-
-If the driver still cannot log in, please reply to this case with the driver's email address, phone type and OS version, a screenshot of any error message, and the date and time of the attempt.
-
-Thanks for continuing to haul with Relay!`,
-        driverNotSeeingLoad: `Dear Carrier,
-
-If your company's driver cannot see an assigned load in the Relay mobile app, we recommend the following:
-
-1. Confirm the driver is assigned to the load on the Trips page at relay.amazon.com.
-2. Have the driver log out and back in, then refresh the app.
-3. Update to the latest Relay app version.
-
-You may find these optional Relay Learning Center courses helpful:
-- How to avoid Automatic Rejections: Asset Not Assigned & No Driver Assigned: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=948c6d87-d6b8-4a91-8a9c-834182a49336
-- Confirming Load Specifics: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=ab2993e7-0b0a-4baa-92a0-01d3fa58461d
-
-If the load still does not appear, please reply to this case with the Load ID or VRID, the driver's email address, and a screenshot of the driver's app.
-
-Thanks for continuing to haul with Relay!`,
     };
 
     // Create and insert response
@@ -716,7 +638,11 @@ Thanks for continuing to haul with Relay!`,
         var signatureButton = document.querySelectorAll('[class="email-button py-0 selected"]')[0];
         if(!signatureButton.textContent.includes("Discard"))
         {
-            signatureButton.click();
+            try {
+                signatureButton.click();
+            } catch (e) {
+                console.log('[Relay Script] EditSignature: signature toggle click failed, filling signature anyway. Error: ' + (e && e.message ? e.message : e) + ' Button text: ' + JSON.stringify(signatureButton.textContent) + ' Button class: ' + signatureButton.className);
+            }
             setTimeout(function() {
                 var signatureBox = document.getElementsByClassName("shadow-none")[1];
                 if(signatureBox)
@@ -724,7 +650,7 @@ Thanks for continuing to haul with Relay!`,
                     var navListuserName = document.getElementsByClassName("text_hF6BH")[0].children[0].textContent.split("User: ")[1].split("Tenant: ")[0].trim()
                     var userName = loginID.indexOf(navListuserName);
                     var findInitial = initials[userName]
-                    signatureBox.value = findInitial + "\r\nRelay Product Excellence" + "\r\n\r\nUS Carriers:\r\n" + winterBlockUS + "\r\n\r\nCanadian Carriers:\r\n" + winterBlockCA;
+                    signatureBox.value = findInitial + "\r\nRelay Product Excellence\r\n\r\nUS Carriers:\r\n" + winterBlockUS + "\r\n\r\nCanadian Carriers:\r\n" + winterBlockCA;
                     signatureBox.dispatchEvent(new Event('input', {bubbles:true}));
                     signatureBox.style.height = "1px";
                     signatureBox.style.height = signatureBox.scrollHeight + "px";
@@ -744,19 +670,17 @@ Thanks for continuing to haul with Relay!`,
         "Other Issue":               { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
         "UIIA":                      { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
         "Auction Support":           { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
-        "Add Admin/Dispatcher":      { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
-        "Add Driver":                { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
-        "Invite Not Received":       { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
-        "Email Already In Use":      { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
-        "Remove User":               { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
-        "Change User Role":          { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
-        "Dispatcher No Payout":      { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
-        "User Missing Trips":        { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
-        "Portal Login Trouble":      { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
-        "Transfer Role":             { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
-        "Super Admin Left Company":  { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
-        "Driver Can't Log In":       { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "App Issue", codeValue: "51180030581" },
-        "Driver Not Seeing Load":    { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "App Issue", codeValue: "51180030581" },
+        "Transfer to Trip Disputes":        { category: "R4C-trips-issues", categoryValue: "45545173241", code: "Other", codeValue: "50947790651" },
+        "Transfer to Driver Verification":  { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Driver-verification", codeValue: "51180030571" },
+        "Transfer to Contracts":            { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Short-term-contract", codeValue: "51180030561" },
+        "Transfer to Insurance":            { category: "Generic-queries-for-relay-carrier-support", categoryValue: "46660406411", code: "Insurance", codeValue: "51180240051" },
+        "Transfer to Assets":               { category: "Generic-queries-for-relay-carrier-support", categoryValue: "46660406411", code: "Relay-other-generic-issues", codeValue: "51180240061" },
+        "Transfer to Site Escalations":     { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
+        "Transfer to Driver Assignment":    { category: "Tech-Issues-R4D-query", categoryValue: "36277959391", code: "Relay-carrier-can't-assign-driver", codeValue: "46808022741" },
+        "Transfer to Auctions":             { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
+        "Transfer to Safety Rewards":       { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
+        "Transfer to Suspension Appeals":   { category: "Loadboard-suspension-queries", categoryValue: "45546793241", code: "Loadboard-Suspension-Low-Performance-carriers", codeValue: "46809635491" },
+        "Transfer to Account Verification": { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
         "RLB NoLoad":                { category: "Loadboard-suspension-queries", categoryValue: "45546793241", code: "Loadboard-Suspension-Low-Performance-carriers", codeValue: "46809635491" },
         "Suspended":                 { category: "Loadboard-suspension-queries", categoryValue: "45546793241", code: "Loadboard-Suspension-Low-Performance-carriers", codeValue: "46809635491" },
         "New Carrier Loads Visibility": { category: "Loadboard-suspension-queries", categoryValue: "45546793241", code: "Loadboard-Suspension-Low-Performance-carriers", codeValue: "46809635491" },
@@ -822,6 +746,355 @@ Thanks for continuing to haul with Relay!`,
     }
 
     // Create button element with styles - now colored by its group
+    // ==== TRANSFER-ON-SEND ====
+    // A TRANSFERS button click arms a transfer; the transfer itself runs
+    // automatically right after the agent clicks Send on the review preview.
+    // The script NEVER clicks Send itself - the agent always reviews first.
+    // Discarding the reply, or clicking another button, drops the armed
+    // transfer. Any failed or timed-out step aborts and logs with a
+    // [Transfers] prefix - never retried blindly, never sent to the
+    // wrong queue. Send completion is the REVIEW YOUR REPLY preview
+    // closing - a Send button can persist on the page after the send
+    // (proven live Nov 24 on case 23584543611). Selectors are role +
+    // visible text, mirroring the
+    // existing Review-button finder (live inspection could not see raw HTML).
+    var TRANSFER_CFG = { pollMs: 250, sendWaitMs: 20000, stepWaitMs: 10000, queueWaitMs: 30000 };
+        var TRANSFER_DESTINATIONS = {
+            xferTripDisputes: { search: 'relay-tripstatus-disputes@amazon.com', option: 'relay-tripstatus-disputes@amazon.com' },
+            xferDriverVerification: { search: 'Relay-driver-verification-checks@amazon.com', option: 'relay-driver-verification-checks' },
+            xferContracts: { search: 'rcm-support@amazon.com', option: 'rcm-support@amazon.com' },
+            xferInsurance: { search: 'nastinsuranceparagoninbox@amazon.com', option: 'nastinsuranceparagoninbox@amazon.com' },
+            xferAssets: { search: 'relay-asset-verification-appeals@amazon.com', option: 'relay-asset-verification-appeals@amazon.com' },
+            xferSiteEscalations: { search: 'relay-site-escalations@amazon.com', option: 'relay-site-escalations@amazon.com' },
+            xferDriverAssignment: { search: 'relay-driver-assignment-support@amazon.com', option: 'relay-driver-assignment-support@amazon.com' },
+            xferAuctions: { search: 'relay-auctions-suppport@amazon.com', option: 'relay-auctions-suppport@amazon.com' },
+            xferSafetyRewards: { search: 'relay-safety-rewards-queue@amazon.com', option: 'relay-safety-rewards-queue@amazon.com' },
+            xferSuspensionAppeals: { search: 'relay-am@amazon.com', option: 'relay-am@amazon.com' },
+            xferAccountVerification: { search: 'relay-account-verification@amazon.com', option: 'relay-account-verification@amazon.com' }
+        };
+    var pendingTransfer = null;
+    var transferWatchTimer = null;
+    var transferSendClicked = false;
+    var transferSawReply = false;
+    
+    function xferFindKatButton(label) {
+        var el = document.querySelector('kat-button[label="' + label + '"] button');
+        if (el) { return el; }
+        var all = document.querySelectorAll('kat-button button');
+        for (var i = 0; i < all.length; i++) {
+            if (all[i].textContent.trim() === label) { return all[i]; }
+        }
+        var btns = document.querySelectorAll('button');
+        for (var j = 0; j < btns.length; j++) {
+            if (btns[j].textContent.trim() === label) { return btns[j]; }
+        }
+        return null;
+    }
+    
+    function xferFindRadio(name) {
+        var labels = document.querySelectorAll('label');
+        for (var i = 0; i < labels.length; i++) {
+            if (labels[i].textContent.trim() === name) {
+                var input = labels[i].querySelector('input[type="radio"]');
+                if (input) { return input; }
+                var forId = labels[i].getAttribute('for');
+                if (forId) {
+                    var target = document.getElementById(forId);
+                    if (target) { return target; }
+                }
+            }
+        }
+        var katLabels = document.querySelectorAll('kat-label');
+        for (var k = 0; k < katLabels.length; k++) {
+            if ((katLabels[k].getAttribute('text') || '').trim() === name) {
+                var kFor = katLabels[k].getAttribute('for');
+                if (kFor) {
+                    var kTarget = document.getElementById(kFor);
+                    if (kTarget) { return kTarget; }
+                }
+            }
+        }
+        var radios = document.querySelectorAll('[role="radio"], input[type="radio"], kat-radio');
+        for (var j = 0; j < radios.length; j++) {
+            var r = radios[j];
+            var txt = (r.getAttribute('label') || r.getAttribute('aria-label') || r.textContent || '').trim();
+            if (txt === name) { return r; }
+        }
+        return null;
+    }
+    
+    function xferClickRadio(name) {
+        var r = xferFindRadio(name);
+        if (!r) { return false; }
+        var id = r.id || (r.getAttribute && r.getAttribute('id')) || '';
+        if (id) {
+            var lab = document.querySelector('label[for="' + id + '"]');
+            if (lab) { lab.click(); }
+        }
+        r.click();
+        return true;
+    }
+    
+    function xferFindSearchBox() {
+        var box = document.querySelector('input[placeholder="Type here to search"]');
+        if (box) { return box; }
+        box = document.querySelector('textarea[placeholder="Type here to search"]');
+        if (box) { return box; }
+        var inputs = document.querySelectorAll('input, textarea');
+        for (var i = 0; i < inputs.length; i++) {
+            if ((inputs[i].getAttribute('placeholder') || '') === 'Type here to search') { return inputs[i]; }
+        }
+        return null;
+    }
+    
+    function xferSetSearch(text) {
+        var box = xferFindSearchBox();
+        if (!box) { return false; }
+        try {
+            var proto = box.tagName === 'TEXTAREA' ? window.HTMLTextAreaElement.prototype : window.HTMLInputElement.prototype;
+            var setter = Object.getOwnPropertyDescriptor(proto, 'value').set;
+            setter.call(box, text);
+        } catch (e) {
+            box.value = text;
+        }
+        box.dispatchEvent(new Event('input', { bubbles: true }));
+        box.dispatchEvent(new Event('change', { bubbles: true }));
+        return true;
+    }
+    
+    function xferFindOption(text) {
+        var opts = document.querySelectorAll('[role="option"]');
+        for (var i = 0; i < opts.length; i++) {
+            if (opts[i].textContent.trim() === text) { return opts[i]; }
+        }
+        var alts = document.querySelectorAll('kat-option, li');
+        for (var j = 0; j < alts.length; j++) {
+            if (alts[j].textContent.trim() === text) { return alts[j]; }
+        }
+        var natives = document.querySelectorAll('option');
+        for (var k = 0; k < natives.length; k++) {
+            var nv = natives[k].value || natives[k].getAttribute('value') || '';
+            if (nv === text || natives[k].textContent.trim() === text) { return natives[k]; }
+        }
+        return null;
+    }
+    
+    function xferClickOption(el) {
+        if (!el) { return false; }
+        el.click();
+        if (el.tagName === 'OPTION') {
+            el.selected = true;
+            var sel = el.parentElement;
+            while (sel && sel.tagName !== 'SELECT') { sel = sel.parentElement; }
+            if (sel) {
+                try {
+                    var setter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, 'value').set;
+                    setter.call(sel, el.value);
+                } catch (e) {
+                    sel.value = el.value;
+                }
+                sel.dispatchEvent(new Event('change', { bubbles: true }));
+                sel.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }
+        return true;
+    }
+    
+    function xferListOptionTexts() {
+        var out = [];
+        var opts = document.querySelectorAll('[role="option"]');
+        for (var i = 0; i < opts.length && out.length < 10; i++) {
+            out.push(opts[i].textContent.trim());
+        }
+        var natives = document.querySelectorAll('option');
+        for (var j = 0; j < natives.length && out.length < 10; j++) {
+            out.push(natives[j].value || natives[j].textContent.trim());
+        }
+        return out.join(' | ');
+    }
+    
+    function xferReadQueue() {
+        var els = document.querySelectorAll('*');
+        for (var i = 0; i < els.length; i++) {
+            if (els[i].textContent.trim() === 'Queue:') {
+                var row = els[i].parentElement;
+                if (row) {
+                    var txt = row.textContent.replace('Queue:', '').trim();
+                    if (txt) { return txt; }
+                }
+            }
+        }
+        return null;
+    }
+    
+    function xferFindSendButton() {
+        return xferFindKatButton('Send');
+    }
+    
+    function xferPreviewHeading() {
+        var heads = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+        for (var i = 0; i < heads.length; i++) {
+            if (heads[i].textContent.trim() === 'REVIEW YOUR REPLY') { return heads[i]; }
+        }
+        return null;
+    }
+    
+    function xferSendSuccessSeen() {
+        var els = document.querySelectorAll('*');
+        for (var i = 0; i < els.length; i++) {
+            var t = els[i].textContent || '';
+            if (t.indexOf('Email was sent successfully') !== -1) { return true; }
+        }
+        return false;
+    }
+    
+    function xferReplyOpen() {
+        return !!xferFindKatButton('Review') || !!xferPreviewHeading();
+    }
+    
+    function xferWaitFor(check, timeoutMs, pollMs) {
+        return new Promise(function(resolve) {
+            var start = Date.now();
+            function tick() {
+                var val = null;
+                try { val = check(); } catch (e) { val = null; }
+                if (val) { resolve(val); return; }
+                if (Date.now() - start >= timeoutMs) { resolve(null); return; }
+                setTimeout(tick, pollMs);
+            }
+            tick();
+        });
+    }
+    
+    function armTransfer(id) {
+        var dest = TRANSFER_DESTINATIONS[id];
+        if (!dest) {
+            console.warn('[Transfers] No destination for button ' + id);
+            return;
+        }
+        pendingTransfer = { id: id, search: dest.search, option: dest.option };
+        transferSendClicked = false;
+        transferSawReply = false;
+        console.log('[Transfers] Armed - transfer to ' + dest.option + ' will run after Send');
+        xferStartWatch();
+    }
+    
+    function disarmTransfer(reason) {
+        if (!pendingTransfer) { return; }
+        console.log('[Transfers] Disarmed (' + reason + ')');
+        pendingTransfer = null;
+        transferSendClicked = false;
+        transferSawReply = false;
+        xferStopWatch();
+    }
+    
+    function xferStartWatch() {
+        if (transferWatchTimer) { return; }
+        transferWatchTimer = setInterval(xferWatchTick, TRANSFER_CFG.pollMs);
+    }
+    
+    function xferStopWatch() {
+        if (transferWatchTimer) { clearInterval(transferWatchTimer); transferWatchTimer = null; }
+    }
+    
+    function xferWatchTick() {
+        if (!pendingTransfer) { xferStopWatch(); return; }
+        if (xferReplyOpen()) { transferSawReply = true; }
+        var sendBtn = transferSendClicked ? null : xferFindSendButton();
+        if (sendBtn && !sendBtn.__xferTracked) {
+            sendBtn.__xferTracked = true;
+            sendBtn.addEventListener('click', function() {
+                if (!pendingTransfer) { return; }
+                console.log('[Transfers] Send clicked - waiting for the reply to go out');
+                transferSendClicked = true;
+                xferWaitForSendDone(pendingTransfer);
+            });
+            console.log('[Transfers] Send button found - transfer to ' + pendingTransfer.option + ' will run after Send');
+        }
+        if (!transferSendClicked && transferSawReply && !xferReplyOpen()) {
+            disarmTransfer('reply closed without sending');
+        }
+    }
+    
+    function xferWaitForSendDone(dest) {
+        xferWaitFor(function() {
+            return xferPreviewHeading() ? null : true;
+        }, TRANSFER_CFG.sendWaitMs, TRANSFER_CFG.pollMs).then(function(done) {
+            if (!done) {
+                console.warn('[Transfers] ABORT: review preview did not close within ' + (TRANSFER_CFG.sendWaitMs / 1000) + 's - transfer NOT run. If the reply went out, transfer manually.');
+                disarmTransfer('send not confirmed');
+                return;
+            }
+            console.log('[Transfers] Reply sent - running transfer to ' + dest.option + (xferSendSuccessSeen() ? ' (success banner seen)' : ' (no success banner seen)'));
+            disarmTransfer('transfer running');
+            xferRunTransfer(dest).then(function(ok) {
+                if (ok) {
+                    console.log('[Transfers] Transfer complete - case is now in ' + dest.option);
+                } else {
+                    console.warn('[Transfers] Transfer did NOT complete - check the Queue value and transfer manually if needed');
+                }
+            });
+        });
+    }
+    
+    async function xferRunTransfer(dest) {
+        console.log('[Transfers] Opening the Transfer panel');
+        var transferBtn = xferFindKatButton('Transfer');
+        if (!transferBtn) {
+            console.warn('[Transfers] ABORT: Transfer button not found');
+            return false;
+        }
+        transferBtn.click();
+        var radio = await xferWaitFor(function() { return xferFindRadio('Another queue'); }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+        if (!radio) {
+            console.warn('[Transfers] ABORT: transfer panel did not open (no Another queue radio)');
+            return false;
+        }
+        xferClickRadio('Another queue');
+        console.log('[Transfers] Another queue selected - waiting for the search box');
+        var searchBox = await xferWaitFor(function() { return xferFindSearchBox(); }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+        if (!searchBox) {
+            console.warn('[Transfers] ABORT: destination search box did not appear after selecting Another queue');
+            return false;
+        }
+        if (!xferSetSearch(dest.search)) {
+            console.warn('[Transfers] ABORT: destination search box not found');
+            return false;
+        }
+        console.log('[Transfers] Searching for ' + dest.search);
+        var option = await xferWaitFor(function() { return xferFindOption(dest.option); }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+        if (!option) {
+            console.warn('[Transfers] ABORT: no destination option matching "' + dest.option + '" (options now: ' + xferListOptionTexts() + ')');
+            return false;
+        }
+        xferClickOption(option);
+        console.log('[Transfers] Destination selected: ' + dest.option);
+        var caseBtn = await xferWaitFor(function() {
+            var b = xferFindKatButton('Transfer Case');
+            if (!b) { return null; }
+            if (b.disabled || b.hasAttribute('disabled')) { return null; }
+            return b;
+        }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+        if (!caseBtn) {
+            console.warn('[Transfers] ABORT: Transfer Case button never became enabled');
+            return false;
+        }
+        caseBtn.click();
+        console.log('[Transfers] Transfer Case clicked - waiting for the Queue to change');
+        var queue = await xferWaitFor(function() {
+            var q = xferReadQueue();
+            if (!q) { return null; }
+            return (q.indexOf(dest.option) !== -1 || q.indexOf(dest.search) !== -1) ? q : null;
+        }, TRANSFER_CFG.queueWaitMs, TRANSFER_CFG.pollMs);
+        if (!queue) {
+            console.warn('[Transfers] Transfer Case was clicked but the Queue did not show ' + dest.option + ' within ' + (TRANSFER_CFG.queueWaitMs / 1000) + 's (Queue now: ' + xferReadQueue() + '). The transfer may still have gone through if the page reloaded - check the Queue value.');
+            return false;
+        }
+        console.log('[Transfers] Queue is now: ' + queue);
+        return true;
+    }
+    // ==== /TRANSFER-ON-SEND ====
+
     const createButton = ({ id, text }, group) => {
         const button = document.createElement('button');
         const style = config.buttonStyle;
@@ -844,6 +1117,14 @@ Thanks for continuing to haul with Relay!`,
         button.addEventListener('mouseout', () => { button.style.backgroundColor = group.backgroundColor; });
         button.addEventListener('click', () => {
             insertResponse(responses[id]);
+            // Transfer-on-Send: arm a transfer for TRANSFERS buttons, drop any
+            // armed transfer for other buttons. This runs before the override
+            // return so a transfer arms even in override mode.
+            if (id.indexOf('xfer') === 0) {
+                armTransfer(id);
+            } else {
+                disarmTransfer('another button clicked');
+            }
             if (crossQueueMode) {
                 console.log("Override mode - text only, dropdowns untouched: " + text);
                 return;
@@ -980,7 +1261,7 @@ Thanks for continuing to haul with Relay!`,
             if (!tray) {
                 tray = document.createElement('div');
                 tray.className = 'tm-switch-tray';
-                Object.assign(tray.style, { position: 'absolute', bottom: '4px', right: '8px', zIndex: '10001', display: 'flex', gap: '6px' });
+                Object.assign(tray.style, { display: 'flex', gap: '6px', justifyContent: 'flex-end', width: '100%', boxSizing: 'border-box' });
                 nativeBar.appendChild(tray);
             }
             if (tray.querySelector('#tm-switch-to-tech')) { return; }
@@ -1015,7 +1296,7 @@ Thanks for continuing to haul with Relay!`,
             const backBtn = document.createElement('button');
             backBtn.id = hiddenBarId ? 'tm-back-to-' + hiddenBarLabel.toLowerCase() : 'tm-back-to-other';
             backBtn.textContent = hiddenBarLabel ? 'Back to ' + hiddenBarLabel + ' responses' : 'Back to responses';
-            Object.assign(backBtn.style, { position: 'absolute', bottom: '4px', right: '8px', zIndex: '10001', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' });
+            Object.assign(backBtn.style, { alignSelf: 'flex-end', order: '99', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' });
             backBtn.addEventListener('click', switchBackFromOverride);
             container.appendChild(backBtn);
         }
