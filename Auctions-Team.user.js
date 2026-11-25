@@ -9,7 +9,6 @@
 // @match        https://paragon-na.amazon.com/hz/view-case?caseId=*
 // @grant        none
 // ==/UserScript==
-
 (function() {
     'use strict';
 
