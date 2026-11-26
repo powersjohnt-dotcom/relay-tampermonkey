@@ -1,16 +1,100 @@
 // ==UserScript==
 // @name         Paragon — Thanksgiving Dark Theme
 // @namespace    http://tampermonkey.net/
-// @version      1.7
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/Theme/themes/Paragon-Thanksgiving-Dark-Theme.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/Theme/themes/Paragon-Thanksgiving-Dark-Theme.user.js
-// @author       J.T. Powers
+// @version      1.7
+// @description  Thanksgiving autumn theme for all of Paragon: deep espresso brown, harvest amber frames and data, cranberry SLA times, warm cream text, monospace text and uppercase headers - restrained, with a fun turkey in the corner — click him to tickle him: gobbles, facts, and good wishes, shuffled so it never feels the same twice. No grid background, per J.T. - the page stays a flat warm brown. A fixer darkens every light surface (keeping its hue, tinted warm brown) and flips dark text to light - including collapsed content before it ever expands, so expanded follow-up replies stay readable. The reply composer and the review screen are inverted as one piece each instead (Kat's card/input/label backgrounds live in shadow DOM and are unreachable any other way), and nothing inside them is themed element by element - mixing the two undoes both. Also runs inside the CloudFront widget iframes (follow-ups, bookmarks, contact reason) and themes them from within, with an invert fallback if injection fails. Changes the look only - no buttons, text, or functions are touched. Toggle it on/off in Tampermonkey without affecting the response scripts. Do not install this and the Star Wars, Batman, Lavender or Thanksgiving Light theme at the same time - they do the same job and will fight each other. Reopen/due rows get a harvest-amber wash that fades across the row, and their SLA-overdue times stay a flat bold cranberry. The composer and review screens now render in the theme brown with readable text. Built from the Star Wars v3.5 codebase, so it carries every lesson through v3.5: due/reopen rows readable on the Lobby (inline wash + SLA cranberry, stylesheet injected into shadow roots), white buttons/panels backstopped, nav/icons/pagination themed, Transfer labels themed, kat-labels inverted only when their text is still dark, and a 30-second heartbeat after the 2-minute fast net.
+// @author       Scout (for J.T.)
 // @match        https://paragon-na.amazon.com/*
 // @match        https://d1u16vxl4h9h9c.cloudfront.net/widget.html*
 // @match        https://*.cloudfront.net/widget.html*
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
+
+/* UPDATES:
+   11/20/2026: v1.7 (per J.T., case 23474480791 body paste): message
+   rows also come in GREEN (row--green), not just grey - the v1.6 button
+   rule already browns the header button, but the green row container
+   is untouched by every fixer rule, so it joins the message-row rule
+   (substring match, same as row--gray).
+   11/20/2026: v1.6 (per J.T., case 739512000 pastes): the header
+   Search Text box is still black (no inline style - the site gives it
+   a dark box and the fixer skips INPUTs), the filter toolbar container
+   is darkened grey rgb(66,62,57), and kat-modal content/header are
+   darkened grey instead of brown. All three get the surface directly -
+   search input (+ BAR_BG search button), .theme-toolbar_ub9Ne, and
+   kat-modal-content/header. The white Relay toolbar is untouched (the
+   scripts' own UI, always excluded).
+   11/20/2026: v1.5 (per J.T., full-page outerHTML, case 23510503891):
+   the HTML proved the v1.4 strip worked (only the composer itself
+   carries the inversion inside it), but the visible surfaces v1.4
+   missed are different elements than the rules assumed: the
+   Attachments bar is a .custom-file-label, the Reason fields are
+   kat-dropdown (not kat-select), the top case-info panel is a
+   kat-table whose grey lives in its shadow DOM, and the message rows
+   are .row--gray buttons the darken rule only took to #403b36. All
+   four get covered now - label + Browse button, kat-dropdown hosts
+   inside/outside the composer, the kat-table host, and the message
+   rows (by class and by their stable correspondence-row attribute).
+   11/20/2026: v1.4 (per J.T., fresh look at live case 23510852331):
+   the reply box is brown now, but its accents were still Kat teal
+   (radio rings, dividers, left border), the To row / Attachments bar
+   rendered black, and the Reason fields pale cream with cream text.
+   Root cause for the teal: elements the fixer inverted before the
+   composer got its filter were double-inverted back to site colours
+   - the composer now strips descendant filters when it inverts, and
+   the accents get pre-inversion amber (#904800) via CSS. To row /
+   Attachments / Reason fields get the pre-inversion box brown (the
+   select rules also go into the injected composer shadow CSS, where
+   the visible field lives). Also: mid-grey panels and near-black bars
+   (top case-info panel, message-header rows, filter bar) are neither
+   light nor button-black, so the fixer now themes grey straight to
+   the surface and near-black to the bar brown. The response-script
+   toolbar is deliberately untouched (its colours are the scripts'
+   own).
+   11/20/2026: v1.3 (per J.T., only Dark active: the reply box came
+   out black with Star Wars colours around it): the composer
+   pre-inversion colours were wrong on the math - #f6ead3 renders
+   rgb(31,19,0), near-black, and #232f3e renders rgb(199,211,226),
+   pale blue-grey (the Star Wars look). Recalibrated from the exact
+   invert + hue-rotate(180) matrix: the box now renders warm brown
+   #4a2f1a (pre #e3c8b3) with warm cream text #f2e7d3 (pre #211602),
+   amber links (pre #904800), warm tan placeholders (pre #826a44), and
+   the radio/checkbox icons get the box brown instead of rendering
+   black. Same treatment for the review screen and the
+   inverted-container safety net.
+   11/20/2026: v1.2 (per J.T.: make the quotes feel limitless, and make
+   the turkey move like it's being tickled): same as light v2.3 - the
+   turkey wiggles when clicked (0.6s tickle animation) and the quotes
+   come from one shuffled deck of 30 - this theme's own 12 facts, 6
+   gobbles, 12 good wishes - nothing repeats until the whole lot is
+   seen, then it reshuffles. Facts sometimes get a "Gobble gobble!"
+   tacked on.
+   11/19/2026: v1.1 (per J.T.: update the dark version with the turkey
+   too, with different facts): same clickable turkey as the light
+   v2.2 - a real #tg-turkey element, created only on the main page
+   (window.parent === window), so the widget iframes stay turkey-free.
+   Click it for a Thanksgiving fact: 12 DIFFERENT facts from the light
+   version's set (Macy's parade, Brown Friday, the turkey pardon,
+   Franksgiving...), in a dark card with an amber border. The light
+   theme's facts are unchanged.
+   11/19/2026: v1.0 (per J.T.): first version. Built from the Star Wars
+   v3.5 codebase, so it carries every lesson through v3.5 (Lobby due rows,
+   white-button backstops, Transfer labels, the kat-label dark-check, the
+   30-second heartbeat). Palette: deep espresso brown (#1e120b / #2e1e12),
+   harvest amber accent (#f0a83e), pale amber-white text (#f2e7d3),
+   cranberry SLA (#ff6f59). NO grid background, per his ask — the dotted
+   grid from the Star Wars theme is gone; the page stays a flat warm
+   brown. Due rows get an amber wash fading across the row and their SLA
+   times stay flat bold cranberry. The composer renders in dark warm brown
+   from the pre-inversion pale cream #f6ead3; Review is the primary button
+   in deep amber #8a5a1e, which renders light amber. The pre-inversion
+   renders are computed from the invert matrix, not yet confirmed on
+   screen - verify on a live case page after installing.
+*/
+
 (function () {
     'use strict';
 
