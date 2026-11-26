@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.37
+// @version      2.38
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @description  Automatically inserts responses for Relay issues
@@ -811,6 +811,14 @@ Reporting Delays (LTR) for On-Time Performance: https://relay.amazon.com/cases/s
 Relay Support Center: https://relay.amazon.com/cases/sc/help
 Relay Learning Center: https://relay.amazon.com/cases/sc/learning
 
+Requesting a Call Back:
+
+If you need live assistance with an active load, you can request a callback directly through the Relay app by following these steps:
+
+Open the Relay Mobile App
+Navigate to the load in question
+Select "Request a call back" to connect with our live operations team
+
 Thanks for continuing to haul with Relay!`,
       Domicile: `Dear Valued Carrier,
 
@@ -1032,6 +1040,14 @@ Relay Assistant for Drivers: https://relay.amazon.com/cases/sc/help/search/detai
 Reporting Delays (LTR) for On-Time Performance: https://relay.amazon.com/cases/sc/help/search?query=JTIyUmVwb3J0aW5nJTIwRGVsYXlzJTIwKExUUiklMjBmb3IlMjBPbiUyMFRpbWUlMjBQZXJmb3JtYW5jZSUyMg
 Relay Support Center: https://relay.amazon.com/cases/sc/help
 Relay Learning Center: https://relay.amazon.com/cases/sc/learning
+
+Requesting a Call Back:
+
+If you need live assistance with an active load, you can request a callback directly through the Relay app by following these steps:
+
+Open the Relay Mobile App
+Navigate to the load in question
+Select "Request a call back" to connect with our live operations team
 
 Thanks for continuing to haul with Relay!`,
 

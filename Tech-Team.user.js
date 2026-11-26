@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses MMPM Version 2 - Grouped — Team
 // @namespace    http://tampermonkey.net/
-// @version      3.42
+// @version      3.44
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
 // @description  Automatically inserts responses for Relay issues - grouped and color-coded tech queue buttons
@@ -12,6 +12,48 @@
 
 (function() {
     'use strict';
+    /*UPDATES:
+    11/26/2026: Responsive bar (v3.43): the button bar now shrinks on smaller screens - below 1600px wide or 850px tall it uses tighter buttons and caps its own height at 45% of the viewport so the case stays visible. It switches back to the full layout automatically on a larger screen, re-checked on every resize and every second.
+    11/25/2026: Transfer buttons now name their team and give the carrier the steps to reach it directly (v3.41, per J.T.). Trip button renamed 'Transfer to Trip Completion Dispute'.
+    11/25/2026: Switch tray now re-asserts its in-flow style every second, so mixed-version installs heal within a second (v3.40, per J.T.). Plus a 10px gap above the tray and the Back button.
+    11/25/2026: Switch tray and Back button are now in-flow rows at the bottom-right instead of absolutely positioned, so they can't cover the last row's buttons (v3.39, per J.T.).
+    11/24/2026: SUPER ADMIN ISSUES removed (v3.38, per J.T., GitHub cleanup): the whole group is gone - all 13 responses and all 13 dropdown mappings.
+    11/24/2026: Transfer destination list is a native select - the finder now matches native options and fires change on the select, so the transfer no longer stalls (v3.37, per J.T.).
+    11/24/2026: The 'Another queue' radio is now found through its label's for-attribute, so the transfer no longer stalls with the panel open (v3.36, per J.T.).
+    11/24/2026: Send completion is now signalled by the REVIEW YOUR REPLY preview closing, not the Send button disappearing (v3.35, per J.T.).
+    11/24/2026: A TRANSFERS button click now arms the transfer - once the agent clicks Send, the script opens the Transfer panel, picks the destination and clicks Transfer Case (v3.34, per J.T.). The script never clicks Send itself.
+    11/24/2026: NEW group TRANSFERS (v3.33, per J.T.): 11 buttons, one per destination queue, each inserting the transfer reply. App & Web Portal is NOT included - it is this script's own queue.
+    11/21/2026: EditSignature click is now wrapped in try/catch, so the 2-second signature fill still runs if the click throws (3.32, per J.T.).
+    11/17/2026: Button groups re-sorted most buttons on top (3.30, per J.T.). Fixed rule from now on: groups always run most buttons first.
+    11/17/2026: Super Admin row: removed 5 duplicate buttons (3.29, per J.T.).
+    11/17/2026: NEW 'Super Admin Issues' row (3.27, per J.T.): 18 buttons.
+    11/17/2026: Winter weather signature block added: US + Canadian notices with Relay Learning links (3.26, per J.T.).
+    11/11/2026: NEW button 'Auction Support': overview of Amazon Relay Auctions (3.23, per J.T.).
+    11/11/2026: NEW button 'UIIA': intermodal certification canned message (3.22, per J.T.).
+    11/11/2026: App combo buttons added (3.21, per J.T.): 'App + In-Transit' and 'App + Performance'.
+    11/10/2026: Four new buttons (v3.20, per J.T.): Suspended, Submit BOL, Call Back, Badge.
+    11/10/2026: TEAM VERSION (per J.T.): the plain team build - no suggestion feature, no case logging. Do NOT install alongside the Personal Tech script.
+    11/04/2026: 3-way switch (per J.T.): Support / Tech / Auctions. Switch buttons now live in a shared bottom-right tray inside any native bar.
+    10/31/2026: Squished-buttons fix (v3.18, per J.T.): unhide now restores a hidden bar with display='flex', so buttons no longer look squished after switching back.
+    10/31/2026: Back button location (v3.17, per J.T.): the top-left 'Back to' button is removed; the override bar gets one button at its bottom-right corner instead.
+    10/31/2026: Switch button location (v3.16, per J.T.): the switch now lives ONLY inside the native bar, at its bottom-right corner.
+    10/31/2026: Switch button back to bottom-right (v3.15, per J.T.'s preference): the top strip is replaced by a small fixed button at the bottom-right corner, and the switch inside the native bar is kept as well.
+    10/31/2026: Switch button now also lives inside the other script's native bar, so it survives a page re-render (v3.14).
+    10/31/2026: Override chip is now shown on page load on every case, no longer gated on the queue (v3.13).
+    10/31/2026: Override switch is now a full-width strip at the top of the page (v3.12).
+    10/31/2026: Override button clicks are now text-only — they insert the message without touching the dropdowns or Review (v3.11).
+    10/31/2026: NEW override chip (v3.10): when the queue gate doesn't match, a small 'Show Tech responses anyway' chip builds this bar on the other queue's case.
+    10/30/2026: Sidebar unpinned (v3.7): #page-sidebar now scrolls with the page, and a MutationObserver keeps re-applying the top shift when Paragon resets it.
+    10/30/2026: Sidebar shift (v3.6): the whole #page-sidebar now moves down by the bar's height, so it moves as one with the rest of the page.
+    10/30/2026: Grid shift (v3.5): the left-hand .dvr-grid is now pushed down by the bar's height after the bar builds.
+    10/30/2026: Sticky full-width bar (v3.4): the bar now sits in the page flow at the top, so Paragon's header, search box and Case actions shift down below it.
+    10/29/2026: Queue gate added (v3.1): the script only builds its bar when the queue is relay-feedback@amazon.com.
+    10/29/2026: Category/reason auto-select added on button click: category is selected, reason code follows, then Review is clicked.
+    10/28/2026: Buttons organized into related groups, ordered most buttons on top, and color coded.
+    10/28/2026: Ported the RAS auto-expand of the first correspondence, so the initial message opens when a case loads.
+    06/02/2025: Fixed to work properly after the Paragon sev 2.
+    05/29/2025: Added 'Remove CC'd Emails' button, plus auto-height on the signature and response fields.
+    */
     // Configuration object - groups are color-coded differently from the first script
     const config = {
         buttonGroups: [
@@ -415,6 +457,14 @@ You can report a delay in Amazon Relay. Go to Trips > In Transit, and then click
 Relay Assistant for In-Transit Trips: https://relay.amazon.com/learning?filterCriteria=Relay%20Assistant%3A%20Trip%20Support&openCourse=4eb24a0b-6896-4d50-8dee-5c4451b93841&ref=owp_nav_learning_center
 Reporting Delays (LTR) for On Time Performance: https://relay.amazon.com/cases/sc/help/search?query=JTIyUmVwb3J0aW5nJTIwRGVsYXlzJTIwKExUUiklMjBmb3IlMjBPbiUyMFRpbWUlMjBQZXJmb3JtYW5jZSUyMg
 
+Requesting a Call Back:
+
+If you need live assistance with an active load, you can request a callback directly through the Relay app by following these steps:
+
+Open the Relay Mobile App
+Navigate to the load in question
+Select "Request a call back" to connect with our live operations team
+
 Thanks for continuing to haul with Relay!`,
         appintransit: `Dear Carrier,
 
@@ -451,6 +501,14 @@ You can report a delay in Amazon Relay. Go to Trips > In Transit, and then click
 
 Relay Assistant for In-Transit Trips: https://relay.amazon.com/learning?filterCriteria=Relay%20Assistant%3A%20Trip%20Support&openCourse=4eb24a0b-6896-4d50-8dee-5c4451b93841&ref=owp_nav_learning_center
 Reporting Delays (LTR) for On Time Performance: https://relay.amazon.com/cases/sc/help/search?query=JTIyUmVwb3J0aW5nJTIwRGVsYXlzJTIwKExUUiklMjBmb3IlMjBPbiUyMFRpbWUlMjBQZXJmb3JtYW5jZSUyMg
+
+Requesting a Call Back:
+
+If you need live assistance with an active load, you can request a callback directly through the Relay app by following these steps:
+
+Open the Relay Mobile App
+Navigate to the load in question
+Select "Request a call back" to connect with our live operations team
 
 Thanks for continuing to haul with Relay!`,
         appperformance: `Dear Carrier,
@@ -1153,6 +1211,7 @@ Thanks for continuing to haul with Relay!`,
 
     const createButton = ({ id, text }, group) => {
         const button = document.createElement('button');
+        button.className = 'tm-response-btn';
         const style = config.buttonStyle;
 
         Object.assign(button.style, {
@@ -1341,6 +1400,28 @@ Thanks for continuing to haul with Relay!`,
         if (!isOverride) { const ownChip = document.getElementById('tm-tech-override-chip'); if (ownChip) { ownChip.remove(); } }
 
         // Remove any bar this script built before, so a re-run never stacks bars.
+        // Responsive bar: shrink the bar on smaller screens so the case stays
+        // visible. Compact below 1600px wide or 850px tall, full size above.
+        // Re-checked on resize and every second, so docking / undocking the
+        // monitor just works.
+        const TM_COMPACT_MAX_WIDTH = 1600;
+        const TM_COMPACT_MAX_HEIGHT = 850;
+        function applyResponsiveBar() {
+            const bar = document.getElementById('tm-main-bar') || document.getElementById('tm-tech-bar');
+            if (!bar) { return; }
+            if (!document.getElementById('tm-responsive-style')) {
+                const st = document.createElement('style');
+                st.id = 'tm-responsive-style';
+                st.textContent = '#tm-main-bar.tm-compact, #tm-tech-bar.tm-compact { gap: 1px !important; padding: 2px !important; min-height: 0 !important; } #tm-main-bar.tm-compact .tm-response-btn, #tm-tech-bar.tm-compact .tm-response-btn { padding: 3px 7px !important; font-size: 11px !important; min-width: 0 !important; } #tm-main-bar.tm-compact .tm-group-label, #tm-tech-bar.tm-compact .tm-group-label { width: 100px !important; min-width: 100px !important; }';
+                document.head.appendChild(st);
+            }
+            const compact = window.innerWidth < TM_COMPACT_MAX_WIDTH || window.innerHeight < TM_COMPACT_MAX_HEIGHT;
+            const wasCompact = bar.classList.contains('tm-compact');
+            bar.classList.toggle('tm-compact', compact);
+            bar.style.maxHeight = compact ? '45vh' : '';
+            bar.style.overflowY = compact ? 'auto' : '';
+            if (compact !== wasCompact) { shiftSidebar(); }
+        }
         const oldBar = document.getElementById('tm-tech-bar');
         if (oldBar) {
             oldBar.remove();
@@ -1382,6 +1463,7 @@ Thanks for continuing to haul with Relay!`,
                 flexShrink: '0'
             });
             label.textContent = group.name;
+            label.className = 'tm-group-label';
             groupRow.appendChild(label);
 
             const buttonsRow = document.createElement('div');
@@ -1438,6 +1520,11 @@ Thanks for continuing to haul with Relay!`,
             return true;
         };
         shiftSidebar();
+        applyResponsiveBar();
+        if (!window.__tmResponsiveInterval) {
+            window.__tmResponsiveInterval = true;
+            setInterval(applyResponsiveBar, 1000);
+        }
         if (!window.__tmTechSidebarObserver) {
             window.__tmTechSidebarObserver = new MutationObserver(function() {
                 shiftSidebar();
@@ -1451,7 +1538,7 @@ Thanks for continuing to haul with Relay!`,
         }
         if (!window.__tmTechSidebarResize) {
             window.__tmTechSidebarResize = true;
-            window.addEventListener('resize', shiftSidebar);
+            window.addEventListener('resize', function() { shiftSidebar(); applyResponsiveBar(); });
         }
 
         //Only lock case for your queue

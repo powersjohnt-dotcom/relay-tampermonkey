@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses RFA Auctions Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      1.7
+// @version      1.8
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Auctions-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Auctions-Team.user.js
 // @description  Automatically inserts responses for Relay Auctions Support issues
@@ -9,6 +9,24 @@
 // @match        https://paragon-na.amazon.com/hz/view-case?caseId=*
 // @grant        none
 // ==/UserScript==
+
+    /*UPDATES:
+    11/25/2026: Switch tray self-heals + gap above switches (v1.7, per J.T.): the v1.6 in-flow fix did not land because the tray in each bar is created by the OTHER two scripts, and its style was only set at creation - so an older script could leave an absolute tray behind. The in-flow style is now re-asserted on every 1-second tick, clearing any absolute positioning, so mixed-version installs heal within a second. Plus a 10px gap above the tray and the Back button, so the switches sit visibly clear of the bottom row. All three updates must be installed and the page reloaded. Support-Team v2.33 and Tech-Team v3.40 carry the same fix. Personal is untouched. v1.6 is untouched as the fallback.
+    11/25/2026: Switch tray + Back button no longer overlay (v1.6, per J.T.): the bottom-right switch tray and the Back button were absolutely positioned over the bar, so they could cover the last row's buttons. Both are now in-flow flex rows at the bottom-right - the tray right-aligns its buttons, the Back button uses order 99 so it still renders last. Same spot on screen, nothing can sit on top of a button now. Support-Team v2.32 and Tech-Team v3.39 carry the same fix. Personal is untouched. v1.5 is untouched as the fallback.
+    11/24/2026: Updated RFA responses (v1.5, per J.T.): 8 new buttons from the team's updated responses (App Issue, Wrong Driver Type, In-Transit, Contract ID, Overlapping, (Missing/Wrong) Trailer, Cancelled Loads, Load Board WIP) and 8 updated texts - Awarded Contract and Renewal rewritten (Renewal is now the short review-request form, not the renewal-offer explainer), Payment/Performance/Update Assets gain the queue preamble, More Information asks for Contract IDs and links to .ca, the follow-ups gain the contract bullet. Button labels follow the team's file (More Info is now More Information, Cancellations is now Cancellations/Rejections). One team typo fixed ("extension request of contact" to "of contract"). Also the Nov 21 Error 1 signature fix (try/catch around the signature click, fill scheduled regardless) - Auctions never got it. Personal v1.7 carries the same buttons/responses plus suggestion keywords for the new buttons. v1.4 is untouched as the fallback.
+    11/17/2026: Winter weather signature block (1.3, per J.T.): US + Canadian notices with Relay Learning links, added to the signature.
+    11/10/2026: TEAM VERSION (per J.T.): this is the plain team build - the v1.2 code exactly as it was, with NO suggestion feature and NO case logging or data collection of any kind. @name is now "... — Team" and the file is named Auctions-Team-v1.2.user.js so it cannot be confused with J.T.'s personal build (Auctions-JT-Personal-v1.5.user.js, which has the suggestion + logging). The code below is byte-identical to v1.2 apart from this label: anyone already running v1.2 does NOT need to reinstall. Do NOT install this alongside the Personal Auctions script - they would build two bars on the same queue.
+    11/04/2026: Full 3-way switch (v1.2, per J.T.): Auctions now joins the Support/Tech switch system — same sticky full-width bar, same bottom-right switch tray and back button, same override rules (text-only, skip lock-case). Bar chrome unified; buttons, responses and signature unchanged. Dropdown mappings unchanged — that work is still to come.
+    11/04/2026: Queue gate (v1.1, per J.T.): same gate as the Support/Tech
+    scripts — the bar now only builds when the case Queue is
+    relay-auctions-suppport@amazon.com (spelling as shown on the case,
+    with the triple-p "suppport"). Polls up to 15 seconds; otherwise it
+    stays silent, so it can stay enabled alongside the other scripts
+    without showing on their queues. Also stops the old lock-check from
+    re-calling init() on a non-matching queue, which could duplicate
+    the bar.
+    */
+
 (function() {
     'use strict';
 
@@ -275,6 +293,14 @@ Relay Assistant for In-Transit Trips: https://relay.amazon.com/learning?filterCr
 For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
 
 For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning
+
+Requesting a Call Back:
+
+If you need live assistance with an active load, you can request a callback directly through the Relay app by following these steps:
+
+Open the Relay Mobile App
+Navigate to the load in question
+Select "Request a call back" to connect with our live operations team
 
 Thanks for continuing to haul with Relay!`,
 
