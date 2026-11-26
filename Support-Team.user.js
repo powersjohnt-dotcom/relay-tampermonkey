@@ -1,145 +1,70 @@
 // ==UserScript==
-// @name         Amazon Relay Responses R4C & RCM Support — J.T. Personal
+// @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.40
+// @version      2.37
+// @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
+// @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @description  Automatically inserts responses for Relay issues
 // @author       Julian Woolcott & Hayden Lindsey & Sheshu Venugopal
 // @match        https://paragon-na.amazon.com/hz/view-case?caseId=*
 // @grant        none
 // ==/UserScript==
     /*UPDATES:
-    11/26/2026: Responsive bar (2.40): the button bar now shrinks on smaller screens - below 1600px wide or 850px tall it uses tighter buttons and caps its own height at 45% of the viewport so the case stays visible. It switches back to the full layout automatically on a larger screen, re-checked on every resize and every second.
-    11/21/2026: NEW "Performance Final" and "Account Access" buttons (2.39, per J.T.): Performance Final (SUPPORT & GENERAL, next to Performance) answers final performance decisions - both dispute options used, decision final, rolls off in six weeks; Account Access (SUPER ADMIN ISSUES, next to Portal Login Trouble) is a triage reply for sign-in trouble - phone/2FA update, DOT/MC linked to another account, Primary Admin suspension, or amazon-engagement. Both copy the closest existing dropdown mapping (Performance/Dispute; RLB Tech Issue/Carrier Account). Sim on all 1,094 logged Support rows (Nov 11-20, live-accurate scoring): the two buttons win 4 cluster customs; 2 suggestion thefts remain (emailAlreadyInUse via 'primary administrator' in thread text; Driver Verification via 'verification code' + 'old phone number' on a driver locked out by an old phone) - wrong suggestions, not wrong sends. 'final decision' was dropped after it stole a Multi case. (The review's 0-theft figure came from the weaker excerpt sim.)
-    11/21/2026: EditSignature click fix (2.39, per J.T.): the signature toggle click is now wrapped in try/catch - if it throws (as on case 23474480791), the 2-second signature fill is still scheduled instead of being skipped, and the clicked button's text/class is logged so a wrong-selector cause can be ruled out.
-    11/19/2026: Keyword retune from the Nov 19 exports (2.38, per J.T.): 5 phrases added, sim Nov 19 100/18/57 -> 106/18/51 and Nov 13 +1, zero regressions Nov 11-14. Insurance gains 'insurance need updated' + 'update my insurance'; Assets gains 'add truck'; Missing BOL gains 'i need bol'; Submit BOL gains 'bols for'. Rejected: 'need bol' (+2/-1, fires on a Call Back case) and 'issues connecting' (+0/-1).
-    11/17/2026: Button groups re-sorted most buttons on top (2.37, per J.T.): ACCOUNT & COMPLIANCE (18), SUPPORT & GENERAL (16), SUPER ADMIN ISSUES (13), TRIPS & OPERATIONS (12). Fixed rule from now on: groups always run most buttons first.
-    11/17/2026: Super Admin row (2.36, per J.T.): removed 6 duplicates - More Info Needed, App Crashing/Freezing, GPS/Location Not Tracking, Check-In Not Working, App Status Not Updating, Driver Using Multiple Devices - and recolored the row orange (was teal, too close to green).
-    11/17/2026: NEW "Super Admin Issues" row (2.35, per J.T.): 19 buttons, his texts verbatim (Support greeting "Dear Valued Carrier,").
-    11/17/2026: Winter weather signature block (2.34, per J.T.): US + Canadian notices with Relay Learning links, added to the signature.
-    11/14/2026: Keyword retune from the Nov 14 exports + RCM gate line to one space (2.33, per J.T.): 21 phrases added, sim Nov 14 154/17/71 -> 175/16/51, zero regressions Nov 11-13.
-    11/13/2026: Combo rule v1 (2.32, per J.T.): an app phrase plus a trip phrase now suggests the matching App + combo button.
-    11/13/2026: Keyword retune from the Nov 13 exports (2.31, per J.T.): In-Transit gains 'heavy traffic' (75 rows across the week's exports, 74 of them In-Transit - it breaks the ties where 'traffic' alone scored 2 against a performance phrase at 3), 'construction' (8/8 In-Transit) and 'change of time' (2/2 In-Transit, the 'change of time on relay' wording). 'revoked' was already in Suspended's map, so nothing was added there. Sim across all four Support corpora (Nov 11, Nov 12 morning, Nov 12 afternoon, Nov 13): Nov 13 goes 119 correct / 33 wrong / 70 missed -> 124 / 33 / 65, the three earlier corpora unchanged, zero regressions. Tested and rejected: dropping bare 'load board' from RLB - it loses more correct RLB suggestions than the wrongs it fixes (Nov 11 -7 correct, Nov 13 -4 correct and +12 missed), because the RLB / Load Board Fluctuation overlap is a real taxonomy ambiguity (the same 'loads visibility reduced' wording got RLB once and Load Board Fluctuation twice from him). Personal-only retune; Team files unchanged. v2.30 is untouched as the fallback.
-    11/12/2026: Tab-switch catch-up (2.30, per J.T.): he opens 50-75 cases in tabs and works through them, and asked whether the suggestion can populate before he clicks a tab. There was no visibility gate in the script - the observer already watches document.body and scores as soon as Paragon puts the case text in the page, background tab or not - but the 800ms debounced check and the 5s safety net are timers, and browsers throttle background-tab timers, so on a tab opened long ago the check could sit queued. NEW: when you switch to a tab, the suggestion now scores immediately instead of waiting for the next timer tick. The listener is registered once per page load and always calls the current case's check, so a same-tab re-init never leaves it pointing at a stale container. No buttons, responses, keywords, dropdowns or logging changed. Whether it is already there before you click still depends on Paragon rendering the case text in the background tab - if Paragon only loads the text when the tab is focused, nothing in the script can beat that, and this is the test for it. Team files unchanged (no suggestion or logging). v2.29 is untouched as the fallback.
-    11/12/2026: Carrier-only suggestion + full-text logging (2.29, per J.T.): the suggestion now scores only the carrier's message - pulled from 'Describe your issue:', 'Explain the issue here:', or the Tech VRID/Contract-ID block - instead of the whole thread, so subject lines, form boilerplate, transfer notices and your own replies no longer fire keywords. If no carrier message is found it falls back to the whole thread as before, so it never has less to work with. The case log now reports everything: each row carries the full thread text (up to 12,000 chars) plus the extracted carrier message and whether the suggestion was scored carrier-only - the JSON you upload has the complete case, not just the first/last 1,000 chars. Also fixed the log cap: it kept the OLDEST 500 entries, so once full the newest cases were never recorded - it now keeps the newest 500, and on a storage-quota failure it retries with the newest 250 instead of losing the entry. Needs live testing in Paragon - the extractor can't be tested here. Team files unchanged (no suggestion or logging). v2.28 is untouched as the fallback.
-    11/12/2026: Keyword retune from the Nov 11 case logs (2.28, 109 Support cases / 102 unique): Suspended now catches load-board-access-after-verification cases ('load board not restored', 'loadboard is disabled', 'still suspended', 'make my account active', 'unable to book loads', 'has not updated', 'restore access', 'previously restricted', 'not restored', 'account active'); dropped 'account was closed' (misfired on a BASIC-score case). RLB dropped bare 'loadboard'. Link dropped 'verification link' (the verification form itself contains it, so it fired on every transferred verification case) - replaced with carrier-worded 'link expired', 'expired link', 'resend link', 'link is not working', "link doesn't work". Carb dropped 'ctc' (fired on VRID codes). Bank dropped bare 'bank' (fired on email addresses like ebanks...). Insurance dropped bare 'insurance' (fired on attachment filenames) and added 'insurance claim'. Cancel added permanent-closure phrasing. Patience dropped 'any update' and 'status of my case' (too generic - they fire on topic follow-ups). Contracts added 'access to contracts' and 'book contracts'. Performance and In-Transit added 'don't penalize us' and delay-arrival phrasing. Sim on the Nov 11 logs: Support 30 correct / 23 wrong / 47 missed -> 44 / 17 / 39. No new buttons - the 9 custom replies were one-offs. Team files unchanged: keyword tuning stays Personal-only, per the standing rule. v2.27 is untouched as the fallback.
-    11/12/2026: Line breaks (2.27, per J.T.): added paragraph breaks to the UIIA and Auction Support responses so the messages read more easily - every section header now stands on its own line with a blank line after it, and the two footer links are on separate lines. No wording changed. Support-Team-v2.17 carries the same fixes plus the Trailer Defect port, per the standing both-versions rule. v2.26 is untouched as the fallback.
-    11/11/2026: NEW button "Auction Support" (2.26, per J.T.): overview of Amazon Relay Auctions - how bidding works, who can access them, the Learning Center course link, and the Relay Auction Support topic for technical issues. Message adapted per queue: Support opens "Dear Valued Carrier," as given; Tech opens "Dear Carrier," per Tech's standard greeting; the body is otherwise identical and verbatim from his message. Placed at the end of the account group after UIIA. Dropdown mapping is a best-fit copy - no auction-specific code was found in the taxonomy (Support: generic account mapping RLB Tech Issue / Carrier Account, same as Other; Tech: General Support mapping Relay-account-category-main-category / Other) - correct it if Paragon offers a better code. Not added to the Auctions (RFA) scripts - he asked for Support and Tech only. Support-Team-v2.16 carries the same button/response/mapping (plain, no suggestion or logging), per the standing both-versions rule. v2.25 is untouched as the fallback.
-    11/11/2026: NEW button "UIIA" (2.25, per J.T.): intermodal certification canned message, his text verbatim (opens "Dear Valued Carrier," as given). Placed at the end of the account group (Support ACCOUNT & COMPLIANCE / Tech ACCOUNT & REDIRECTS). Dropdown mapping is a best-fit copy - no UIIA/intermodal-specific code was found in the taxonomy (Support: generic account mapping RLB Tech Issue / Carrier Account, same as Other; Tech: General Support mapping Relay-account-category-main-category / Other) - correct it if Paragon offers a better code. Support-Team-v2.15 carries the same button/response/mapping (plain, no suggestion or logging), per the standing both-versions rule. v2.24 is untouched as the fallback.
-    11/11/2026: Suggestion re-init fix (2.24, per J.T. — still missing after v2.23): found the remaining hole. tmLastSuggestion is set once per page load, but when Paragon opens another case in the SAME tab it re-runs init() without reloading the script — so the new case inherited the previous case's 'suggestion already shown' flag, and the re-score observer disconnected itself immediately while the safety-net interval stopped on its first check. That left each later case with only the retry loop, and a refresh (full reload) is what cleared the flag, which matches the symptom exactly. Fix: runSuggestion() now resets tmLastSuggestion to null, so every case starts with a live watcher. No buttons, responses, keywords, dropdowns or logging changed. Tech-JT-Personal-v3.27 carries the same fix. v2.23 is untouched as the fallback.
-    11/11/2026: Suggestion timing fix (2.23, per J.T.): the suggestion sometimes never appeared until a page refresh. Root cause: the v2.22 re-score observer watched the .body_RioZc node itself, but Paragon replaces that node when the full thread loads, leaving the observer on a detached node that never fires again; the retry loop only covered ~16 seconds, so text arriving later was never scored. On refresh the text loads fast (cached), which is why a refresh fixed it. Fix: the observer now watches document.body, a node Paragon never swaps out, and a 5-second safety-net re-check runs while no suggestion is shown (stops on its own after 10 minutes), so a suggestion now appears within ~5 seconds of the text arriving even if a mutation is missed. Retry loop extended from 8 to 30 attempts (~60s). Also fixed a latent bug: tmLastSuggestion was set before the button-exists check, which could have killed the watcher permanently. Still suggest-only, still never replaces a shown suggestion or re-shows after Dismiss. No buttons, responses, keywords, dropdowns or logging changed. v2.22 is untouched as the fallback.
-    11/10/2026: End-of-day keyword tuning + late-text re-score (v2.22, per J.T.): Scout tuned the suggestion keywords from today's Support + Tech exports (99 rows). Measured on the logged case text, Support suggestions go from 4 correct / 2 wrong / 48 missed (live) to 43 correct / 4 wrong / 7 missed in simulation; Tech goes from 1 / 1 / 29 to 29 / 2 / 0. The bigger fix is not keywords: the scorer only read the case text for ~18 seconds after the bar built, but Paragon often fills the correspondence in later, so identical cases scored 6 one time and 0 the next. NEW: a debounced re-score observer watches the correspondence text and re-runs the suggestion while none has been shown yet - it never replaces a shown suggestion and never re-shows one after Dismiss. Keyword changes (all tested in simulation): appIssue drops 'relay app'/'mobile app' (they fired on the Tech-queue subject line on every case) and gains 'experiencing glitches'/'glitches'; contracts drops bare 'contract' (it fired on the "VRID/Tour/Block/Contract ID:" header); Suspended gains reinstatement/revocation/load-board-access wording; Performance gains dispute wording ('performance impact', 'app malfunction', 'controllable', 'carrier controllable', 'negative performance impact', "shouldn't affect", 'company performance', 'is not late'); In-Transit gains timestamp/missing-timestamp/still-showing/empty-move/schedule-error/transit-time wording plus 'came as unexpected'; Assets gains trailer-space wording ('not enough room', 'cube out', 'tractor'); Submit BOL gains 'upload the bol'/'bol for drop'; Missing BOL gains 'pod are missing'/'pod is missing'; 'close my account' moves from Cancel to Close Account Verify (J.T. answered a plain close request with Verify); arc drops 'crash' (crash-delay cases go to In-Transit); Site Escalation gains 'still on the train'; Call Back gains 'callme'; Trailer Defect gains 'container is damaged'/'container damaged'/"trailer's issue"; Driver Verification gains 'account is still not verified'; Bank gains 'update my profile'; Payment Dispute gains 'compensation'. No buttons, responses, dropdowns or logging changed. v2.21 is untouched as the fallback.
-    11/10/2026: Personal vs Team split (v2.21, per J.T.): this file is now the PERSONAL version, for J.T. only. @name is now "... — J.T. Personal" so it is unmistakable in the Tampermonkey dashboard, the report footer carries a purple "J.T. Personal" badge while the bar is running, and the file is named Support-JT-Personal-v2.21.user.js. Nothing else changed from v2.20: suggestion + case logging (reopen rows, non-canned auto-log) are in this file only. The TEAM version is Support-Team-v2.14.user.js - the plain v2.14 code with no suggestion and no logging. Because the @name changed, Tampermonkey sees this as a new script: delete the v2.20 entry first if you installed it, then install this one. Do NOT install both the Personal and Team Support scripts at once - they would build two bars on the same queue.
-    11/10/2026: Reopen rows + non-canned auto-log (v2.20, per J.T.): (1) Reopens: the log no longer overwrites by case ID - every button click is now its own row (exact duplicates within 60 seconds are still skipped, so a double-click does not log twice). Each entry now also carries threadTail (the last 1,000 chars of the thread, so a reopen message is not cut off by the first-1,000-char excerpt) and isReopen (true when the thread contains reopen wording like "not solved", "still no solution", "still waiting", "didn't work", "issue persists"). (2) Non-canned replies: the script now watches for clicks on the Review button. When you send a reply that does not match any canned template, it auto-logs a row with actualButton "Custom reply", outcome "custom", and replyExcerpt (the first 500 chars of what you wrote) so Scout can see what you actually said and whether a button should exist for it. If the reply matches a canned template and that button was already logged for the case in the last 10 minutes, nothing extra is logged. Note: logging happens on the Review click, the closest observable send step - if you open Review to preview and back out without sending, that row is a false log. CSV gains isReopen, threadTail and replyExcerpt columns. v2.19 is untouched as the fallback.
-    11/10/2026: Backfill analysis + NEW "Trailer Defect" button (v2.19, per J.T.): Scout analyzed the 500-case backfill export (2026-11-10). 468 of 500 replies matched a canned template; the suggestion was right only 44 times on the 212 cases with a readable carrier message (24%), so the keywords below were retuned from the actual carrier wording. Measured on those 212 cases, the keyword retune alone moves correct suggestions 44 -> 64 and missed suggestions 100 -> 78 (wrong 38 -> 40). With the new Trailer Defect button added, 7 defect cases that used to point at Assets/Call Back now point at Trailer Defect instead (its intended new home), so against the old buttons the file scores 58 correct / 45 wrong - those 7 are the new button working, not errors. NEW BUTTON: "Trailer Defect" (id trailerDefect, TRIPS & OPERATIONS group, green) - the clearest uncovered trend was carriers reporting a physical defect on an Amazon trailer/container at pickup or delivery (missing mudflap, loose door hinges, air leak, damaged tire rim, missing door, broken chassis, mechanical/container issue; 11 clear cases in the 500, previously split between Assets and Call Back). Its response asks for trailer number, VRID, location and photos and to complete the DVIR, and points to a case under Topic: Asset - the same resolution path as the Assets button, with defect-specific wording. Dropdown mapping is the same as Assets: Reason Category "In-Transit Issues" (37058497991), Reason Code "On-Site Issues (ROC)" (39474113041). Keyword additions (all tested on the backfill): Assets adds asset-registration wording; Suspended adds reinstatement/reactivation/account-closed/BASIC-scores wording; Performance adds score-dropped/score-remained/trip-completion-status/late wording; Call Back adds please-call/call-me/please-confirm; Payment Dispute adds didn't-get-paid/rate-per-mile; Missing BOL adds waybill; Driver Verification adds selfie mis-match/identity wording; Site Escalation adds kingpin-lock/parking-fee/gate-refusal wording; Contracts adds dedicated-contract/closed-node; Patience (had none) adds still-waiting/still-no-solution/any-update wording for follow-up cases; RLB adds "post a truck". Note for the next backfill: 209 of the 500 logged cases had no readable carrier message in the export (the logger was reading the page header instead of the quoted carrier email), so the real suggestion rate on live cases is better than the 44/468 in this file suggests - Scout Case Logger v1.3 fixes that extraction.
-    11/10/2026: Case logger + export (v2.18, per J.T.): NEW. Every canned-button click now auto-logs that case to the browser only (localStorage, nothing leaves the machine): case ID, date, queue, carrier message excerpt, button actually used, what was suggested, and right/wrong/missed. A report footer at the bottom of the bar shows the logged count and has Export JSON, Export CSV, "Log this case" (for a completed case you open later - it matches your reply against the canned templates), and Clear log buttons. Upload the exported file to Scout to refine the suggestion keywords. v2.17 is untouched as the fallback.
-    11/10/2026: Suggestion tuning (v2.17, per J.T.): added "traffic" and "delay" to the In-Transit keywords. Removed reading the subject line (and page title) - it is static across issues and was adding noise; the suggestion now reads only the carrier's message in the correspondence body. No other logic changed.
-    11/10/2026: Suggestion color (v2.16, per J.T.): suggestion highlight changed from orange to purple (#7c3aed), so it cannot be confused with the orange switch buttons. Suggestion line is now pale purple with a purple border; the "Use it" button is purple. Switch buttons stay orange. No logic changed from v2.15.
-    11/10/2026: Case suggestion (v2.15, per J.T.): NEW, suggest-only. The script now reads the case subject + carrier message, scores it against keyword lists for each button, and if one button clearly wins it highlights that button with a "Suggested" badge and shows a "Suggested: <button> - matched '<phrase>'" line at the top of the bar, with a "Use it" button (clicks the suggested button, same as clicking it yourself) and a "Dismiss" button. It NEVER clicks, inserts, or sends anything on its own. If no button clearly wins, it shows "No clear suggestion - pick a button below." and highlights nothing. v2.14 is untouched - keep it installed as the fallback if v2.15/v2.16 misbehave; disable v2.16 and re-enable v2.14 to roll back.
-    11/04/2026: Safety Score button (v2.14, per J.T.): renamed the BASICs button to 'Safety Score Not Compliant' (same id basicsCompliant, so no duplicate button), re-keyed its dropdown mapping to the new button text, and replaced its canned response with the expanded FMCSA version. Dropdown values unchanged: Performance / Dispute.
-    11/04/2026: 3-way switch (per J.T.): generalized from 2-way to Support / Tech / Auctions. Switch buttons now live in a shared bottom-right tray inside any native bar, so two switches never overlap. Back button returns to whichever bar was hidden. Bar chrome unified (sticky full-width, same switch/back styling). Buttons, responses, dropdown mappings and signatures unchanged — dropdown work is still to come.
-    11/04/2026: Second gate (v2.12, per J.T.): added rcm-support@amazon.com
-    as a second allowed queue, so the Support bar now also builds natively
-    on RCM cases (previously only r4c-support@amazon.com passed the gate,
-    so RCM cases showed neither bar). Tech script is untouched — its gate
-    is relay-feedback@amazon.com, so no double-bar conflict on RCM.
-    10/31/2026: Squished-buttons fix (v2.11, per J.T.): unhideOtherBar
-    used to restore a hidden native bar with display='' (block), losing its
-    flex column layout — so after switching back, the groups collapsed and
-    the buttons looked squished together. It now restores display='flex'
-    explicitly, so the bar comes back with its original layout intact.
-    10/31/2026: Back button location (v2.10, per J.T.): the top-left "Back to"
-    button in the override bar is removed. Instead, the override bar gets a
-    single button at its bottom-right corner, labelled "Back to Tech
-    responses", in the same spot as the original switch button. Clicking it
-    restores the native bar, whose original switch button (hidden with it)
-    becomes visible again. Override clicks remain text-only.
-    10/31/2026: Switch button location (v2.9, per J.T.): page bottom-right chip
-    removed. The switch now lives ONLY inside the native bar, at its bottom-right
-    corner, as an out-of-flow (absolute) button — so it does not add a row,
-    change the bar height, or change the spacing of the existing buttons.
-    Override clicks remain text-only.
-    10/31/2026: Switch button back to bottom-right (v2.8, per J.T.'s preference):
-    the top strip is replaced by a small fixed button at the bottom-right
-    corner, labelled "Switch to Support responses". The switch button inside
-    the native bar (v2.7) is kept as well. Chip is still always shown on load.
-    Override clicks remain text-only.
-    10/31/2026: Switch button inside the native bar (v2.7): the top strip could
-    be wiped by a page re-render even when the native bar survived. This
-    version also polls for the other script's bar and, when it appears,
-    appends an orange "Switch to Support responses" button inside that bar
-    itself (at the bottom), so the switch lives with the bar that survives.
-    Clicking it still builds this bar, hides the native bar, and the Back
-    button restores it. Override clicks remain text-only.
-    10/31/2026: Override chip always shown (v2.6): the chip no longer depends on
-    the queue gate to appear — it is shown on page load on every case, so a
-    gate-read failure cannot hide it. Clicking it still builds this bar,
-    hides the native bar, and the Back button restores it. Override clicks
-    remain text-only.
-    10/31/2026: Override chip moved to top (v2.5): the switch button was a small
-    bottom-right chip and could be missed or covered. It is now a bright,
-    full-width strip at the very top of the page, labelled "Switch to Support
-    responses". Clicking it still builds this bar, hides the native bar, and
-    the Back button restores it. Override clicks remain text-only.
-    10/31/2026: Override text-only (v2.4): when the override chip has been used,
-    a button click now only inserts the canned message — it does not touch
-    the Reason Category / Reason Code dropdowns and does not click Review.
-    Native (non-override) buttons are unchanged: insert + auto-select + Review.
-    10/31/2026: Override chip (v2.3): when the queue gate does not match, a small
-    "Show Support responses anyway" chip appears (bottom-right). Clicking it
-    builds this bar on the other queue's case, hiding the native bar (not
-    removing it). A "Back to Tech responses" button at the top of the
-    override bar restores the native bar. Override bars skip the lock-case
-    step (the native script already locked the case). As of v2.4, override
-    button clicks are text-only (see above); native buttons keep their
-    normal insert + auto-select + Review flow.
-    10/30/2026: Text cleanup (v2.2): canned messages only — misspellings,
-    grammar, and sentence/paragraph spacing fixed; greetings standardized
-    to "Dear Valued Carrier," and endings to "Thanks for continuing to
-    haul with Relay!" (including moving the Thanks line to the end in
-    Background Check and Driver Verification). No button text, mapping,
-    URL, email, or code changed.
-    10/30/2026: Bar height match (v2.1): the support bar has only 3 rows
-    against the tech bar's 5, so it was noticeably shorter. The container
-    now has minHeight 154px (the tech bar's measured height on his page)
-    with its rows spread evenly, so both bars stand the same height.
-    10/30/2026: Same page-move changes as tech v3.7 (v2.0): sticky full-width
-    bar inserted at the top of the page flow so Paragon content shifts down
-    below it, and #page-sidebar is unpinned (position: absolute) and shifted
-    down by the bar's height via a MutationObserver, so the whole page moves
-    as one instead of the sidebar staying still.
-    10/29/2026: Queue gate (v1.9): the script now reads the Queue field and only
-    builds its bar / locks a case when the queue is r4c-support@amazon.com,
-    so it can stay enabled alongside the tech script without showing two bars.
-    If that queue does not appear within 15 seconds, it stays silent.
-    8/28/2026: when buttons are clicked the Reason Category and Reason Code are selected automatically.
+    11/26/2026: Responsive bar (v2.37): the button bar now shrinks on smaller screens - below 1600px wide or 850px tall it uses tighter buttons and caps its own height at 45% of the viewport so the case stays visible. It switches back to the full layout automatically on a larger screen, re-checked on every resize and every second.
+    11/25/2026: Removed 10 buttons now covered by the transfer buttons: Driver Verification, Contracts, Insurance, Assets, Site Escalation, Driver Assignment Issue, Auction Support, Suspended, Pending Verification and Verification Link (v2.36). Groups re-sorted by button count, so TRANSFERS moves up to second.
+    11/25/2026: Transfer buttons now name their team and give the carrier the steps to reach it directly (v2.34, per J.T.). Trip button renamed 'Transfer to Trip Completion Dispute'.
+    11/25/2026: Switch tray now re-asserts its in-flow style every second, so mixed-version installs heal within a second (v2.33, per J.T.). Plus a 10px gap above the tray and the Back button.
+    11/25/2026: Switch tray and Back button are now in-flow rows at the bottom-right instead of absolutely positioned, so they can't cover the last row's buttons (v2.32, per J.T.).
+    11/24/2026: SUPER ADMIN ISSUES removed (v2.31, per J.T., GitHub cleanup): the whole group is gone - all 14 responses and all 14 dropdown mappings.
+    11/24/2026: Transfer destination list is a native select - the finder now matches native options and fires change on the select, so the transfer no longer stalls (v2.29, per J.T.).
+    11/24/2026: The 'Another queue' radio is now found through its label's for-attribute, so the transfer no longer stalls with the panel open (v2.28, per J.T.).
+    11/24/2026: Send completion is now signalled by the REVIEW YOUR REPLY preview closing, not the Send button disappearing (v2.27, per J.T.).
+    11/24/2026: A TRANSFERS button click now arms the transfer - once the agent clicks Send, the script opens the Transfer panel, picks the destination and clicks Transfer Case (v2.25, per J.T.). The script never clicks Send itself.
+    11/24/2026: NEW group TRANSFERS (v2.24, per J.T.): 12 buttons, one per destination queue, each inserting the transfer reply. Payment Support is NOT included (not yet transferrable).
+    11/21/2026: NEW buttons 'Performance Final' and 'Account Access', same as Support Personal v2.39 (2.23, per J.T.).
+    11/21/2026: EditSignature click is now wrapped in try/catch, so the 2-second signature fill still runs if the click throws (2.23, per J.T.).
+    11/17/2026: Button groups re-sorted most buttons on top (2.21, per J.T.). Fixed rule from now on: groups always run most buttons first.
+    11/17/2026: Super Admin row: removed 6 duplicate buttons and recolored the row orange (2.20, per J.T.).
+    11/17/2026: NEW 'Super Admin Issues' row (2.19, per J.T.): 19 buttons, his texts verbatim.
+    11/17/2026: Winter weather signature block added: US + Canadian notices with Relay Learning links (2.18, per J.T.).
+    11/12/2026: Trailer Defect button ported from Personal, plus line-break fixes in the UIIA and Auction Support responses (2.17, per J.T.).
+    11/11/2026: NEW button 'Auction Support': overview of Amazon Relay Auctions (2.16, per J.T.).
+    11/11/2026: NEW button 'UIIA': intermodal certification canned message (2.15, per J.T.).
+    11/10/2026: TEAM VERSION (per J.T.): the plain team build - no suggestion feature, no case logging. Do NOT install alongside the Personal Support script.
+    11/04/2026: BASICs button renamed 'Safety Score Not Compliant' with the expanded FMCSA response (v2.14, per J.T.).
+    11/04/2026: 3-way switch (per J.T.): Support / Tech / Auctions. Switch buttons now live in a shared bottom-right tray inside any native bar.
+    11/04/2026: Second gate added (v2.12, per J.T.): rcm-support@amazon.com, so the Support bar now builds on RCM cases too.
+    10/31/2026: Squished-buttons fix (v2.11, per J.T.): unhide now restores a hidden bar with display='flex', so buttons no longer look squished after switching back.
+    10/31/2026: Back button location (v2.10, per J.T.): the top-left 'Back to' button is removed; the override bar gets one button at its bottom-right corner instead.
+    10/31/2026: Switch button location (v2.9, per J.T.): the bottom-right chip is removed; the switch now lives ONLY inside the native bar, at its bottom-right corner.
+    10/31/2026: Switch button back to bottom-right (v2.8, per J.T.'s preference): the top strip is replaced by a small fixed button at the bottom-right corner, and the switch inside the native bar is kept as well.
+    10/31/2026: Switch button now also lives inside the other script's native bar, so it survives a page re-render (v2.7).
+    10/31/2026: Override chip is now shown on page load on every case, no longer gated on the queue (v2.6).
+    10/31/2026: Override switch is now a full-width strip at the top of the page (v2.5).
+    10/31/2026: Override button clicks are now text-only — they insert the message without touching the dropdowns or Review (v2.4).
+    10/31/2026: NEW override chip (v2.3): when the queue gate doesn't match, a 'Show Support responses anyway' chip builds this bar on the other queue's case.
+    10/30/2026: Bar is now a sticky full-width bar at the top of the page flow, and the sidebar shifts down with it (v2.0).
+    10/29/2026: Queue gate added (v1.9): the script only builds its bar when the queue is r4c-support@amazon.com.
     08/14/2026 Organized buttons into categories and color coded them.
-    06/02/2025 After sev 2 paragon, fixed it to work properly (hope).
-    05/29/2025: Added Remove CC'd Emails to script. Added auto-height to signature and response fields.
+    06/02/2025: Fixed to work properly after the Paragon sev 2.
+    05/29/2025: Added 'Remove CC'd Emails' button, plus auto-height on the signature and response fields.
     */
     // Configuration object
 const dropdownMappings = {
     "Safety Score Not Compliant": { category: "Performance", categoryValue: "37058498011", code: "Dispute", codeValue: "39474112881" },
     "CARB":                  { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Insurance":             { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "RLB Access / Visibility": { category: "RLB Access", categoryValue: "39778217681", code: "Load Board Visibility", codeValue: "39474112921" },
-    "Suspended":             { category: "RLB Access", categoryValue: "39778217681", code: "Suspended", codeValue: "39474112901" },
-    "Driver Verification":   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Background Check":      { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Domicile":              { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Selfie / Verification": { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Retake 101":            { category: "RLB Access", categoryValue: "39778217681", code: "Suspended", codeValue: "39474112901" },
-    "Contracts":             { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Contracts", codeValue: "48827581941" },
-    "Pending Verification":  { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Verification Link":     { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Assets":                { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
+    "Trailer Defect":        { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
     "In-Transit":            { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
     "Submit BOL":            { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
     "Missing BOL":           { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
     "Assign Drivers":        { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
-    "Driver Assignment Issue": { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Accident":              { category: "In-Transit Issues", categoryValue: "37058497991", code: "Accident Report", codeValue: "39474113031" },
     "Loss Prevention":       { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
-    "Site Escalation":       { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
     "TONU":                  { category: "Payment Related", categoryValue: "37058498001", code: "Dispute", codeValue: "39474112971" },
     "Load Not Showing":      { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
     "Call Back":             { category: "In-Transit Issues", categoryValue: "37058497991", code: "Call back request", codeValue: "39474113021" },
@@ -163,22 +88,18 @@ const dropdownMappings = {
     "Solicitation":           { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Update Bank Info":       { category: "Payment Related", categoryValue: "37058498001", code: "Update Banking Info", codeValue: "39474112991" },
     "UIIA":                   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Auction Support":        { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Add Admin/Dispatcher":   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Add Driver":             { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Invite Not Received":    { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Email Already In Use":   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Remove User":            { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Change User Role":       { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Dispatcher No Payout":   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "User Missing Trips":     { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Portal Login Trouble":   { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Account Access":        { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Transfer Role":          { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Super Admin Left Company":{ category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
-    "Driver Can't Log In":    { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
-    "Driver Not Seeing Load": { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
-    "Trailer Defect":         { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
+    "Transfer to Trip Completion Dispute":        { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
+    "Transfer to Driver Verification":  { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
+    "Transfer to App & Web Portal":     { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Relay Mobile App", codeValue: "48827582041" },
+    "Transfer to Contracts":            { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Contracts", codeValue: "48827581941" },
+    "Transfer to Insurance":            { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
+    "Transfer to Assets":               { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
+    "Transfer to Site Escalations":     { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
+    "Transfer to Driver Assignment":    { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
+    "Transfer to Auctions":             { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
+    "Transfer to Safety Rewards":       { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
+    "Transfer to Suspension Appeals":   { category: "RLB Access", categoryValue: "39778217681", code: "Suspended", codeValue: "39474112901" },
+    "Transfer to Account Verification": { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
 
 };
 function setDropdownValue(dropdownId, value, displayName) {
@@ -241,32 +162,6 @@ function autoSelectDropdowns(buttonLabel) {
     const config = {
 buttonGroups: [
     {
-        name: 'ACCOUNT & COMPLIANCE',
-        backgroundColor: '#0b66c3',
-        hoverColor: '#084a8c',
-        labelColor: '#0b66c3',
-        buttons: [
-            { id: 'basicsCompliant', text: 'Safety Score Not Compliant' },
-            { id: 'carb', text: 'CARB' },
-            { id: 'insurance', text: 'Insurance' },
-            { id: 'rlb', text: 'RLB Access / Visibility' },
-            { id: 'suspended', text: 'Suspended' },
-            { id: 'Driververification', text: 'Driver Verification' },
-            { id: 'BGCheck', text: 'Background Check' },
-            { id: 'Domicile', text: 'Domicile' },
-            { id: 'selfie', text: 'Selfie / Verification' },
-            { id: 'retake', text: 'Retake 101' },
-            { id: 'contracts', text: 'Contracts' },
-            { id: 'pending', text: 'Pending Verification' },
-            { id: 'link', text: 'Verification Link' },
-            { id: 'assets', text: 'Assets' },
-            { id: 'Solicitation', text: 'Solicitation' },
-            { id: 'bank', text: 'Update Bank Info' },
-            { id: 'uiia', text: 'UIIA' },
-            { id: 'auctionSupport', text: 'Auction Support' },
-        ]
-    },
-    {
         name: 'SUPPORT & GENERAL',
         backgroundColor: '#6b7280',
         hoverColor: '#4b5563',
@@ -292,25 +187,41 @@ buttonGroups: [
         ]
     },
     {
-        name: 'SUPER ADMIN ISSUES',
-        backgroundColor: '#ea580c',
-        hoverColor: '#c2410c',
-        labelColor: '#ea580c',
+        name: 'TRANSFERS',
+        backgroundColor: '#0f766e',
+        hoverColor: '#115e59',
+        labelColor: '#0f766e',
         buttons: [
-            { id: 'addAdminDispatcher', text: 'Add Admin/Dispatcher' },
-            { id: 'addDriver', text: 'Add Driver' },
-            { id: 'inviteNotReceived', text: 'Invite Not Received' },
-            { id: 'emailAlreadyInUse', text: 'Email Already In Use' },
-            { id: 'removeUser', text: 'Remove User' },
-            { id: 'changeUserRole', text: 'Change User Role' },
-            { id: 'dispatcherNoPayout', text: 'Dispatcher No Payout' },
-            { id: 'userMissingTrips', text: 'User Missing Trips' },
-            { id: 'portalLoginTrouble', text: 'Portal Login Trouble' },
-            { id: 'accountAccess', text: 'Account Access' },
-            { id: 'transferRole', text: 'Transfer Role' },
-            { id: 'superAdminLeftCompany', text: 'Super Admin Left Company' },
-            { id: 'driverCantLogIn', text: "Driver Can't Log In" },
-            { id: 'driverNotSeeingLoad', text: 'Driver Not Seeing Load' },
+            { id: 'xferTripDisputes', text: 'Transfer to Trip Completion Dispute' },
+            { id: 'xferDriverVerification', text: 'Transfer to Driver Verification' },
+            { id: 'xferAppPortal', text: 'Transfer to App & Web Portal' },
+            { id: 'xferContracts', text: 'Transfer to Contracts' },
+            { id: 'xferInsurance', text: 'Transfer to Insurance' },
+            { id: 'xferAssets', text: 'Transfer to Assets' },
+            { id: 'xferSiteEscalations', text: 'Transfer to Site Escalations' },
+            { id: 'xferDriverAssignment', text: 'Transfer to Driver Assignment' },
+            { id: 'xferAuctions', text: 'Transfer to Auctions' },
+            { id: 'xferSafetyRewards', text: 'Transfer to Safety Rewards' },
+            { id: 'xferSuspensionAppeals', text: 'Transfer to Suspension Appeals' },
+            { id: 'xferAccountVerification', text: 'Transfer to Account Verification' }
+        ]
+    },
+    {
+        name: 'ACCOUNT & COMPLIANCE',
+        backgroundColor: '#0b66c3',
+        hoverColor: '#084a8c',
+        labelColor: '#0b66c3',
+        buttons: [
+            { id: 'basicsCompliant', text: 'Safety Score Not Compliant' },
+            { id: 'carb', text: 'CARB' },
+            { id: 'rlb', text: 'RLB Access / Visibility' },
+            { id: 'BGCheck', text: 'Background Check' },
+            { id: 'Domicile', text: 'Domicile' },
+            { id: 'selfie', text: 'Selfie / Verification' },
+            { id: 'retake', text: 'Retake 101' },
+            { id: 'Solicitation', text: 'Solicitation' },
+            { id: 'bank', text: 'Update Bank Info' },
+            { id: 'uiia', text: 'UIIA' },
         ]
     },
     {
@@ -323,10 +234,8 @@ buttonGroups: [
             { id: 'submitBol', text: 'Submit BOL' },
             { id: 'MissingBOL', text: 'Missing BOL' },
             { id: 'assigndrivers', text: 'Assign Drivers' },
-            { id: 'driverassignmentissue', text: 'Driver Assignment Issue' },
             { id: 'arc', text: 'Accident' },
             { id: 'lossprevention', text: 'Loss Prevention' },
-            { id: 'siteescalation', text: 'Site Escalation' },
             { id: 'tonu', text: 'TONU' },
             { id: 'load', text: 'Load Not Showing' },
             { id: 'CallBack', text: 'Call Back' },
@@ -368,13 +277,128 @@ containerStyle: {
 };
     // Response templates
     const responses = {
-        assets: `Dear Valued Carrier,
+        xferTripDisputes: `Dear Valued Carrier,
 
-Thank you for reaching out. For inquiries related to assets, please navigate to the Relay Support Center via your Relay account and create a case under the Topic: Asset. Our support team will review your case and follow up accordingly.
+We are transferring your case to the Trip Completion Dispute team so they can help you with this issue.
 
-For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning
+Next time, you can reach them directly:
 
-Thanks for continuing to haul with Relay!`,
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay Trip Completion Status Dispute
+
+Thank you for continuing to haul with Relay!`,
+        xferDriverVerification: `Dear Valued Carrier,
+
+We are transferring your case to the Driver Verification team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay Driver Verification Dispute
+
+Thank you for continuing to haul with Relay!`,
+        xferAppPortal: `Dear Valued Carrier,
+
+We are transferring your case to the App & Web Portal team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay App & Web Portal Tech Support
+
+Thank you for continuing to haul with Relay!`,
+        xferContracts: `Dear Valued Carrier,
+
+We are transferring your case to the Contracts team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Short-Term Contracts
+
+Thank you for continuing to haul with Relay!`,
+        xferInsurance: `Dear Valued Carrier,
+
+We are transferring your case to the Insurance team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Insurance Compliance
+
+Thank you for continuing to haul with Relay!`,
+        xferAssets: `Dear Valued Carrier,
+
+We are transferring your case to the Assets team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Asset Edit
+
+Thank you for continuing to haul with Relay!`,
+        xferSiteEscalations: `Dear Valued Carrier,
+
+We are transferring your case to the Site Escalations team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Site Escalations
+
+Thank you for continuing to haul with Relay!`,
+        xferDriverAssignment: `Dear Valued Carrier,
+
+We are transferring your case to the Driver Assignment team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay Driver Assignment Support
+
+Thank you for continuing to haul with Relay!`,
+        xferAuctions: `Dear Valued Carrier,
+
+We are transferring your case to the Auctions team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay Actions Support
+
+Thank you for continuing to haul with Relay!`,
+        xferSafetyRewards: `Dear Valued Carrier,
+
+We are transferring your case to the Safety Rewards team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on the "Rewards" button on the left side of the screen.
+
+Thank you for continuing to haul with Relay!`,
+        xferSuspensionAppeals: `Dear Valued Carrier,
+
+We are transferring your case to the team that handles suspension appeals so they can review your appeal.
+
+You don't need to do anything else. They will pick up this same case.
+
+Thank you for continuing to haul with Relay!`,
+        xferAccountVerification: `Dear Valued Carrier,
+
+We are transferring your case to the Account Verification team so they can help you with this issue.
+
+You don't need to do anything else. They will pick up this same case.
+
+Thank you for continuing to haul with Relay!`,
                 bank: `Dear Valued Carrier,
 
 Thank you for reaching out to Amazon Relay Support.
@@ -578,29 +602,6 @@ Relay Support Center: https://relay.amazon.com/cases/sc/help
 If your issue requires immediate attention or you have not received a response within a reasonable timeframe, you may submit a new support case through the Relay Support Center for further assistance.
 
 Thanks for continuing to haul with Relay!`,
-          link: `Dear Valued Carrier,
-
-Thank you for reaching out about your ownership documents.
-
-For ownership verification matters, please email the dedicated team directly at:
-
-relay-account-verification@amazon.com
-
-When emailing, please include the following information so they can assist you promptly:
-
-SCAC:
-Company Name:
-Contact Name:
-Description of Issue: Briefly explain which ownership documents you have already submitted and what additional documents (if any) you were asked to provide
-Attachments: Re-attach any relevant ownership documents for their review
-This team specializes in account and ownership verification and will be able to guide you through any remaining steps.
-
-For additional resources and self-service support, please visit:
-
-Relay Support Center: https://relay.amazon.com/cases/sc/help
-Relay Learning Center: https://relay.amazon.com/cases/sc/learning
-
-Thanks for continuing to haul with Relay!`,
                 badge: `Dear Valued Carrier,
 
 Thank you for reaching out to Relay Support regarding driver badging.
@@ -664,25 +665,6 @@ Confirmation that there are no outstanding loads or active contracts currently a
 If you have any other questions or need additional support, please visit our Support Center at: https://relay.amazon.com/cases/sc/help
 
 For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning
-
-Thanks for continuing to haul with Relay!`,
-               pending: `Dear Valued Carrier,
-
-Thank you for reaching out, and we appreciate your patience while your business identity verification is being processed.
-
-Verification reviews can sometimes take additional time depending on the volume of submissions. Here are a few steps to confirm everything is in order on your end:
-
-Log in to your Relay account at relay.amazon.com
-Navigate to your Account Settings and review the verification section
-Confirm that all requested documents have been uploaded and that no additional action items are flagged
-Check the email associated with your account for any messages from Relay regarding next steps or additional documentation requests — including your spam/junk folder
-
-If you have confirmed all steps are complete and the status still shows "pending," please reply to this case confirming that, and we will escalate internally for further review.
-
-For additional support and resources, please visit:
-
-Relay Support Center: https://relay.amazon.com/cases/sc/help
-Relay Learning Center: https://relay.amazon.com/cases/sc/learning
 
 Thanks for continuing to haul with Relay!`,
         retake: `Dear Valued Carrier,
@@ -868,20 +850,6 @@ Relay Support Center: https://relay.amazon.com/cases/sc/help
 Relay Learning Center: https://relay.amazon.com/cases/sc/learning
 
 Thanks for continuing to haul with Relay!`,
-        Driververification: `Dear Valued Carrier,
-
-Thank you for reaching out regarding your driver verification inquiry.
-
-We recommend the following steps to help resolve this:
-
-Please have the driver check their spam/junk folder for any communications regarding verification next steps.
-Confirm the driver's email address is entered correctly in the Relay portal.
-If the driver has completed all requirements and still has not received further communication, please have the driver email Relay-driver-verification-checks@amazon.com with their full name, carrier SCAC, and a description of the issue.
-
-
-For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
-
-Thanks for continuing to haul with Relay!`,
 
         lossprevention: `Dear Valued Carrier,
 
@@ -893,26 +861,6 @@ For additional resources, please visit the Relay Learning Center at: https://rel
 
 Thanks for continuing to haul with Relay!`,
 
-        siteescalation: `Dear Valued Carrier,
-
-Thank you for reaching out. For site-level concerns — including facility issues, safety events, equipment issues, or carrier behavior incidents — the Relay Site Escalations team is the dedicated team that will investigate and work toward resolution on your behalf. To get your case started, please follow these steps:
-
-Log in to your Relay account
-Navigate to the Relay Support Center
-Select "Create a Case"
-Choose the Topic: Site Escalations
-In your case description, please include:
-Site code
-Date and time of the incident
-A brief description of the issue
-Any supporting details or documentation you have available
-
-Including these details upfront will help the team begin their review without needing to follow up for additional information, which means a faster resolution for you. Once submitted, the team will review your case and respond in the order cases are received. Please allow time for the team to investigate, and they will reach out directly if they have any questions.
-
-For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
-For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning
-
-Thanks for continuing to haul with Relay!`,
 
         trailerDefect: `Dear Valued Carrier,
 
@@ -930,6 +878,7 @@ Please also make sure the DVIR (Driver Vehicle Inspection Report) for the traile
 For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning
 
 Thanks for continuing to haul with Relay!`,
+
 
         arc: `Dear Valued Carrier,
 
@@ -949,6 +898,51 @@ For additional support, please visit the Relay Support Center at: https://relay.
 For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning
 
 Thanks for continuing to haul with Relay!`,
+
+        uiia: `Dear Valued Carrier,
+
+Thank you for your interest in hauling intermodal loads with Amazon Relay. Here is an overview of the UIIA certification and the Amazon Relay steps your company will need to complete.
+
+Step 1: Join the UIIA
+
+The Uniform Intermodal Interchange and Facilities Access Agreement (UIIA) is a standard interchange agreement. It collects your insurance certificates and checks your company against the requirements of each equipment provider. You can apply online on the UIIA website (Motor Carriers section). Please have the following ready:
+
+An active US DOT number and Motor Carrier Operating Authority number (if applicable) with FMCSA. The company name on your UIIA application should match the name your DOT and MC numbers are registered under.
+An active Standard Carrier Alpha Code (SCAC) with the National Motor Freight Traffic Association.
+Your Federal Tax Identification Number.
+Insurance submitted online by your insurance agent in the UIIA database. It should meet the UIIA base requirements and the requirements of each equipment provider you plan to work with.
+Step 2: Get your addenda through the UIIA
+
+Rail drayage: You need addenda for the railroads at the locations where your company plans to operate.
+Port drayage: You need a Flexivan (FLXC) chassis addendum and Ocean Carrier (steamship line) addenda. We recommend getting addenda with all the ocean carriers Amazon works with, so your company has the most load opportunities: CMA CGM (CMDU), Evergreen (EGLV), Hyundai (HDMU), Hapag-Lloyd (HLCU), Maersk (MAEU), MSC (MSCU), Ocean Network Express (ONEY), COSCO Shipping (COSU), Yang Ming (YMLU), ZIM (ZIMU), and OOCL (OOLU).
+Step 3: Complete the Amazon Relay steps
+
+To be eligible for intermodal loads on Amazon Relay, your company needs to:
+
+Have an active Amazon Relay account for 30 days or more.
+Complete the Intermodal Safety course in the Relay Learning Center.
+Keep an Independent UIIA Driver Roster up to date.
+Follow the requirements of each rail yard or port where your company operates.
+Port drayage only: complete the port self-attestations in Relay under Carrier Account → Company Profile → Certifications.
+AFE drayage only: hold a Relay performance score (RPS) of B or higher.
+Stay in compliance with the Relay Program Policies, including current insurance and no active safety suspensions.
+Step 4: Allow time for your updates to sync
+
+Once the UIIA approves your application and addenda, please allow 24 to 48 hours for the updates to show up in Amazon Relay before booking intermodal loads.
+
+Questions about intermodal certification
+
+For questions about intermodal loads or certification, please email imdlcertifications@amazon.com. Include your company name, SCAC, and a short description of your question.
+
+For questions about the Relay app or portal, please open a case through the Relay Support Center.
+
+Relay Support Center: https://relay.amazon.com/cases/sc/help
+Relay Learning Center: https://relay.amazon.com/cases/sc/learning
+
+Thanks for continuing to haul with Relay!`,
+
+
+
 
         other: `Dear Valued Carrier,
 
@@ -977,33 +971,6 @@ For additional resources, please visit the Relay Learning Center at: https://rel
 
 Thanks for continuing to haul with Relay!`,
 
-        driverassignmentissue: `Dear Valued Carrier,
-
-Thank you for your continued patience as we work to support you on this matter. To help resolve the driver assignment issue, please try the following troubleshooting steps:
-
-Step 1 — Hard Refresh & Clear Browser Cache
-
-Before attempting to reassign the driver, please perform a hard refresh of your browser:
-
-Windows/Chrome: Press Ctrl + Shift + R
-Mac/Safari or Chrome: Press Cmd + Shift + R
-After the hard refresh, clear your browser cache and cookies, then log back into the Relay portal and attempt the driver assignment again.
-
-Step 2 — Try a Different Browser
-
-If the issue persists after the hard refresh, we recommend attempting the driver assignment using Google Chrome, as it is the recommended browser for the Relay portal. If you are already using Chrome, please try an Incognito/Private window to rule out any cached session data.
-
-Step 3 — Confirm Prior Block Status
-
-If the driver recently completed a prior block on this same contract, please verify that the previous block shows a status of Completed in your Relay portal before attempting to assign the driver to the current block. An open or in-progress prior block may prevent the system from accepting a new assignment for the same driver.
-
-Please attempt these steps and let us know if the issue is resolved. If the problem continues after completing all steps above, please reply to this case and we will escalate for further investigation.
-
-For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
-
-For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning
-
-Thanks for continuing to haul with Relay!`,
 
         assigndrivers: `Dear Valued Carrier,
 
@@ -1029,46 +996,7 @@ For additional resources, please visit the Relay Learning Center at: https://rel
 
 Thanks for continuing to haul with Relay!`,
 
-        contracts: `Dear Valued Carrier,
 
-Thank you for reaching out regarding your contract concern.
-
-To ensure your request is reviewed by the appropriate team, please follow the steps below to self-escalate:
-
-For contract questions, modifications, or cancellation requests:
-
-Log in to your Relay account at relay.amazon.com
-Navigate to the Support Center
-Select Create a Case
-Provide the following details in your case:
-Your SCAC code
-The specific contract or lane(s) affected
-A brief description of your concern or request
-Any supporting documentation (screenshots, load IDs, etc.)
-
-Our contracts team will review your submission and follow up directly if they have any questions.
-
-Helpful Resources:
-
-Relay Support Center: https://relay.amazon.com/cases/sc/help
-Relay Learning Center: https://relay.amazon.com/cases/sc/learning
-
-Thanks for continuing to haul with Relay!`,
-
-        insurance: `Dear Valued Carrier,
-
-Thank you for reaching out. For inquiries related to insurance compliance — including updates, changes, or questions regarding your insurance documentation — please navigate to the Relay Support Center via your Relay account and create a case under the Topic: Insurance Compliance. Our support team will review your case and provide follow-up assistance.
-
-When submitting your case, we recommend including the following details to help expedite the review:
-
-SCAC (Standard Carrier Alpha Code)
-Brief description of your insurance inquiry (e.g., policy update, certificate of insurance question, compliance status)
-Supporting documentation, if applicable
-For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
-
-For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning
-
-Thanks for continuing to haul with Relay!`,
 
         intransit: `Dear Valued Carrier,
 
@@ -1357,28 +1285,6 @@ For additional resources, please visit the Relay Learning Center at: https://rel
 
 Thanks for continuing to haul with Relay!`,
 
-        suspended: `Dear Valued Carrier,
-
-Thank you for reaching out. We understand your concern regarding your account status. However, account suspension inquiries are handled by a specialized team that has the tools and access to assist you directly.
-
-Next Steps:
-
-Please contact the Account Management team at the following email for further assistance with your suspended account:
-
-Open a new case by emailing relay-am@amazon.com
-
-When reaching out, we recommend including the following details to help expedite your request:
-
-SCAC (Standard Carrier Alpha Code)
-Brief description of the circumstances surrounding the suspension
-Any relevant documentation that may support your inquiry
-The Account Management team will review your case and provide guidance on next steps.
-
-For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
-
-For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning
-
-Thanks for continuing to haul with Relay!`,
 
       MissingBOL: `Dear Valued Carrier,
 
@@ -1395,222 +1301,6 @@ Select the load details to locate and download the BOL.
 If you are unable to locate the BOL through your Relay account, please reply to this email confirming you have attempted the steps above and we will investigate further.
 
 For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
-
-Thanks for continuing to haul with Relay!`,
-
-
-        uiia: `Dear Valued Carrier,
-
-Thank you for your interest in hauling intermodal loads with Amazon Relay. Here is an overview of the UIIA certification and the Amazon Relay steps your company will need to complete.
-
-Step 1: Join the UIIA
-
-The Uniform Intermodal Interchange and Facilities Access Agreement (UIIA) is a standard interchange agreement. It collects your insurance certificates and checks your company against the requirements of each equipment provider. You can apply online on the UIIA website (Motor Carriers section). Please have the following ready:
-
-An active US DOT number and Motor Carrier Operating Authority number (if applicable) with FMCSA. The company name on your UIIA application should match the name your DOT and MC numbers are registered under.
-An active Standard Carrier Alpha Code (SCAC) with the National Motor Freight Traffic Association.
-Your Federal Tax Identification Number.
-Insurance submitted online by your insurance agent in the UIIA database. It should meet the UIIA base requirements and the requirements of each equipment provider you plan to work with.
-Step 2: Get your addenda through the UIIA
-
-Rail drayage: You need addenda for the railroads at the locations where your company plans to operate.
-Port drayage: You need a Flexivan (FLXC) chassis addendum and Ocean Carrier (steamship line) addenda. We recommend getting addenda with all the ocean carriers Amazon works with, so your company has the most load opportunities: CMA CGM (CMDU), Evergreen (EGLV), Hyundai (HDMU), Hapag-Lloyd (HLCU), Maersk (MAEU), MSC (MSCU), Ocean Network Express (ONEY), COSCO Shipping (COSU), Yang Ming (YMLU), ZIM (ZIMU), and OOCL (OOLU).
-Step 3: Complete the Amazon Relay steps
-
-To be eligible for intermodal loads on Amazon Relay, your company needs to:
-
-Have an active Amazon Relay account for 30 days or more.
-Complete the Intermodal Safety course in the Relay Learning Center.
-Keep an Independent UIIA Driver Roster up to date.
-Follow the requirements of each rail yard or port where your company operates.
-Port drayage only: complete the port self-attestations in Relay under Carrier Account → Company Profile → Certifications.
-AFE drayage only: hold a Relay performance score (RPS) of B or higher.
-Stay in compliance with the Relay Program Policies, including current insurance and no active safety suspensions.
-Step 4: Allow time for your updates to sync
-
-Once the UIIA approves your application and addenda, please allow 24 to 48 hours for the updates to show up in Amazon Relay before booking intermodal loads.
-
-Questions about intermodal certification
-
-For questions about intermodal loads or certification, please email imdlcertifications@amazon.com. Include your company name, SCAC, and a short description of your question.
-
-For questions about the Relay app or portal, please open a case through the Relay Support Center.
-
-Relay Support Center: https://relay.amazon.com/cases/sc/help
-Relay Learning Center: https://relay.amazon.com/cases/sc/learning
-
-Thanks for continuing to haul with Relay!`,
-
-
-
-        auctionSupport: `Dear Valued Carrier,
-
-Thank you for reaching out about Amazon Relay Auctions. Here's an overview of how they work.
-
-What are Auctions?
-
-Auctions let your company bid on lanes and set the price it wants to haul for. Most auctions are one-way, so they're a good fit for backhauls and for naming your price.
-
-How bidding works
-
-Single or bulk bids: You can bid on one lane or on several lanes at once.
-Full transparency: Each auction shows how much time is left and the current leading bid, so you can make informed decisions before you bid.
-Who can access Auctions
-
-Access depends on your company's performance grade. A grade needs 6 weeks of performance history hauling for Relay. If you don't see Auctions yet, we recommend reviewing your performance grade in your Relay portal.
-
-Learn more
-
-For a step-by-step walkthrough, see the Auctions course in the Relay Learning Center: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=377045ba-0b0d-4fba-b9ba-fe32d56c2948
-
-If you have a technical issue while bidding, please open a case through the Relay Support Center and select the topic "Relay Auction Support." Include your SCAC, the auction or lane details, and a screenshot of the issue.
-
-Relay Support Center: https://relay.amazon.com/cases/sc/help
-Relay Learning Center: https://relay.amazon.com/cases/sc/learning
-
-Thanks for continuing to haul with Relay!`,
-        addAdminDispatcher: `Dear Valued Carrier,
-
-As the Super Admin, you can invite Admins and Dispatchers to your company's Relay account. Log in to relay.amazon.com, go to your user management area and send the invite to the person's email address. They will receive an email to finish setting up their account.
-
-If the invite does not arrive, ask them to check their spam folder before you send it again.
-
-You may find this optional Relay Learning Center course helpful:
-- Get started with Relay 101: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=70c8bf62-bd37-48a8-bef4-34128b223a60
-
-Thanks for continuing to haul with Relay!`,
-        addDriver: `Dear Valued Carrier,
-
-You can invite drivers from the Driver Roster page at relay.amazon.com. Once the driver accepts, they can log in to the Relay mobile app with the same email address.
-
-We recommend that drivers use the latest Relay app version on Android 7 or later, or iOS 13.1 or later.
-
-You may find these optional Relay Learning Center resources helpful:
-- Driver Background Check Guide: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=4bcb6fd6-9383-4834-bdb5-20bce34da56b
-- How to avoid Automatic Rejections: Asset Not Assigned & No Driver Assigned: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=948c6d87-d6b8-4a91-8a9c-834182a49336
-
-Thanks for continuing to haul with Relay!`,
-        inviteNotReceived: `Dear Valued Carrier,
-
-If a user or driver did not receive their Relay invite, we recommend the following:
-
-1. Ask them to check their spam or junk folder.
-2. Confirm the email address on the invite is spelled correctly.
-3. Send the invite again from relay.amazon.com.
-
-If the invite still does not arrive, please reply to this case with the user's email address, their role (Admin, Dispatcher, or Driver), and the date you sent the invite.
-
-Thanks for continuing to haul with Relay!`,
-        emailAlreadyInUse: `Dear Valued Carrier,
-
-A Relay login can be linked to more than one carrier account or role. If you see a message that the email is already in use, the person may already have a Relay account under that email.
-
-We recommend asking the user to log in with their existing credentials. If they need a separate login for your company, please invite them with a different email address.
-
-If the issue continues, please reply to this case with the email address, the role you are trying to assign, and a screenshot of the message.
-
-Thanks for continuing to haul with Relay!`,
-        removeUser: `Dear Valued Carrier,
-
-As the Super Admin, you can remove Admins, Dispatchers, and drivers from your company's Relay account at relay.amazon.com. We recommend reviewing your user list regularly so that only current users have access.
-
-If you are unable to remove a user, please reply to this case with the user's email address, their role, and a screenshot of what you see.
-
-You may find this optional Relay Learning Center course helpful:
-- Get started with Relay 101: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=70c8bf62-bd37-48a8-bef4-34128b223a60
-
-Thanks for continuing to haul with Relay!`,
-        changeUserRole: `Dear Valued Carrier,
-
-Each user on your account has a role: Admin, Dispatcher, or Driver. Admins can see payout information for loads; Dispatchers cannot. Before changing a role, consider what each person needs to see.
-
-As the Super Admin, you can update a user's access at relay.amazon.com. If you are unable to change the role, please reply to this case with the user's email address, the current role, the role you would like, and a screenshot.
-
-You may find this optional Relay Learning Center course helpful:
-- Get started with Relay 101: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=70c8bf62-bd37-48a8-bef4-34128b223a60
-
-Thanks for continuing to haul with Relay!`,
-        dispatcherNoPayout: `Dear Valued Carrier,
-
-This is expected. Admins can see payout information for loads, but Dispatchers cannot. If this person needs to see payouts, you may consider inviting them as an Admin instead.
-
-Thanks for continuing to haul with Relay!`,
-        userMissingTrips: `Dear Valued Carrier,
-
-If domiciles are assigned to a user on the Carrier Profile or Driver Roster page, that user will only see trips that start in those domiciles. As the Super Admin, you can review and update each user's domiciles there.
-
-If the domiciles are correct and trips are still missing, please reply to this case with the Load ID, the user's role, and a screenshot.
-
-Thanks for continuing to haul with Relay!`,
-        portalLoginTrouble: `Dear Valued Carrier,
-
-If you are having trouble logging in to relay.amazon.com, we recommend the following:
-
-1. Use the "Forgot password" option on the login page.
-2. Clear your browser cache and cookies, then do a hard refresh.
-3. Try a different browser.
-
-If you still cannot log in, please reply to this case with your SCAC, the email address on the account, a screenshot of any error message, and the date and time of the attempt.
-
-You may find this optional Relay Learning Center course helpful:
-- Get started with Relay 101: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=70c8bf62-bd37-48a8-bef4-34128b223a60
-
-Thanks for continuing to haul with Relay!`,
-        accountAccess: `Dear Carrier,
-
-Thank you for reaching out, and we're sorry for the trouble signing in. The right fix depends on what is blocking your sign-in:
-
-If you can still sign in on another device, update the phone number first: sign in at amazon.com with the same email and password you use for Relay, go to Account & Lists, then Your Account, then Login & security. Next to Mobile number, select Edit, enter the new number, and enter the verification code sent to that number. If you are still signed in to the Relay mobile app, please stay signed in for now — signing out may prevent you from getting back in until the phone number is updated.
-
-If your company's DOT and MC numbers appear to be linked to a different Relay account, this has to be reviewed by the team that handles account verification. Please email atscompliance@amazon.com with your company's DOT and MC numbers, the email address you're trying to sign in with, and any other email address that may have been used to register the account.
-
-If your Primary Administrator can't sign in because their Amazon.com account is suspended, the quickest way to restore access is to resolve that suspension first: have the Primary Administrator contact Amazon.com Customer Service about the Amazon.com account suspension and follow the steps provided to restore access.
-
-For other account issues, including problems related to sign-in, unauthorized access, or account security concerns, you can reach out to amazon-engagement@amazon.com for assistance. Please note that Amazon will never request personal information such as passwords, OTPs, or credit card numbers via phone or email.
-
-Thanks for continuing to haul with Relay!`,
-        transferRole: `Dear Valued Carrier,
-
-Each Relay account has one Super Admin. To move the role to someone else, please open a case in the Relay Support Center at relay.amazon.com and include your SCAC, the current Super Admin's email, and the new Super Admin's email.
-
-If you already have an open case about this, please reply on that case with these details instead of opening a new one.
-
-Thanks for continuing to haul with Relay!`,
-        superAdminLeftCompany: `Dear Valued Carrier,
-
-If your Super Admin is no longer with your company, the role will need to be moved to a new person. Please open a case in the Relay Support Center at relay.amazon.com and include your SCAC, the former Super Admin's email, and the new Super Admin's name and email.
-
-If you already have an open case about this, please reply on that case with these details instead of opening a new one.
-
-Thanks for continuing to haul with Relay!`,
-        driverCantLogIn: `Dear Valued Carrier,
-
-If your company's driver is unable to log in to the Relay mobile app, we recommend the following:
-
-1. Confirm the driver accepted their invite and is using the same email address the invite was sent to.
-2. Use the "Forgot password" option on the app login screen.
-3. Update to the latest Relay app version (Android 7 or later, or iOS 13.1 or later).
-4. Close and restart the app, and check for a stable internet connection.
-
-You may find this optional Relay Learning Center course helpful:
-- Introduction to Primary and Secondary Devices: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=1b83c2f9-1e32-4d56-9f3c-1c8e8e988998
-
-If the driver still cannot log in, please reply to this case with the driver's email address, phone type and OS version, a screenshot of any error message, and the date and time of the attempt.
-
-Thanks for continuing to haul with Relay!`,
-        driverNotSeeingLoad: `Dear Valued Carrier,
-
-If your company's driver cannot see an assigned load in the Relay mobile app, we recommend the following:
-
-1. Confirm the driver is assigned to the load on the Trips page at relay.amazon.com.
-2. Have the driver log out and back in, then refresh the app.
-3. Update to the latest Relay app version.
-
-You may find these optional Relay Learning Center courses helpful:
-- How to avoid Automatic Rejections: Asset Not Assigned & No Driver Assigned: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=948c6d87-d6b8-4a91-8a9c-834182a49336
-- Confirming Load Specifics: https://relay.amazon.com/learning/all-resources?filterCriteria=&openCourse=ab2993e7-0b0a-4baa-92a0-01d3fa58461d
-
-If the load still does not appear, please reply to this case with the Load ID or VRID, the driver's email address, and a screenshot of the driver's app.
 
 Thanks for continuing to haul with Relay!`,
     };
@@ -1661,13 +1351,360 @@ const insertResponse = (response) => {
             }, 2000);
         }
     }
-    // Registry of built buttons by id, so the suggestion feature can highlight one.
-    const tmButtons = {};
     // Create button element with styles
+// ==== TRANSFER-ON-SEND ====
+// A TRANSFERS button click arms a transfer; the transfer itself runs
+// automatically right after the agent clicks Send on the review preview.
+// The script NEVER clicks Send itself - the agent always reviews first.
+// Discarding the reply, or clicking another button, drops the armed
+// transfer. Any failed or timed-out step aborts and logs with a
+// [Transfers] prefix - never retried blindly, never sent to the
+// wrong queue. Send completion is the REVIEW YOUR REPLY preview
+// closing - a Send button can persist on the page after the send
+// (proven live Nov 24 on case 23584543611). Selectors are role +
+// visible text, mirroring the
+// existing Review-button finder (live inspection could not see raw HTML).
+var TRANSFER_CFG = { pollMs: 250, sendWaitMs: 20000, stepWaitMs: 10000, queueWaitMs: 30000 };
+    var TRANSFER_DESTINATIONS = {
+        xferTripDisputes: { search: 'relay-tripstatus-disputes@amazon.com', option: 'relay-tripstatus-disputes@amazon.com' },
+        xferDriverVerification: { search: 'Relay-driver-verification-checks@amazon.com', option: 'relay-driver-verification-checks' },
+        xferAppPortal: { search: 'relay-feedback@amazon.com', option: 'relay-feedback@amazon.com' },
+        xferContracts: { search: 'rcm-support@amazon.com', option: 'rcm-support@amazon.com' },
+        xferInsurance: { search: 'nastinsuranceparagoninbox@amazon.com', option: 'nastinsuranceparagoninbox@amazon.com' },
+        xferAssets: { search: 'relay-asset-verification-appeals@amazon.com', option: 'relay-asset-verification-appeals@amazon.com' },
+        xferSiteEscalations: { search: 'relay-site-escalations@amazon.com', option: 'relay-site-escalations@amazon.com' },
+        xferDriverAssignment: { search: 'relay-driver-assignment-support@amazon.com', option: 'relay-driver-assignment-support@amazon.com' },
+        xferAuctions: { search: 'relay-auctions-suppport@amazon.com', option: 'relay-auctions-suppport@amazon.com' },
+        xferSafetyRewards: { search: 'relay-safety-rewards-queue@amazon.com', option: 'relay-safety-rewards-queue@amazon.com' },
+        xferSuspensionAppeals: { search: 'relay-am@amazon.com', option: 'relay-am@amazon.com' },
+        xferAccountVerification: { search: 'relay-account-verification@amazon.com', option: 'relay-account-verification@amazon.com' }
+    };
+var pendingTransfer = null;
+var transferWatchTimer = null;
+var transferSendClicked = false;
+var transferSawReply = false;
+
+function xferFindKatButton(label) {
+    var el = document.querySelector('kat-button[label="' + label + '"] button');
+    if (el) { return el; }
+    var all = document.querySelectorAll('kat-button button');
+    for (var i = 0; i < all.length; i++) {
+        if (all[i].textContent.trim() === label) { return all[i]; }
+    }
+    var btns = document.querySelectorAll('button');
+    for (var j = 0; j < btns.length; j++) {
+        if (btns[j].textContent.trim() === label) { return btns[j]; }
+    }
+    return null;
+}
+
+function xferFindRadio(name) {
+    var labels = document.querySelectorAll('label');
+    for (var i = 0; i < labels.length; i++) {
+        if (labels[i].textContent.trim() === name) {
+            var input = labels[i].querySelector('input[type="radio"]');
+            if (input) { return input; }
+            var forId = labels[i].getAttribute('for');
+            if (forId) {
+                var target = document.getElementById(forId);
+                if (target) { return target; }
+            }
+        }
+    }
+    var katLabels = document.querySelectorAll('kat-label');
+    for (var k = 0; k < katLabels.length; k++) {
+        if ((katLabels[k].getAttribute('text') || '').trim() === name) {
+            var kFor = katLabels[k].getAttribute('for');
+            if (kFor) {
+                var kTarget = document.getElementById(kFor);
+                if (kTarget) { return kTarget; }
+            }
+        }
+    }
+    var radios = document.querySelectorAll('[role="radio"], input[type="radio"], kat-radio');
+    for (var j = 0; j < radios.length; j++) {
+        var r = radios[j];
+        var txt = (r.getAttribute('label') || r.getAttribute('aria-label') || r.textContent || '').trim();
+        if (txt === name) { return r; }
+    }
+    return null;
+}
+
+function xferClickRadio(name) {
+    var r = xferFindRadio(name);
+    if (!r) { return false; }
+    var id = r.id || (r.getAttribute && r.getAttribute('id')) || '';
+    if (id) {
+        var lab = document.querySelector('label[for="' + id + '"]');
+        if (lab) { lab.click(); }
+    }
+    r.click();
+    return true;
+}
+
+function xferFindSearchBox() {
+    var box = document.querySelector('input[placeholder="Type here to search"]');
+    if (box) { return box; }
+    box = document.querySelector('textarea[placeholder="Type here to search"]');
+    if (box) { return box; }
+    var inputs = document.querySelectorAll('input, textarea');
+    for (var i = 0; i < inputs.length; i++) {
+        if ((inputs[i].getAttribute('placeholder') || '') === 'Type here to search') { return inputs[i]; }
+    }
+    return null;
+}
+
+function xferSetSearch(text) {
+    var box = xferFindSearchBox();
+    if (!box) { return false; }
+    try {
+        var proto = box.tagName === 'TEXTAREA' ? window.HTMLTextAreaElement.prototype : window.HTMLInputElement.prototype;
+        var setter = Object.getOwnPropertyDescriptor(proto, 'value').set;
+        setter.call(box, text);
+    } catch (e) {
+        box.value = text;
+    }
+    box.dispatchEvent(new Event('input', { bubbles: true }));
+    box.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
+}
+
+function xferFindOption(text) {
+    var opts = document.querySelectorAll('[role="option"]');
+    for (var i = 0; i < opts.length; i++) {
+        if (opts[i].textContent.trim() === text) { return opts[i]; }
+    }
+    var alts = document.querySelectorAll('kat-option, li');
+    for (var j = 0; j < alts.length; j++) {
+        if (alts[j].textContent.trim() === text) { return alts[j]; }
+    }
+    var natives = document.querySelectorAll('option');
+    for (var k = 0; k < natives.length; k++) {
+        var nv = natives[k].value || natives[k].getAttribute('value') || '';
+        if (nv === text || natives[k].textContent.trim() === text) { return natives[k]; }
+    }
+    return null;
+}
+
+function xferClickOption(el) {
+    if (!el) { return false; }
+    el.click();
+    if (el.tagName === 'OPTION') {
+        el.selected = true;
+        var sel = el.parentElement;
+        while (sel && sel.tagName !== 'SELECT') { sel = sel.parentElement; }
+        if (sel) {
+            try {
+                var setter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, 'value').set;
+                setter.call(sel, el.value);
+            } catch (e) {
+                sel.value = el.value;
+            }
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
+            sel.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+    return true;
+}
+
+function xferListOptionTexts() {
+    var out = [];
+    var opts = document.querySelectorAll('[role="option"]');
+    for (var i = 0; i < opts.length && out.length < 10; i++) {
+        out.push(opts[i].textContent.trim());
+    }
+    var natives = document.querySelectorAll('option');
+    for (var j = 0; j < natives.length && out.length < 10; j++) {
+        out.push(natives[j].value || natives[j].textContent.trim());
+    }
+    return out.join(' | ');
+}
+
+function xferReadQueue() {
+    var els = document.querySelectorAll('*');
+    for (var i = 0; i < els.length; i++) {
+        if (els[i].textContent.trim() === 'Queue:') {
+            var row = els[i].parentElement;
+            if (row) {
+                var txt = row.textContent.replace('Queue:', '').trim();
+                if (txt) { return txt; }
+            }
+        }
+    }
+    return null;
+}
+
+function xferFindSendButton() {
+    return xferFindKatButton('Send');
+}
+
+function xferPreviewHeading() {
+    var heads = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    for (var i = 0; i < heads.length; i++) {
+        if (heads[i].textContent.trim() === 'REVIEW YOUR REPLY') { return heads[i]; }
+    }
+    return null;
+}
+
+function xferSendSuccessSeen() {
+    var els = document.querySelectorAll('*');
+    for (var i = 0; i < els.length; i++) {
+        var t = els[i].textContent || '';
+        if (t.indexOf('Email was sent successfully') !== -1) { return true; }
+    }
+    return false;
+}
+
+function xferReplyOpen() {
+    return !!xferFindKatButton('Review') || !!xferPreviewHeading();
+}
+
+function xferWaitFor(check, timeoutMs, pollMs) {
+    return new Promise(function(resolve) {
+        var start = Date.now();
+        function tick() {
+            var val = null;
+            try { val = check(); } catch (e) { val = null; }
+            if (val) { resolve(val); return; }
+            if (Date.now() - start >= timeoutMs) { resolve(null); return; }
+            setTimeout(tick, pollMs);
+        }
+        tick();
+    });
+}
+
+function armTransfer(id) {
+    var dest = TRANSFER_DESTINATIONS[id];
+    if (!dest) {
+        console.warn('[Transfers] No destination for button ' + id);
+        return;
+    }
+    pendingTransfer = { id: id, search: dest.search, option: dest.option };
+    transferSendClicked = false;
+    transferSawReply = false;
+    console.log('[Transfers] Armed - transfer to ' + dest.option + ' will run after Send');
+    xferStartWatch();
+}
+
+function disarmTransfer(reason) {
+    if (!pendingTransfer) { return; }
+    console.log('[Transfers] Disarmed (' + reason + ')');
+    pendingTransfer = null;
+    transferSendClicked = false;
+    transferSawReply = false;
+    xferStopWatch();
+}
+
+function xferStartWatch() {
+    if (transferWatchTimer) { return; }
+    transferWatchTimer = setInterval(xferWatchTick, TRANSFER_CFG.pollMs);
+}
+
+function xferStopWatch() {
+    if (transferWatchTimer) { clearInterval(transferWatchTimer); transferWatchTimer = null; }
+}
+
+function xferWatchTick() {
+    if (!pendingTransfer) { xferStopWatch(); return; }
+    if (xferReplyOpen()) { transferSawReply = true; }
+    var sendBtn = transferSendClicked ? null : xferFindSendButton();
+    if (sendBtn && !sendBtn.__xferTracked) {
+        sendBtn.__xferTracked = true;
+        sendBtn.addEventListener('click', function() {
+            if (!pendingTransfer) { return; }
+            console.log('[Transfers] Send clicked - waiting for the reply to go out');
+            transferSendClicked = true;
+            xferWaitForSendDone(pendingTransfer);
+        });
+        console.log('[Transfers] Send button found - transfer to ' + pendingTransfer.option + ' will run after Send');
+    }
+    if (!transferSendClicked && transferSawReply && !xferReplyOpen()) {
+        disarmTransfer('reply closed without sending');
+    }
+}
+
+function xferWaitForSendDone(dest) {
+    xferWaitFor(function() {
+        return xferPreviewHeading() ? null : true;
+    }, TRANSFER_CFG.sendWaitMs, TRANSFER_CFG.pollMs).then(function(done) {
+        if (!done) {
+            console.warn('[Transfers] ABORT: review preview did not close within ' + (TRANSFER_CFG.sendWaitMs / 1000) + 's - transfer NOT run. If the reply went out, transfer manually.');
+            disarmTransfer('send not confirmed');
+            return;
+        }
+        console.log('[Transfers] Reply sent - running transfer to ' + dest.option + (xferSendSuccessSeen() ? ' (success banner seen)' : ' (no success banner seen)'));
+        disarmTransfer('transfer running');
+        xferRunTransfer(dest).then(function(ok) {
+            if (ok) {
+                console.log('[Transfers] Transfer complete - case is now in ' + dest.option);
+            } else {
+                console.warn('[Transfers] Transfer did NOT complete - check the Queue value and transfer manually if needed');
+            }
+        });
+    });
+}
+
+async function xferRunTransfer(dest) {
+    console.log('[Transfers] Opening the Transfer panel');
+    var transferBtn = xferFindKatButton('Transfer');
+    if (!transferBtn) {
+        console.warn('[Transfers] ABORT: Transfer button not found');
+        return false;
+    }
+    transferBtn.click();
+    var radio = await xferWaitFor(function() { return xferFindRadio('Another queue'); }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+    if (!radio) {
+        console.warn('[Transfers] ABORT: transfer panel did not open (no Another queue radio)');
+        return false;
+    }
+    xferClickRadio('Another queue');
+    console.log('[Transfers] Another queue selected - waiting for the search box');
+    var searchBox = await xferWaitFor(function() { return xferFindSearchBox(); }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+    if (!searchBox) {
+        console.warn('[Transfers] ABORT: destination search box did not appear after selecting Another queue');
+        return false;
+    }
+    if (!xferSetSearch(dest.search)) {
+        console.warn('[Transfers] ABORT: destination search box not found');
+        return false;
+    }
+    console.log('[Transfers] Searching for ' + dest.search);
+    var option = await xferWaitFor(function() { return xferFindOption(dest.option); }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+    if (!option) {
+        console.warn('[Transfers] ABORT: no destination option matching "' + dest.option + '" (options now: ' + xferListOptionTexts() + ')');
+        return false;
+    }
+    xferClickOption(option);
+    console.log('[Transfers] Destination selected: ' + dest.option);
+    var caseBtn = await xferWaitFor(function() {
+        var b = xferFindKatButton('Transfer Case');
+        if (!b) { return null; }
+        if (b.disabled || b.hasAttribute('disabled')) { return null; }
+        return b;
+    }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+    if (!caseBtn) {
+        console.warn('[Transfers] ABORT: Transfer Case button never became enabled');
+        return false;
+    }
+    caseBtn.click();
+    console.log('[Transfers] Transfer Case clicked - waiting for the Queue to change');
+    var queue = await xferWaitFor(function() {
+        var q = xferReadQueue();
+        if (!q) { return null; }
+        return (q.indexOf(dest.option) !== -1 || q.indexOf(dest.search) !== -1) ? q : null;
+    }, TRANSFER_CFG.queueWaitMs, TRANSFER_CFG.pollMs);
+    if (!queue) {
+        console.warn('[Transfers] Transfer Case was clicked but the Queue did not show ' + dest.option + ' within ' + (TRANSFER_CFG.queueWaitMs / 1000) + 's (Queue now: ' + xferReadQueue() + '). The transfer may still have gone through if the page reloaded - check the Queue value.');
+        return false;
+    }
+    console.log('[Transfers] Queue is now: ' + queue);
+    return true;
+}
+// ==== /TRANSFER-ON-SEND ====
+
 const createButton = ({ id, text, backgroundColor, hoverColor }) => {
     const button = document.createElement('button');
     button.className = 'tm-response-btn';
-    tmButtons[id] = button;
     const style = config.buttonStyle;
 
     const buttonBg = backgroundColor || style.backgroundColor;
@@ -1695,8 +1732,15 @@ const createButton = ({ id, text, backgroundColor, hoverColor }) => {
     });
 
 button.addEventListener('click', () => {
-    try { tmLogCase(id, text); } catch (e) { console.warn('Case log failed', e); }
     insertResponse(responses[id]);
+    // Transfer-on-Send: arm a transfer for TRANSFERS buttons, drop any
+    // armed transfer for other buttons. This runs before the override
+    // return so a transfer arms even in override mode.
+    if (id.indexOf('xfer') === 0) {
+        armTransfer(id);
+    } else {
+        disarmTransfer('another button clicked');
+    }
     if (crossQueueMode) {
         console.log("Override mode - text only, dropdowns untouched: " + text);
         return;
@@ -1857,9 +1901,12 @@ button.addEventListener('click', () => {
             if (!tray) {
                 tray = document.createElement('div');
                 tray.className = 'tm-switch-tray';
-                Object.assign(tray.style, { position: 'absolute', bottom: '4px', right: '8px', zIndex: '10001', display: 'flex', gap: '6px' });
                 nativeBar.appendChild(tray);
             }
+            // Re-assert in-flow layout on every tick: an older script
+            // version may have created this tray with absolute
+            // positioning, which floats it over the last row's buttons.
+            Object.assign(tray.style, { position: '', bottom: '', right: '', zIndex: '', display: 'flex', gap: '6px', justifyContent: 'flex-end', width: '100%', boxSizing: 'border-box', marginTop: '10px' });
             if (tray.querySelector('#tm-switch-to-support')) { return; }
             const btn = document.createElement('button');
             btn.id = 'tm-switch-to-support';
@@ -1870,526 +1917,6 @@ button.addEventListener('click', () => {
         });
     }
         setInterval(attachSwitchToNativeBars, 1000);
-
-    // ---- Case suggestion (v2.15): suggest-only, never auto-clicks ----
-    // Keyword lists per button id. Phrases (with a space) score 3, single
-    // words score 2 - the single words here are distinctive (fmcsa, ctc,
-    // accident, domicile...), not generic filler. Generic buttons (More
-    // Info, Other, Patience, App + In-Transit, App + Performance) have no
-    // keywords on purpose - they are fallbacks, not something to suggest
-    // from a keyword.
-    const SUGGESTION_KEYWORDS = {
-        basicsCompliant: ['safety score', 'basic score', 'basics', 'csa score', 'unsafe driving', 'hos compliance', 'behavioral analysis safety'],
-        carb: ['carb', 'clean truck check', 'california clean truck', 'california compliance'],
-        insurance: ['insurance compliance', 'certificate of insurance', 'insurance claim', 'insurance need updated', 'update my insurance'],
-        rlb: ['load board visibility', 'load board access', 'load board', 'no loads', 'cannot see loads', "can't see loads", 'post a truck'],
-        suspended: ['account suspended', 'suspended', 'suspension', 'reinstatement', 'reactivation', 'account closed', 'basic scores', 'basics are within', 'account was suspended', 'was suspended', 'reinstate', 'revoked', 'status says revoked', 'motus', 'operating authority', 'lost the access', 'access to our load board', 'access disappeared', 'load board access', 'manual review', 'has been revoked', 'load board not restored', 'loadboard is disabled', 'load board is disabled', 'still suspended', 'load board reactivated', 'make my account active', 'unable to book loads', 'has not updated', 'restore access', 'previously restricted', 'access was restricted', 'not restored', 'account active', 'granted access'],
-        Driververification: ['driver verification', 'verification check', 'verify driver', 'selfie mis-match', 'selfie mismatch', 'driver mis-match', 'stole his identity', 'account is still not verified'],
-        BGCheck: ['background check', 'background screening'],
-        Domicile: ['domicile'],
-        selfie: ['selfie'],
-        retake: ['relay 101', 'retake 101', 'onboarding for carriers', 'onboarding course'],
-        contracts: ['dedicated contract', 'closed node', 'access to contracts', 'book contracts', 'book any contract'],
-        pending: ['pending verification', 'verification pending', 'identity verification', 'business identity'],
-        link: ['ownership verification', 'ownership documents', 'ownership', 'link expired', 'expired link', 'resend link', 'link is not working', "link doesn't work"],
-        assets: ['asset', 'added an asset', 'truck is still not verified', 'added a truck', 'not enough room', 'do not fit', 'no remaining space', 'completely full', 'cube out', 'tractor', 'add my new vehicle', 'chassis', 'add truck'],
-        Solicitation: ['solicitation', 'freight opportunities'],
-        bank: ['bank account', 'banking', 'direct deposit', 'routing number', 'tax details', 'update my profile'],
-        appIssue: ['app not working', 'app crashing', 'app error', 'experiencing glitches', 'glitches'],
-        performance: ['performance dispute', 'performance score', 'rps', 'score dropped', 'score is dropping', 'score remained', 'performance remained', 'trip completion status', 'late arrival', 'late loads', "shouldn't affect", 'company performance', 'performance impact', 'app malfunction', 'controllable', 'is not late', 'carrier controllable', 'negative performance impact', 'should not impact our performance', 'does not negatively impact', 'negatively impact our performance', 'not count against our performance'],
-        performanceFinal: ['decision is final', 'both disputes', 'already submitted a dispute', 'submitted a dispute and an appeal', 'second review', 'reopen the case', 'remove the penalty', 'score should be adjusted', 'adjust my score', 'change my score', 'used both', 'both dispute options', 'roll off', 'six weeks', 'submitted an appeal', 'appeal was rejected', 'performance penalty', 'missing the points', 'score is below', 'my appeal', 'appeal has been', 'dispute options', 'dispute process', 'appeal process', 'already disputed', 'dispute was', 'appeal was', 'cannot change my', 'remove the negative impact', 'both dispute', 'already appealed', 'appeal is final'],
-        accountAccess: ['cannot login', "can't log in", 'can not login', 'trouble signing in', 'unable to log in', 'verification code', 'two step verification', 'old phone number', 'update phone number', 'update the phone number', 'primary administrator', 'linked to a different', 'google account', 'account suspension', 'sign in trouble', 'cannot sign in', "can't sign in", 'trouble logging in', 'unable to sign in'],
-        paymentDispute: ['payment dispute', 'missing from my invoice', 'missing payment', 'not paid', "didn't get paid", 'did not get paid', 'payment denied', 'rate per mile', 'get paid', 'compensation'],
-        Multi: ['multiple cases', 'duplicate case', 'existing case', 'same issue'],
-        DOTDPS: ['dot audit', 'dps audit', 'dot/dps'],
-        badge: ['badge access', 'badging', 'badge'],
-        middlemile: ['middle mile', 'mmpm'],
-        scorecard: ['performance scorecard', 'scorecard'],
-        close: ['close account verify', 'close my account'],
-        loadboard: ['load board fluctuation', 'load board visibility', 'loads fluctuate', 'load availability'],
-        cancel: ['permanently close', 'permanent closure', 'close this account', 'close our account', 'closure of my account', 'permanent account closure'],
-        intransit: ['stuck in transit', 'in-transit', 'in transit', 'trip completion', 'report delay', 'traffic', 'delay', 'missing ts', 'missing timestamp', 'timestamp', 'time stamp', 'still showing', "doesn't close out", 'does not close out', 'long line', 'big line', 'came as unexpected', 'came up as unexpected', 'empty move', 'too much transit time', 'schedule error', 'scheduling discrepancy', 'sufficient transit time', 'eta updated', 'unloaded date', 'arrived late', 'driver arrived late', 'delay was caused by', 'delay is due to', 'heavy traffic', 'construction', 'change of time', 'traffic jam', 'weigh station', 'yard congestion', 'road conditions', 'changed the schedule', 'check in times', 'weather', 'drop off', 'no doors available', 'unable to pick up'],
-        submitBol: ['submit bol', 'submit bill of lading', 'bill of lading', 'proof of delivery', 'bols for stop', 'upload the bol', 'bol for drop', 'bols for'],
-        MissingBOL: ['missing bol', 'missing bill of lading', "can't find bol", 'cannot find bol', 'download bol', 'waybill', 'way bill', 'pod are missing', 'pod is missing', 'i need bol'],
-        assigndrivers: ['assign drivers', 'assign driver'],
-        driverassignmentissue: ['driver assignment issue', 'cannot assign driver', "can't assign driver", 'driver not assigned'],
-        arc: ['accident report', 'accident'],
-        lossprevention: ['loss prevention', 'stolen', 'theft'],
-        siteescalation: ['site escalation', 'site issue', 'safety event', 'kingpin lock', 'parking fee', 'refusing to open the gate', 'cannot maneuver', 'wrong equipment', 'still on the train'],
-        tonu: ['tonu', 'trip not operated'],
-        load: ['load not showing', 'load is not showing', 'load not appearing', 'load is not appearing', 'booked load', 'load missing'],
-        CallBack: ['call back', 'callback', 'request a call', 'please call', 'call back at', 'call me', 'please confirm', 'can you confirm', 'callme', 'call dispatch', 'showing rejected'],
-        patience: ['still no solution', 'still waiting', 'waiting for response'],
-        trailerDefect: ['trailer is missing', 'missing mudflap', 'door hinges', 'air leak', 'tire rim', 'chassis is broken', 'mechanical issue', 'trailer door', 'cubed out trailer', 'trailer has', 'missing a door', "trailer's issue", 'container is damaged', 'container damaged', 'rear lights', 'lights are not working', "lights aren't working", 'mechanical tractor'],
-        uiia: ['uiia', 'intermodal', 'intermodal loads', 'intermodal certification', 'uiia certification', 'addenda', 'addendum', 'drayage', 'rail drayage', 'port drayage', 'flexivan', 'chassis addendum', 'ocean carrier', 'steamship', 'imdlcertifications', 'trailer interchange'],
-        auctionSupport: ['auction support', 'relay auctions', 'auctions', 'bid on lanes', 'bidding', 'backhaul', 'backhauls', 'leading bid']
-    };
-    // Read the case text WITHOUT the script's own bar (its button labels
-    // would match their own keywords). Reads ONLY the carrier's message
-    // in the correspondence container Paragon already uses elsewhere in
-    // this script (.body_RioZc) - the subject line / page title are NOT
-    // read, per J.T.: they are static across issues and add noise. Fall
-    // back to a copy of the page with our bars removed.
-    function getCaseTextRaw() {
-        var parts = [];
-        var corr = document.querySelector('.body_RioZc');
-        if (corr && corr.innerText) {
-            parts.push(corr.innerText);
-        } else {
-            var clone = document.body.cloneNode(true);
-            clone.querySelectorAll('#tm-main-bar, #tm-tech-bar, #tm-auctions-bar, .tm-switch-tray').forEach(function(n) { n.remove(); });
-            if (clone.innerText) { parts.push(clone.innerText.slice(0, 8000)); }
-        }
-        return parts.join('\n');
-    }
-    function getCaseText() {
-        return getCaseTextRaw().toLowerCase();
-    }
-
-    // ---- Carrier-only suggestion (v2.29/v3.32, per J.T.) ----
-    // Score only the carrier's own message, not the whole thread: the
-    // thread text in .body_RioZc also carries email headers, subject
-    // lines, transfer notices, Relay's form boilerplate and your own
-    // sent replies, and keywords were firing on all of that. If no
-    // carrier message is found, fall back to the whole thread as before,
-    // so the suggestion never has less to work with than today.
-    function extractCarrierMessage(full) {
-        var flat = (full || '').replace(/\s+/g, ' ');
-        var cutAt = function(text) {
-            var stops = ['[Company Name:', 'Attachments:', 'View translation', 'From:', 'Related Frequently Asked Questions'];
-            var end = text.length;
-            stops.forEach(function(s) {
-                var j = text.indexOf(s);
-                if (j !== -1 && j < end) { end = j; }
-            });
-            return text.slice(0, end).trim();
-        };
-        var m;
-        // 1. Support form: "Describe your issue:" ... VRID / [Company Name:
-        m = flat.match(/Describe your issue:\s*(.*?)\s*(?:VRID if applicable:|\[Company Name:)/i);
-        if (m && m[1].trim().length >= 20) { return cutAt(m[1].trim()).slice(0, 3000); }
-        // 2. Verification form: "Explain the issue here:" ...
-        m = flat.match(/Explain the issue here:\s*(.*?)\s*(?:Related Frequently Asked Questions|\[Company Name:)/i);
-        if (m && m[1].trim().length >= 20) { return cutAt(m[1].trim()).slice(0, 3000); }
-        // 3. Tech format: the message follows the VRID / Contract ID value.
-        // (In some cases the Topic label comes after the ID, with the
-        // message right behind it - strip that label too, so the topic
-        // field itself never scores.)
-        var idx = flat.search(/VRID(?:\/Tour\/Block\/Contract ID|#):/i);
-        if (idx !== -1) {
-            var rest = flat.slice(idx).replace(/^VRID(?:\/Tour\/Block\/Contract ID|#):\s*/i, '');
-            var tokens = rest.split(' ');
-            var i = 0;
-            while (i < tokens.length && /^[A-Za-z0-9\-\/]+$/.test(tokens[i]) && /\d/.test(tokens[i]) && tokens[i].length >= 5) { i++; }
-            rest = tokens.slice(i).join(' ').replace(/^Topic \(What's your issue about\?\)\s*:\s*/i, '');
-            var msg = cutAt(rest);
-            if (msg.length >= 20) { return msg.slice(0, 3000); }
-        }
-        return '';
-    }
-    function getSuggestionText(raw) {
-        raw = (raw === undefined) ? getCaseTextRaw() : raw;
-        var carrier = extractCarrierMessage(raw);
-        if (carrier) { return { text: carrier.toLowerCase(), carrierOnly: true }; }
-        return { text: raw.toLowerCase(), carrierOnly: false };
-    }
-    // Combo rule v1: an app phrase plus a trip phrase suggests the matching
-    // combo button (the combos are keywordless by design, so this is the only
-    // way they get suggested). App signal = appIssue / navigation /
-    // appissueExpBehaviour scoring 2+; trip = In-Transit or Performance
-    // scoring 2+, whichever is higher (a tie keeps the normal suggestion).
-    function comboSuggestion(scores) {
-        var byId = {};
-        scores.forEach(function(s) { byId[s.id] = s.score; });
-        var appScore = Math.max(byId.appIssue || 0, byId.navigation || 0, byId.appissueExpBehaviour || 0);
-        var inScore = byId.intransit || 0;
-        var pfScore = byId.performance || 0;
-        if (appScore < 2 || Math.max(inScore, pfScore) < 2) { return null; }
-        if (inScore === pfScore) { return null; }
-        return { id: inScore > pfScore ? 'appintransit' : 'appperformance', score: Math.max(inScore, pfScore), matched: 'combo-rule' };
-    }
-    function scoreSuggestion(text) {
-        var scores = [];
-        Object.keys(SUGGESTION_KEYWORDS).forEach(function(id) {
-            var score = 0, matched = '';
-            SUGGESTION_KEYWORDS[id].forEach(function(phrase) {
-                var needle = phrase.toLowerCase();
-                var idx = text.indexOf(needle);
-                if (idx !== -1) {
-                    score += needle.indexOf(' ') !== -1 ? 3 : 2;
-                    if (!matched) { matched = phrase; }
-                }
-            });
-            if (score > 0) { scores.push({ id: id, score: score, matched: matched }); }
-        });
-        scores.sort(function(a, b) { return b.score - a.score; });
-        if (scores.length === 0) { return null; }
-        var combo = comboSuggestion(scores);
-        if (combo) { return combo; }
-        var top = scores[0];
-        // Clear winner only: at least 2 points and at least 2 ahead of #2.
-        if (top.score < 2) { return null; }
-        if (scores.length > 1 && top.score - scores[1].score < 2) { return null; }
-        return top;
-    }
-    function clearSuggestionHighlight() {
-        Object.keys(tmButtons).forEach(function(id) {
-            var b = tmButtons[id];
-            b.style.outline = '';
-            b.style.boxShadow = '';
-            if (b.dataset.tmOriginalText) { b.textContent = b.dataset.tmOriginalText; delete b.dataset.tmOriginalText; }
-        });
-    }
-    let tmLastSuggestion = null;
-    function applySuggestion(container) {
-        var old = document.getElementById('tm-suggestion-line');
-        if (old) { old.remove(); }
-        clearSuggestionHighlight();
-        var rawText = getCaseTextRaw();
-        var scored = getSuggestionText(rawText);
-        var text = scored.text;
-        var line = document.createElement('div');
-        line.id = 'tm-suggestion-line';
-        Object.assign(line.style, { display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', fontSize: '13px', fontWeight: 'bold', backgroundColor: '#f5f3ff', border: '1px solid #a78bfa', borderRadius: '4px', marginBottom: '2px' });
-        if (rawText.replace(/\s/g, '').length < 100) {
-            line.textContent = 'Suggestion: case text not loaded yet - pick a button below.';
-            line.style.fontWeight = 'normal';
-            container.insertBefore(line, container.firstChild);
-            return false;
-        }
-        var best = scoreSuggestion(text);
-        if (!best) {
-            line.textContent = 'No clear suggestion - pick a button below.';
-            line.style.fontWeight = 'normal';
-            container.insertBefore(line, container.firstChild);
-            return false;
-        }
-        var btn = tmButtons[best.id];
-        if (!btn) {
-            line.textContent = 'No clear suggestion - pick a button below.';
-            container.insertBefore(line, container.firstChild);
-            return false;
-        }
-        best.carrierOnly = scored.carrierOnly;
-        tmLastSuggestion = best;
-        btn.dataset.tmOriginalText = btn.textContent;
-        btn.textContent = btn.textContent + ' ★ Suggested';
-        btn.style.outline = '3px solid #7c3aed';
-        btn.style.boxShadow = '0 0 8px rgba(124,58,237,0.7)';
-        var label = document.createElement('span');
-        label.textContent = 'Suggested: ' + btn.dataset.tmOriginalText + ' — matched "' + best.matched + '"';
-        line.appendChild(label);
-        var useBtn = document.createElement('button');
-        useBtn.textContent = 'Use it';
-        Object.assign(useBtn.style, { backgroundColor: '#7c3aed', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer' });
-        useBtn.addEventListener('click', function() { btn.click(); });
-        line.appendChild(useBtn);
-        var dismissBtn = document.createElement('button');
-        dismissBtn.textContent = 'Dismiss';
-        Object.assign(dismissBtn.style, { backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontSize: '12px', cursor: 'pointer' });
-        dismissBtn.addEventListener('click', function() { line.remove(); clearSuggestionHighlight(); });
-        line.appendChild(dismissBtn);
-        container.insertBefore(line, container.firstChild);
-        return true;
-    }
-    // Re-score when the case text arrives late (2.23): Paragon sometimes
-    // fills .body_RioZc after the retry loop below has already given up,
-    // which is why some cases logged a 0 score even though the text was
-    // there when the logger ran later. This watcher re-runs
-    // applySuggestion when the correspondence text changes, but ONLY while
-    // no suggestion has been shown yet (tmLastSuggestion is still null) -
-    // it never replaces a shown suggestion, and never re-shows one after
-    // Dismiss (Dismiss leaves tmLastSuggestion set). It disconnects itself
-    // once a suggestion exists. v2.22 watched the .body_RioZc node itself,
-    // but Paragon replaces that node when the full thread loads, leaving
-    // the observer on a detached node that never fires again - which is
-    // why a refresh (fast, cached load) sometimes fixed a missing
-    // suggestion. 2.23 watches document.body instead, a node Paragon never
-    // swaps out, and adds a 5-second safety-net re-check so a suggestion
-    // appears within ~5s of the text arriving even if a mutation is missed
-    // entirely. Personal only - the Team script has no suggestion feature.
-    function startRescoreObserver(container) {
-        if (window.__tmSupportRescoreObserver) { window.__tmSupportRescoreObserver.disconnect(); }
-        if (window.__tmSupportRescoreInterval) { clearInterval(window.__tmSupportRescoreInterval); }
-        var lastText = '';
-        var timer = null;
-        var safetyChecks = 0;
-        var stopWatching = function() {
-            if (window.__tmSupportRescoreObserver) { window.__tmSupportRescoreObserver.disconnect(); }
-            if (window.__tmSupportRescoreInterval) { clearInterval(window.__tmSupportRescoreInterval); window.__tmSupportRescoreInterval = null; }
-        };
-        var check = function() {
-            if (tmLastSuggestion) { stopWatching(); return; }
-            var corr = document.querySelector('.body_RioZc');
-            var t = corr ? (corr.innerText || '') : '';
-            if (t !== lastText) {
-                lastText = t;
-                applySuggestion(container);
-            }
-        };
-        window.__tmSupportRescoreObserver = new MutationObserver(function() {
-            if (timer) { clearTimeout(timer); }
-            timer = setTimeout(check, 800);
-        });
-        window.__tmSupportRescoreObserver.observe(document.body, { childList: true, subtree: true, characterData: true });
-        // Safety net: re-check every 5s while no suggestion is shown, so
-        // a missed mutation can never leave the bar suggestion-less. Stops
-        // on its own after 10 minutes; the observer keeps watching after
-        // that. Cleared together with the observer once a suggestion shows.
-        window.__tmSupportRescoreInterval = setInterval(function() {
-            safetyChecks++;
-            if (safetyChecks > 120 || tmLastSuggestion) { stopWatching(); return; }
-            check();
-        }, 5000);
-        // Tab-switch catch-up (2.30/3.33): background tabs throttle timers,
-        // so the debounced check can sit queued on a tab opened long ago.
-        // When you switch to a tab, score immediately instead of waiting
-        // for the next timer tick. Registered once per page load; the
-        // stored check always points at the current case's check, so a
-        // same-tab re-init never leaves it calling a stale container.
-        window.__tmSupportCheck = check;
-        if (!window.__tmSupportVisListener) {
-            window.__tmSupportVisListener = true;
-            document.addEventListener('visibilitychange', function() {
-                if (!document.hidden && window.__tmSupportCheck) { window.__tmSupportCheck(); }
-            });
-        }
-    }
-    function runSuggestion(container) {
-        // Fresh case, fresh watcher (v2.24): tmLastSuggestion lives for the
-        // whole page load, but Paragon re-runs init() when you open
-        // another case in the same tab without reloading. Without this
-        // reset the new case inherits the previous case's 'suggestion
-        // already shown' flag and the observer + safety net shut
-        // themselves off immediately, leaving only the retry loop.
-        tmLastSuggestion = null;
-        var attempts = 0;
-        var tick = function() {
-            attempts++;
-            if (applySuggestion(container)) { return; }
-            if (attempts < 30) { setTimeout(tick, 2000); }
-        };
-        setTimeout(tick, 2500);
-        startRescoreObserver(container);
-    }
-
-    // ---- Case logger + export (v2.18) ----
-    // Everything stays in this browser's localStorage - nothing is sent
-    // anywhere. Upload the exported file to Scout yourself when you want
-    // the suggestion keywords refined.
-    const TM_LOG_KEY = 'tmSupportCaseLog-v1';
-    const TM_LOG_MAX = 500;
-    function tmReadLog() {
-        try { return JSON.parse(localStorage.getItem(TM_LOG_KEY) || '[]'); } catch (e) { return []; }
-    }
-    function tmWriteLog(entries) {
-        // Keep the NEWEST 500 (entries are oldest-first): the old slice(0, 500)
-        // kept the oldest 500, so once the log filled up no new case was ever
-        // recorded. Full-text rows are bigger, so on a storage-quota failure
-        // retry with the newest 250 instead of losing the entry.
-        try { localStorage.setItem(TM_LOG_KEY, JSON.stringify(entries.slice(-TM_LOG_MAX))); } catch (e) {
-            try { localStorage.setItem(TM_LOG_KEY, JSON.stringify(entries.slice(-250))); } catch (e2) { console.warn('Case log save failed', e2); }
-        }
-    }
-    function tmCaseId() {
-        var m = location.href.match(/caseId=([^&]+)/);
-        return m ? decodeURIComponent(m[1]) : location.href;
-    }
-    const TM_REOPEN_PHRASES = ['not solved', "wasn't solved", 'still no solution', 'still waiting', "didn't work", 'did not work', 'not resolved', 'issue persists', 'still not', 'no solution', 'problem not solved', 'still unresolved', 'still facing'];
-    function tmIsReopen(text) {
-        var t = (text || '').toLowerCase();
-        return TM_REOPEN_PHRASES.some(function(p) { return t.indexOf(p) !== -1; });
-    }
-    function tmRecentlyLogged(caseId, buttonId, minutes) {
-        var cutoff = Date.now() - (minutes || 10) * 60000;
-        return tmReadLog().some(function(e) {
-            return e.caseId === caseId && e.actualButtonId === buttonId && Date.parse(e.timestamp || 0) >= cutoff;
-        });
-    }
-    // Non-canned auto-log (v2.20): watch Review clicks. A reply that does
-    // not match any canned template is logged as a "Custom reply" row with
-    // the first 500 chars of what you wrote, so Scout can see it. A canned
-    // reply already logged by its button click is skipped. Queue-guarded:
-    // this watcher only logs when the case is in this script's queue, so
-    // it cannot write into another queue's log when you switch cases.
-    function tmLogReviewClick() {
-        var q = readQueueValue();
-        if (['r4c-support@amazon.com', 'rcm-support@amazon.com'].indexOf(q) === -1) { return; }
-        var ta = document.querySelector('textarea');
-        var reply = ta ? ta.value || '' : '';
-        if (reply.replace(/\s/g, '').length < 20) { return; }
-        var match = tmMatchCannedReply(reply);
-        if (match) {
-            if (tmRecentlyLogged(tmCaseId(), match.id, 10)) { return; }
-            var label = '';
-            config.buttonGroups.forEach(function(g) {
-                g.buttons.forEach(function(b) { if (b.id === match.id) { label = b.text; } });
-            });
-            tmLogCase(match.id, label || match.id);
-            return;
-        }
-        tmLogCase('custom', 'Custom reply', { replyExcerpt: reply.replace(/\s+/g, ' ').trim().slice(0, 500), outcomeOverride: 'custom' });
-    }
-    function tmWatchReviewButton() {
-        if (window.__tmSupportReviewWatch) { return; }
-        window.__tmSupportReviewWatch = true;
-        document.addEventListener('click', function(e) {
-            var t = e.target;
-            if (!t || !t.closest) { return; }
-            var reviewBtn = t.closest('kat-button[label="Review"]') || t.closest('kat-button[data-csm-name="reply-composer-review"]');
-            if (!reviewBtn) {
-                var b = t.closest('button');
-                if (!b || b.textContent.trim() !== 'Review') { return; }
-            }
-            try { tmLogReviewClick(); } catch (err) { console.warn('Review log failed', err); }
-        }, true);
-    }
-    function tmOutcome(actualId, suggested) {
-        if (!suggested) { return 'missed'; }
-        return suggested.id === actualId ? 'correct' : 'wrong';
-    }
-    function tmLogCase(actualId, actualText, opts) {
-        opts = opts || {};
-        var carrier = getCaseTextRaw().replace(/\s+/g, ' ').trim();
-        var suggested = tmLastSuggestion || null;
-        var entry = {
-            timestamp: new Date().toISOString(),
-            caseId: tmCaseId(),
-            queue: readQueueValue() || '',
-            carrierExcerpt: carrier.slice(0, 1000),
-            threadTail: carrier.slice(-1000),
-            fullText: carrier.slice(0, 12000),
-            carrierMessage: extractCarrierMessage(carrier).slice(0, 3000),
-            scoredCarrierOnly: suggested ? !!suggested.carrierOnly : false,
-            isReopen: tmIsReopen(carrier),
-            replyExcerpt: opts.replyExcerpt || '',
-            actualButtonId: actualId,
-            actualButton: actualText,
-            actualCategory: (dropdownMappings[actualText] || {}).category || '',
-            actualCode: (dropdownMappings[actualText] || {}).code || '',
-            suggestedButtonId: suggested ? suggested.id : '',
-            suggestedMatched: suggested ? suggested.matched : '',
-            suggestedScore: suggested ? suggested.score : 0,
-            outcome: opts.outcomeOverride || tmOutcome(actualId, suggested)
-        };
-        // Reopen rows (v2.20): keep every click as its own row instead of
-        // overwriting by case ID, so a reopen keeps its history. Only skip
-        // an exact duplicate (same case + same button within 60 seconds).
-        var log = tmReadLog().filter(function(e) {
-            if (e.caseId !== entry.caseId || e.actualButtonId !== entry.actualButtonId) { return true; }
-            var age = Date.now() - Date.parse(e.timestamp || 0);
-            return age > 60000;
-        });
-        log.push(entry);
-        tmWriteLog(log);
-        tmUpdateReportCount();
-        console.log('[Relay Script] Case logged: ' + entry.caseId + ' -> ' + actualText + ' (' + entry.outcome + ')');
-        return entry;
-    }
-    // Match a reply you already sent against the canned templates, for
-    // "Log this case" on a completed case you open later. Word-overlap
-    // (Jaccard) on words of 4+ letters; needs >= 0.25 to count.
-    function tmMatchCannedReply(replyText) {
-        if (!replyText || replyText.length < 50) { return null; }
-        var words = function(s) {
-            var set = {};
-            (s.toLowerCase().match(/[a-z]{4,}/g) || []).forEach(function(w) { set[w] = 1; });
-            return set;
-        };
-        var replyWords = words(replyText);
-        var replyCount = Object.keys(replyWords).length;
-        var best = null;
-        Object.keys(responses).forEach(function(id) {
-            var tWords = words(responses[id]);
-            var shared = 0;
-            Object.keys(tWords).forEach(function(w) { if (replyWords[w]) { shared++; } });
-            var union = replyCount + Object.keys(tWords).length - shared;
-            var score = union ? shared / union : 0;
-            if (!best || score > best.score) { best = { id: id, score: score }; }
-        });
-        return best && best.score >= 0.25 ? best : null;
-    }
-    function tmLogThisCase() {
-        // Your reply is the last reply in the correspondence thread; the
-        // reply composer textarea, if present, is the text being drafted.
-        var corr = document.querySelector('.body_RioZc');
-        var text = corr ? corr.innerText : '';
-        var match = tmMatchCannedReply(text);
-        if (!match) {
-            alert('Could not match this case to a canned response. Open the case, make sure your reply is visible, and try again.');
-            return;
-        }
-        var label = '';
-        config.buttonGroups.forEach(function(g) {
-            g.buttons.forEach(function(b) { if (b.id === match.id) { label = b.text; } });
-        });
-        tmLogCase(match.id, label || match.id);
-        alert('Logged this case as: ' + (label || match.id) + ' (match ' + Math.round(match.score * 100) + '%). Total logged: ' + tmReadLog().length);
-    }
-    function tmDownload(filename, text, type) {
-        var blob = new Blob([text], { type: type || 'text/plain' });
-        var a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function() { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
-    }
-    function tmExportJSON() {
-        var log = tmReadLog();
-        var date = new Date().toISOString().slice(0, 10);
-        tmDownload('relay-support-case-log-' + date + '.json', JSON.stringify(log, null, 2), 'application/json');
-    }
-    function tmExportCSV() {
-        var log = tmReadLog();
-        var esc = function(v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
-        var rows = [['timestamp', 'caseId', 'queue', 'actualButton', 'suggestedButtonId', 'suggestedMatched', 'suggestedScore', 'outcome', 'actualCategory', 'actualCode', 'carrierExcerpt', 'isReopen', 'threadTail', 'replyExcerpt'].map(esc).join(',')];
-        log.forEach(function(e) {
-            rows.push([e.timestamp, e.caseId, e.queue, e.actualButton, e.suggestedButtonId, e.suggestedMatched, e.suggestedScore, e.outcome, e.actualCategory, e.actualCode, e.carrierExcerpt.replace(/\n/g, ' '), e.isReopen, (e.threadTail || '').replace(/\n/g, ' '), (e.replyExcerpt || '').replace(/\n/g, ' ')].map(esc).join(','));
-        });
-        var date = new Date().toISOString().slice(0, 10);
-        tmDownload('relay-support-case-log-' + date + '.csv', rows.join('\n'), 'text/csv');
-    }
-    function tmUpdateReportCount() {
-        var el = document.getElementById('tm-report-count');
-        if (el) { el.textContent = 'Logged cases: ' + tmReadLog().length; }
-    }
-    function buildReportFooter(container) {
-        var footer = document.createElement('div');
-        footer.id = 'tm-report-footer';
-        Object.assign(footer.style, { display: 'flex', alignItems: 'center', gap: '8px', padding: '6px 10px', fontSize: '12px', backgroundColor: '#f3f4f6', borderTop: '1px solid #d1d5db', borderRadius: '4px', marginTop: '2px' });
-        var count = document.createElement('span');
-        count.id = 'tm-report-count';
-        count.textContent = 'Logged cases: ' + tmReadLog().length;
-        count.style.fontWeight = 'bold';
-        footer.appendChild(count);
-        var badge = document.createElement('span');
-        badge.textContent = 'J.T. Personal';
-        Object.assign(badge.style, { backgroundColor: '#7c3aed', color: 'white', borderRadius: '4px', padding: '2px 8px', fontSize: '11px', fontWeight: 'bold' });
-        footer.appendChild(badge);
-        var mkBtn = function(label, fn, bg) {
-            var b = document.createElement('button');
-            b.textContent = label;
-            Object.assign(b.style, { backgroundColor: bg || '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '4px 10px', fontSize: '12px', cursor: 'pointer' });
-            b.addEventListener('click', fn);
-            footer.appendChild(b);
-            return b;
-        };
-        mkBtn('Export JSON', tmExportJSON, '#0b66c3');
-        mkBtn('Export CSV', tmExportCSV, '#0b66c3');
-        mkBtn('Log this case', tmLogThisCase, '#2e8b57');
-        mkBtn('Clear log', function() {
-            if (confirm('Clear all ' + tmReadLog().length + ' logged cases? This cannot be undone. Export first if you want to keep them.')) {
-                tmWriteLog([]);
-                tmUpdateReportCount();
-            }
-        }, '#b91c1c');
-        var note = document.createElement('span');
-        note.textContent = 'Log stays in this browser only — upload the export to Scout to refine suggestions.';
-        note.style.color = '#4b5563';
-        footer.appendChild(note);
-        container.appendChild(footer);
-    }
 
     // Initialize
     const init = (isOverride) => {
@@ -2434,7 +1961,7 @@ if (crossQueueMode) {
     const backBtn = document.createElement('button');
     backBtn.id = hiddenBarId ? 'tm-back-to-' + hiddenBarLabel.toLowerCase() : 'tm-back-to-other';
     backBtn.textContent = hiddenBarLabel ? 'Back to ' + hiddenBarLabel + ' responses' : 'Back to responses';
-    Object.assign(backBtn.style, { position: 'absolute', bottom: '4px', right: '8px', zIndex: '10001', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' });
+    Object.assign(backBtn.style, { alignSelf: 'flex-end', order: '99', marginTop: '10px', backgroundColor: '#6b7280', color: 'white', border: 'none', borderRadius: '4px', padding: '6px 12px', fontSize: '12px', fontWeight: 'bold', cursor: 'pointer', boxShadow: '0 2px 6px rgba(0,0,0,0.3)' });
     backBtn.addEventListener('click', switchBackFromOverride);
     container.appendChild(backBtn);
 }
@@ -2492,16 +2019,6 @@ group.buttons.forEach(buttonConfig => {
 });
 
 document.body.insertBefore(container, document.body.firstChild);
-
-// Case suggestion (v2.15): read the case, highlight one button if there
-// is a clear winner. Suggest-only - it never clicks anything itself.
-runSuggestion(container);
-
-// Case logger (v2.18): report footer with export buttons.
-buildReportFooter(container);
-
-// Non-canned auto-log (v2.20): watch Review clicks for custom replies.
-tmWatchReviewButton();
 
 // Unpin #page-sidebar (Paragon pins it at top: 71px, so it stayed still
 // while the rest of the page moved) and shift it down by the bar's height,
