@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses RFA Auctions Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      1.8
+// @version      1.9
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Auctions-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Auctions-Team.user.js
 // @description  Automatically inserts responses for Relay Auctions Support issues
@@ -11,6 +11,7 @@
 // ==/UserScript==
 
     /*UPDATES:
+    11/26/2026: New 'Outside of Scope' button (v1.9): sends the out-of-scope escalation reply.
     11/25/2026: Switch tray self-heals + gap above switches (v1.7, per J.T.): the v1.6 in-flow fix did not land because the tray in each bar is created by the OTHER two scripts, and its style was only set at creation - so an older script could leave an absolute tray behind. The in-flow style is now re-asserted on every 1-second tick, clearing any absolute positioning, so mixed-version installs heal within a second. Plus a 10px gap above the tray and the Back button, so the switches sit visibly clear of the bottom row. All three updates must be installed and the page reloaded. Support-Team v2.33 and Tech-Team v3.40 carry the same fix. Personal is untouched. v1.6 is untouched as the fallback.
     11/25/2026: Switch tray + Back button no longer overlay (v1.6, per J.T.): the bottom-right switch tray and the Back button were absolutely positioned over the bar, so they could cover the last row's buttons. Both are now in-flow flex rows at the bottom-right - the tray right-aligns its buttons, the Back button uses order 99 so it still renders last. Same spot on screen, nothing can sit on top of a button now. Support-Team v2.32 and Tech-Team v3.39 carry the same fix. Personal is untouched. v1.5 is untouched as the fallback.
     11/24/2026: Updated RFA responses (v1.5, per J.T.): 8 new buttons from the team's updated responses (App Issue, Wrong Driver Type, In-Transit, Contract ID, Overlapping, (Missing/Wrong) Trailer, Cancelled Loads, Load Board WIP) and 8 updated texts - Awarded Contract and Renewal rewritten (Renewal is now the short review-request form, not the renewal-offer explainer), Payment/Performance/Update Assets gain the queue preamble, More Information asks for Contract IDs and links to .ca, the follow-ups gain the contract bullet. Button labels follow the team's file (More Info is now More Information, Cancellations is now Cancellations/Rejections). One team typo fixed ("extension request of contact" to "of contract"). Also the Nov 21 Error 1 signature fix (try/catch around the signature click, fill scheduled regardless) - Auctions never got it. Personal v1.7 carries the same buttons/responses plus suggestion keywords for the new buttons. v1.4 is untouched as the fallback.
@@ -53,7 +54,8 @@
             { id: 'overlapping', text: 'Overlapping' },
             { id: 'missingWrongTrailer', text: '(Missing/Wrong) Trailer' },
             { id: 'cancelledLoads', text: 'Cancelled Loads' },
-            { id: 'loadBoardWip', text: 'Load Board WIP' }
+            { id: 'loadBoardWip', text: 'Load Board WIP' },
+            { id: 'outsideOfScope', text: 'Outside of Scope' }
         ],
         buttonStyle: {
             backgroundColor: '#1a8a8a',
@@ -381,7 +383,16 @@ We're sorry for any inconvenience this caused, and we appreciate your understand
 
 Thanks for continuing to haul with Relay,
 
-The Amazon Relay team`
+The Amazon Relay team`,
+        outsideOfScope: `Dear Valued Carrier,
+
+Thank you for contacting us. We understand this matter is important to your company's operations.
+
+Your request falls outside the scope of what our team can resolve directly. However, we have escalated it to the appropriate team for further review.
+
+We will follow up with you once we receive an update. In the meantime, if you have more questions or concerns, or any documentation that would help support this issue, please reply to this email.
+
+Thanks for continuing to haul with Relay!`,
     };
 
 

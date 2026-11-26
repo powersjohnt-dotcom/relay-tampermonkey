@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses MMPM Version 2 - Grouped — Team
 // @namespace    http://tampermonkey.net/
-// @version      3.44
+// @version      3.45
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
 // @description  Automatically inserts responses for Relay issues - grouped and color-coded tech queue buttons
@@ -13,6 +13,7 @@
 (function() {
     'use strict';
     /*UPDATES:
+    11/26/2026: New 'Outside of Scope' button (v3.45): sends the out-of-scope escalation reply.
     11/26/2026: Responsive bar (v3.43): the button bar now shrinks on smaller screens - below 1600px wide or 850px tall it uses tighter buttons and caps its own height at 45% of the viewport so the case stays visible. It switches back to the full layout automatically on a larger screen, re-checked on every resize and every second.
     11/25/2026: Transfer buttons now name their team and give the carrier the steps to reach it directly (v3.41, per J.T.). Trip button renamed 'Transfer to Trip Completion Dispute'.
     11/25/2026: Switch tray now re-asserts its in-flow style every second, so mixed-version installs heal within a second (v3.40, per J.T.). Plus a 10px gap above the tray and the Back button.
@@ -88,6 +89,7 @@
                     { id: 'assets', text: 'Assets' },
                     { id: 'suspended', text: 'Suspended' },
                     { id: 'other', text: 'Other Issue' },
+                    { id: 'outsideOfScope', text: 'Outside of Scope' },
                     { id: 'uiia', text: 'UIIA' },
                     { id: 'auctionSupport', text: 'Auction Support' }
                 ]
@@ -364,6 +366,15 @@ Thanks for continuing to haul with Relay!`,
 Thank you for reaching out. However, this queue is meant for technical support needed with issues using the Relay app/portal.
 
 Please navigate to Relay’s Support Center and click “create a new case.” If your Topic is not listed, select "Other" for further assistance.
+
+Thanks for continuing to haul with Relay!`,
+        outsideOfScope: `Dear Valued Carrier,
+
+Thank you for contacting us. We understand this matter is important to your company's operations.
+
+Your request falls outside the scope of what our team can resolve directly. However, we have escalated it to the appropriate team for further review.
+
+We will follow up with you once we receive an update. In the meantime, if you have more questions or concerns, or any documentation that would help support this issue, please reply to this email.
 
 Thanks for continuing to haul with Relay!`,
         paymentissue: `Dear Carrier,
@@ -782,6 +793,7 @@ Thanks for continuing to haul with Relay!`,
         "Contracts":                 { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Short-term-contract", codeValue: "51180030561" },
         "Assets":                    { category: "Generic-queries-for-relay-carrier-support", categoryValue: "46660406411", code: "Relay-other-generic-issues", codeValue: "51180240061" },
         "Other Issue":               { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
+        "Outside of Scope":          { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
         "UIIA":                      { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
         "Auction Support":           { category: "Relay-account-category-main-category", categoryValue: "46658786461", code: "Other", codeValue: "51180030591" },
         "Transfer to Trip Completion Dispute":        { category: "R4C-trips-issues", categoryValue: "45545173241", code: "Other", codeValue: "50947790651" },

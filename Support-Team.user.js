@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses R4C & RCM Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.38
+// @version      2.39
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Support-Team.user.js
 // @description  Automatically inserts responses for Relay issues
@@ -10,6 +10,7 @@
 // @grant        none
 // ==/UserScript==
     /*UPDATES:
+    11/26/2026: New 'Outside of Scope' button (v2.39): sends the out-of-scope escalation reply.
     11/26/2026: Responsive bar (v2.37): the button bar now shrinks on smaller screens - below 1600px wide or 850px tall it uses tighter buttons and caps its own height at 45% of the viewport so the case stays visible. It switches back to the full layout automatically on a larger screen, re-checked on every resize and every second.
     11/25/2026: Removed 10 buttons now covered by the transfer buttons: Driver Verification, Contracts, Insurance, Assets, Site Escalation, Driver Assignment Issue, Auction Support, Suspended, Pending Verification and Verification Link (v2.36). Groups re-sorted by button count, so TRANSFERS moves up to second.
     11/25/2026: Transfer buttons now name their team and give the carrier the steps to reach it directly (v2.34, per J.T.). Trip button renamed 'Transfer to Trip Completion Dispute'.
@@ -77,6 +78,7 @@ const dropdownMappings = {
     "App + In-Transit":      { category: "In-Transit Issues", categoryValue: "37058497991", code: "On-Site Issues (ROC)", codeValue: "39474113041" },
     "App + Performance":     { category: "Performance", categoryValue: "37058498011", code: "Dispute", codeValue: "39474112881" },
     "Multiple Cases":        { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
+    "Outside of Scope":      { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "DOT/DPS Audit":         { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
     "Badge":                 { category: "In-Transit Issues", categoryValue: "37058497991", code: "Badge Request", codeValue: "39474113121" },
     "Patience":              { category: "RLB Tech Issue", categoryValue: "37056877931", code: "Carrier Account", codeValue: "48827582001" },
@@ -176,6 +178,7 @@ buttonGroups: [
             { id: 'appintransit', text: 'App + In-Transit' },
             { id: 'appperformance', text: 'App + Performance' },
             { id: 'Multi', text: 'Multiple Cases' },
+            { id: 'outsideOfScope', text: 'Outside of Scope' },
             { id: 'DOTDPS', text: 'DOT/DPS Audit' },
             { id: 'badge', text: 'Badge' },
             { id: 'patience', text: 'Patience' },
@@ -696,6 +699,15 @@ Thanks for continuing to haul with Relay!`,
 Thank you for reaching out. This inquiry has already been addressed on Case #[NUMBER]. To ensure continuity and timely resolution, all further communication regarding this matter should be submitted on that existing case.
 
 You can access and respond to your open cases through the Relay Support Center at: https://relay.amazon.com/cases/sc/help
+
+Thanks for continuing to haul with Relay!`,
+         outsideOfScope: `Dear Valued Carrier,
+
+Thank you for contacting us. We understand this matter is important to your company's operations.
+
+Your request falls outside the scope of what our team can resolve directly. However, we have escalated it to the appropriate team for further review.
+
+We will follow up with you once we receive an update. In the meantime, if you have more questions or concerns, or any documentation that would help support this issue, please reply to this email.
 
 Thanks for continuing to haul with Relay!`,
          appperformance: `Dear Valued Carrier,
