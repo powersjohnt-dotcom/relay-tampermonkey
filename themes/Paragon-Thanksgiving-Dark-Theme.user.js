@@ -2,6 +2,8 @@
 // @name         Paragon — Thanksgiving Dark Theme
 // @namespace    http://tampermonkey.net/
 // @version      1.7
+// @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/Theme/themes/Paragon-Thanksgiving-Dark-Theme.user.js
+// @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/Theme/themes/Paragon-Thanksgiving-Dark-Theme.user.js
 // @author       J.T. Powers
 // @match        https://paragon-na.amazon.com/*
 // @match        https://d1u16vxl4h9h9c.cloudfront.net/widget.html*
