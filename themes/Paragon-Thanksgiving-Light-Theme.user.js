@@ -2,6 +2,8 @@
 // @name         Paragon — Thanksgiving Light Theme
 // @namespace    http://tampermonkey.net/
 // @version      2.3
+// @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/Theme/themes/Paragon-Thanksgiving-Light-Theme.user.js
+// @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/Theme/themes/Paragon-Thanksgiving-Light-Theme.user.js
 // @description  Thanksgiving autumn theme for all of Paragon - LIGHT and fun: warm cream page, warm-white panels, tan bars, pumpkin frames and data, cranberry SLA times, dark brown text, monospace text and uppercase headers - cheerful, with a fun turkey in the bottom-right corner — click him to tickle him: gobbles, facts, and good wishes, shuffled so it never feels the same twice. No grid background. A fixer lightens every dark surface toward cream (keeping its hue) and flips light text to dark - including collapsed content before it ever expands, so expanded follow-up replies stay readable. The reply composer and the review screen are themed directly like everything else - there is no inversion anywhere in this version. Also runs inside the CloudFront widget iframes (follow-ups, bookmarks, contact reason) and themes them from within. Changes the look only - no buttons, text, or functions are touched. Toggle it on/off in Tampermonkey without affecting the response scripts. 
 // @author       J.T. Powers
 // @match        https://paragon-na.amazon.com/*
