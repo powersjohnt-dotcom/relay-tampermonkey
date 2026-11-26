@@ -1,17 +1,72 @@
 // ==UserScript==
 // @name         Paragon — Thanksgiving Light Theme
 // @namespace    http://tampermonkey.net/
-// @version      2.3
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/Theme/themes/Paragon-Thanksgiving-Light-Theme.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/Theme/themes/Paragon-Thanksgiving-Light-Theme.user.js
-// @description  Thanksgiving autumn theme for all of Paragon - LIGHT and fun: warm cream page, warm-white panels, tan bars, pumpkin frames and data, cranberry SLA times, dark brown text, monospace text and uppercase headers - cheerful, with a fun turkey in the bottom-right corner — click him to tickle him: gobbles, facts, and good wishes, shuffled so it never feels the same twice. No grid background. A fixer lightens every dark surface toward cream (keeping its hue) and flips light text to dark - including collapsed content before it ever expands, so expanded follow-up replies stay readable. The reply composer and the review screen are themed directly like everything else - there is no inversion anywhere in this version. Also runs inside the CloudFront widget iframes (follow-ups, bookmarks, contact reason) and themes them from within. Changes the look only - no buttons, text, or functions are touched. Toggle it on/off in Tampermonkey without affecting the response scripts. 
-// @author       J.T. Powers
+// @version      2.3
+// @description  Thanksgiving autumn theme for all of Paragon - LIGHT and fun: warm cream page, warm-white panels, tan bars, pumpkin frames and data, cranberry SLA times, dark brown text, monospace text and uppercase headers - cheerful, with a fun turkey in the bottom-right corner — click him to tickle him: gobbles, facts, and good wishes, shuffled so it never feels the same twice. No grid background. A fixer lightens every dark surface toward cream (keeping its hue) and flips light text to dark - including collapsed content before it ever expands, so expanded follow-up replies stay readable. The reply composer and the review screen are themed directly like everything else - there is no inversion anywhere in this version. Also runs inside the CloudFront widget iframes (follow-ups, bookmarks, contact reason) and themes them from within. Changes the look only - no buttons, text, or functions are touched. Toggle it on/off in Tampermonkey without affecting the response scripts. Do not install this and the Star Wars, Batman or Lavender theme at the same time - they do the same job and will fight each other. Reopen/due rows get a soft amber wash on pale gold, and their SLA-overdue times stay a flat bold cranberry. Built from the Star Wars v3.5 codebase via the dark Thanksgiving v1.0, so it carries every lesson through v3.5: due/reopen rows readable on the Lobby (inline wash + SLA cranberry, stylesheet injected into shadow roots), light buttons/panels backstopped, nav/icons/pagination themed, Transfer labels themed, and a 30-second heartbeat after the 2-minute fast net.
+// @author       Scout (for J.T.)
 // @match        https://paragon-na.amazon.com/*
 // @match        https://d1u16vxl4h9h9c.cloudfront.net/widget.html*
 // @match        https://*.cloudfront.net/widget.html*
 // @grant        none
 // @run-at       document-start
 // ==/UserScript==
+
+/* UPDATES:
+   11/20/2026: v2.3 (per J.T.: make the quotes feel limitless, and make
+   the turkey move like it's being tickled): the turkey now wiggles
+   when clicked (a 0.6s tickle animation) and the quotes come from one
+   shuffled deck of 30 - the 12 facts, 6 gobbles ("Gobble gobble!"),
+   and 12 good wishes ("Pass the gravy!") - so nothing repeats until
+   you have seen the whole lot, then it reshuffles. Facts sometimes
+   get a "Gobble gobble!" tacked on for good measure.
+   11/19/2026: v2.2 (per J.T.: the turkey showed up in the Bookmarks
+   section and the Scout dialogue, and "facts about thanksgiving"): the
+   turkey is a real element now, not a body::after overlay - the old
+   overlay rendered inside every widget iframe too, because this script
+   runs in those frames. addTurkey() only runs on the main page
+   (window.parent === window), so the widgets stay turkey-free. Click
+   the turkey for a Thanksgiving fact (12 facts, a new one each click,
+   in a little card above the turkey; click the card or wait 8 seconds
+   to hide it). No sounds - facts only, per his pick.
+   11/19/2026: v2.1 (per J.T., "are you able to add a fun turkey to the
+   background?"): yes - a flat-design turkey (pumpkin/cranberry/gold
+   feather fan, brown body, orange beak, red wattle) sits in the
+   bottom-right corner of every page, as a fixed body::after overlay
+   (pointer-events none, below the response bars). Inline SVG in a data
+   URI, so the theme stays one file - no image to host. Also fixes the
+   stale "warm brown" wording in the no-grid comment (the light theme's
+   page is warm cream).
+   11/19/2026: v2.0 (per J.T., "don't make it dark make it light and
+   fun"): the theme is now LIGHT - warm cream page (#f9f1de), warm-white
+   panels (#fffaf0), tan bars (#f2e2bd), pumpkin accent (#c85a17),
+   cranberry SLA (#b03a2e), dark brown text (#3a2415). The fixer is
+   mirrored, not just recoloured: it LIGHTENS dark surfaces toward cream
+   (keeping hue) and flips light text to dark, instead of darkening
+   light surfaces and flipping dark text to light. There is NO inversion
+   anywhere now - no inverted leaves, no inverted composer/review (the
+   composer is themed directly, like everything else), no invert fallback
+   for the widget iframes (a white widget on a cream page is fine).
+   Due rows get a soft amber wash on pale gold (#fdeecb) with flat bold
+   cranberry SLA times. Autumn confetti dots (pumpkin/gold) replace the
+   starfield; the top sweep runs amber to cranberry. Still no grid
+   background. The v1.0 dark version is superseded - install v2.0 under
+   its new name (delete the old "Thanksgiving Dark Theme" entry first,
+   Tampermonkey treats a new @name as a new script).
+   11/19/2026: v1.0 (per J.T.): first version, DARK. Built from the Star
+   Wars v3.5 codebase, so it carries every lesson through v3.5 (Lobby due
+   rows, white-button backstops, Transfer labels, the kat-label
+   dark-check, the 30-second heartbeat). Palette: deep espresso brown
+   (#1e120b / #2e1e12), harvest amber accent (#f0a83e), pale amber-white
+   text (#f2e7d3), cranberry SLA (#ff6f59). NO grid background, per his
+   ask - the dotted grid from the Star Wars theme is gone; the page
+   stays a flat warm brown. Due rows get an amber wash fading across the
+   row and their SLA times stay flat bold cranberry. The composer renders
+   in dark warm brown from the pre-inversion pale cream #f6ead3; Review
+   is the primary button in deep amber #8a5a1e, which renders light
+   amber. Superseded by v2.0 (light).
+*/
 
 (function () {
     'use strict';
@@ -59,7 +114,8 @@
 
         /* v2.2: the turkey is a real element now (not body::after), so it
            can be clicked - and it only exists on the main page, never
-           inside the widget iframes (Bookmarks, Contact Reason). Click it for a Thanksgiving fact. */
+           inside the widget iframes (Bookmarks, Contact Reason, the
+           Scout dialogue). Click it for a Thanksgiving fact. */
         '/* v2.3: ticklish turkey, endless quotes */',
         '#tg-turkey {',
         '  position: fixed;',
@@ -1032,7 +1088,7 @@
        The turkey is a real element now, not a body::after overlay, so it
        can be clicked - and it is only created on the main page. The old
        body::after version rendered inside every widget iframe too
-       (Bookmarks, Contact Reason), because this
+       (Bookmarks, Contact Reason, the Scout dialogue), because this
        script runs in those frames as well. Click the turkey for a
        Thanksgiving fact; click again for another one. ---------------------- */
     var TG_FACTS = [
@@ -1088,7 +1144,7 @@
     var tgFactTimer = null;
     function addTurkey() {
         // Main page only: widget iframes (Bookmarks, Contact Reason,
-        // never get a turkey.
+        // Scout dialogue) never get a turkey.
         if (window.parent !== window) return;
         if (!document.body || document.getElementById('tg-turkey')) return;
         var turkey = document.createElement('div');
