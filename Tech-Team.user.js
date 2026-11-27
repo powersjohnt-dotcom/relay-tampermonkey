@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses MMPM Version 2 - Grouped — Team
 // @namespace    http://tampermonkey.net/
-// @version      3.46
+// @version      3.47
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
 // @description  Automatically inserts responses for Relay issues - grouped and color-coded tech queue buttons
@@ -370,9 +370,7 @@ Please navigate to Relay’s Support Center and click “create a new case.” I
 Thanks for continuing to haul with Relay!`,
         outsideOfScope: `Dear Valued Carrier,
 
-Thank you for contacting us. We understand this matter is important to your company's operations.
-
-Your request falls outside the scope of what our team can resolve directly. However, we have escalated it to the appropriate team for further review.
+Thank you for contacting us. We understand this matter is important to your company's operations. We have escalated it to the appropriate team for further review.
 
 We will follow up with you once we receive an update. In the meantime, if you have more questions or concerns, or any documentation that would help support this issue, please reply to this email.
 

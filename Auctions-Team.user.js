@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses RFA Auctions Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.1
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Auctions-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Auctions-Team.user.js
 // @description  Automatically inserts responses for Relay Auctions Support issues
@@ -384,9 +384,7 @@ Thanks for continuing to haul with Relay,
 The Amazon Relay team`,
         outsideOfScope: `Dear Valued Carrier,
 
-Thank you for contacting us. We understand this matter is important to your company's operations.
-
-Your request falls outside the scope of what our team can resolve directly. However, we have escalated it to the appropriate team for further review.
+Thank you for contacting us. We understand this matter is important to your company's operations. We have escalated it to the appropriate team for further review.
 
 We will follow up with you once we receive an update. In the meantime, if you have more questions or concerns, or any documentation that would help support this issue, please reply to this email.
 
