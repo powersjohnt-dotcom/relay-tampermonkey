@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses MMPM Version 2 - Grouped — Team
 // @namespace    http://tampermonkey.net/
-// @version      3.45
+// @version      3.46
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Tech-Team.user.js
 // @description  Automatically inserts responses for Relay issues - grouped and color-coded tech queue buttons
@@ -456,6 +456,12 @@ For issues related to In-Transit Trips please take the following steps:
 3. Use the dropdown options to complete the delay report.
 4. Describe the issue and follow the prompts.
 
+If you need live assistance with an active load, you can also request a callback directly through the Relay app by following these steps:
+
+Open the Relay Mobile App
+Navigate to the load in question
+Select "Request a call back" to connect with our live operations team
+
 For Trip Completion issues (request a timestamp)
 
 1. Go to your "Trips" and then "In Transit.".
@@ -467,14 +473,6 @@ You can report a delay in Amazon Relay. Go to Trips > In Transit, and then click
 
 Relay Assistant for In-Transit Trips: https://relay.amazon.com/learning?filterCriteria=Relay%20Assistant%3A%20Trip%20Support&openCourse=4eb24a0b-6896-4d50-8dee-5c4451b93841&ref=owp_nav_learning_center
 Reporting Delays (LTR) for On Time Performance: https://relay.amazon.com/cases/sc/help/search?query=JTIyUmVwb3J0aW5nJTIwRGVsYXlzJTIwKExUUiklMjBmb3IlMjBPbiUyMFRpbWUlMjBQZXJmb3JtYW5jZSUyMg
-
-Requesting a Call Back:
-
-If you need live assistance with an active load, you can request a callback directly through the Relay app by following these steps:
-
-Open the Relay Mobile App
-Navigate to the load in question
-Select "Request a call back" to connect with our live operations team
 
 Thanks for continuing to haul with Relay!`,
         appintransit: `Dear Carrier,
@@ -501,6 +499,12 @@ For issues related to In-Transit Trips please take the following steps:
 3. Use the dropdown options to complete the delay report.
 4. Describe the issue and follow the prompts.
 
+If you need live assistance with an active load, you can also request a callback directly through the Relay app by following these steps:
+
+Open the Relay Mobile App
+Navigate to the load in question
+Select "Request a call back" to connect with our live operations team
+
 For Trip Completion issues (request a timestamp)
 
 1. Go to your "Trips" and then "In Transit.".
@@ -512,14 +516,6 @@ You can report a delay in Amazon Relay. Go to Trips > In Transit, and then click
 
 Relay Assistant for In-Transit Trips: https://relay.amazon.com/learning?filterCriteria=Relay%20Assistant%3A%20Trip%20Support&openCourse=4eb24a0b-6896-4d50-8dee-5c4451b93841&ref=owp_nav_learning_center
 Reporting Delays (LTR) for On Time Performance: https://relay.amazon.com/cases/sc/help/search?query=JTIyUmVwb3J0aW5nJTIwRGVsYXlzJTIwKExUUiklMjBmb3IlMjBPbiUyMFRpbWUlMjBQZXJmb3JtYW5jZSUyMg
-
-Requesting a Call Back:
-
-If you need live assistance with an active load, you can request a callback directly through the Relay app by following these steps:
-
-Open the Relay Mobile App
-Navigate to the load in question
-Select "Request a call back" to connect with our live operations team
 
 Thanks for continuing to haul with Relay!`,
         appperformance: `Dear Carrier,

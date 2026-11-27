@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses RFA Auctions Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      1.9
+// @version      2.0
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Auctions-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Auctions-Team.user.js
 // @description  Automatically inserts responses for Relay Auctions Support issues
@@ -282,6 +282,12 @@ For issues related to In-Transit Trips please take the following steps:
 3. Use the dropdown options to complete the delay report.
 4. Describe the issue and follow the prompts.
 
+If you need live assistance with an active load, you can also request a callback directly through the Relay app by following these steps:
+
+Open the Relay Mobile App
+Navigate to the load in question
+Select "Request a call back" to connect with our live operations team
+
 For Trip Completion issues (request a timestamp)
 
 1. Go to your "Trips" and then "In Transit.".
@@ -295,14 +301,6 @@ Relay Assistant for In-Transit Trips: https://relay.amazon.com/learning?filterCr
 For additional support, please visit the Relay Support Center at: https://relay.amazon.com/cases/sc/help
 
 For additional resources, please visit the Relay Learning Center at: https://relay.amazon.com/cases/sc/learning
-
-Requesting a Call Back:
-
-If you need live assistance with an active load, you can request a callback directly through the Relay app by following these steps:
-
-Open the Relay Mobile App
-Navigate to the load in question
-Select "Request a call back" to connect with our live operations team
 
 Thanks for continuing to haul with Relay!`,
 
