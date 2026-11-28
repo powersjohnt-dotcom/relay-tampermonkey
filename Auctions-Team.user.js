@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Amazon Relay Responses RFA Auctions Support — Team
 // @namespace    http://tampermonkey.net/
-// @version      2.1
+// @version      2.2
 // @updateURL    https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Auctions-Team.user.js
 // @downloadURL  https://raw.githubusercontent.com/powersjohnt-dotcom/relay-tampermonkey/main/Auctions-Team.user.js
 // @description  Automatically inserts responses for Relay Auctions Support issues
@@ -11,6 +11,7 @@
 // ==/UserScript==
 
     /*UPDATES:
+    11/28/2026: Transfer buttons (v2.2): 11 new buttons, one per destination queue, each inserting the transfer reply and running the transfer automatically after Send, plus the prepared Payment Support message (no button yet - not transferrable).
     11/26/2026: New 'Outside of Scope' button (v1.9): sends the out-of-scope escalation reply.
     11/25/2026: Switch tray self-heals + gap above switches (v1.7, per J.T.): the v1.6 in-flow fix did not land because the tray in each bar is created by the OTHER two scripts, and its style was only set at creation - so an older script could leave an absolute tray behind. The in-flow style is now re-asserted on every 1-second tick, clearing any absolute positioning, so mixed-version installs heal within a second. Plus a 10px gap above the tray and the Back button, so the switches sit visibly clear of the bottom row. All three updates must be installed and the page reloaded. Support-Team v2.33 and Tech-Team v3.40 carry the same fix. Personal is untouched. v1.6 is untouched as the fallback.
     11/25/2026: Switch tray + Back button no longer overlay (v1.6, per J.T.): the bottom-right switch tray and the Back button were absolutely positioned over the bar, so they could cover the last row's buttons. Both are now in-flow flex rows at the bottom-right - the tray right-aligns its buttons, the Back button uses order 99 so it still renders last. Same spot on screen, nothing can sit on top of a button now. Support-Team v2.32 and Tech-Team v3.39 carry the same fix. Personal is untouched. v1.5 is untouched as the fallback.
@@ -55,7 +56,18 @@
             { id: 'missingWrongTrailer', text: '(Missing/Wrong) Trailer' },
             { id: 'cancelledLoads', text: 'Cancelled Loads' },
             { id: 'loadBoardWip', text: 'Load Board WIP' },
-            { id: 'outsideOfScope', text: 'Outside of Scope' }
+            { id: 'outsideOfScope', text: 'Outside of Scope' },
+            { id: 'xferTripDisputes', text: 'Transfer to Trip Completion Dispute' },
+            { id: 'xferDriverVerification', text: 'Transfer to Driver Verification' },
+            { id: 'xferAppPortal', text: 'Transfer to App & Web Portal' },
+            { id: 'xferContracts', text: 'Transfer to Contracts' },
+            { id: 'xferInsurance', text: 'Transfer to Insurance' },
+            { id: 'xferAssets', text: 'Transfer to Assets' },
+            { id: 'xferSiteEscalations', text: 'Transfer to Site Escalations' },
+            { id: 'xferDriverAssignment', text: 'Transfer to Driver Assignment' },
+            { id: 'xferSafetyRewards', text: 'Transfer to Safety Rewards' },
+            { id: 'xferSuspensionAppeals', text: 'Transfer to Suspension Appeals' },
+            { id: 'xferCarrierVerification', text: 'Transfer to Carrier Verification' },
         ],
         buttonStyle: {
             backgroundColor: '#1a8a8a',
@@ -389,6 +401,128 @@ Thank you for contacting us. We understand this matter is important to your comp
 We will follow up with you once we receive an update. In the meantime, if you have more questions or concerns, or any documentation that would help support this issue, please reply to this email.
 
 Thanks for continuing to haul with Relay!`,
+        xferTripDisputes: `Dear Valued Carrier,
+
+We are transferring your case to the Trip Completion Dispute team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay Trip Completion Status Dispute
+
+Thank you for continuing to haul with Relay!`,
+        xferDriverVerification: `Dear Valued Carrier,
+
+We are transferring your case to the Driver Verification team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay Driver Verification Dispute
+
+Thank you for continuing to haul with Relay!`,
+        xferAppPortal: `Dear Valued Carrier,
+
+We are transferring your case to the App & Web Portal team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay App & Web Portal Tech Support
+
+Thank you for continuing to haul with Relay!`,
+        xferContracts: `Dear Valued Carrier,
+
+We are transferring your case to the Contracts team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Short-Term Contracts
+
+Thank you for continuing to haul with Relay!`,
+        xferInsurance: `Dear Valued Carrier,
+
+We are transferring your case to the Insurance team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Insurance Compliance
+
+Thank you for continuing to haul with Relay!`,
+        xferAssets: `Dear Valued Carrier,
+
+We are transferring your case to the Assets team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Asset Edit
+
+Thank you for continuing to haul with Relay!`,
+        xferSiteEscalations: `Dear Valued Carrier,
+
+We are transferring your case to the Site Escalations team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Site Escalations
+
+Thank you for continuing to haul with Relay!`,
+        xferDriverAssignment: `Dear Valued Carrier,
+
+We are transferring your case to the Driver Assignment team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay Driver Assignment Support
+
+Thank you for continuing to haul with Relay!`,
+        xferSafetyRewards: `Dear Valued Carrier,
+
+We are transferring your case to the Safety Rewards team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on the "Rewards" button on the left side of the screen.
+
+Thank you for continuing to haul with Relay!`,
+        xferSuspensionAppeals: `Dear Valued Carrier,
+
+We are transferring your case to the team that handles suspension appeals so they can review your appeal.
+
+You don't need to do anything else. They will pick up this same case.
+
+Thank you for continuing to haul with Relay!`,
+        xferCarrierVerification: `Dear Valued Carrier,
+
+We are transferring your case to the Carrier Verification team so they can help you with this issue.
+
+You don't need to do anything else. They will pick up this same case.
+
+Thank you for continuing to haul with Relay!`,
+        xferPaymentSupport: `Dear Valued Carrier,
+
+We are transferring your case to the Payment Support team so they can help you with this issue.
+
+Next time, you can reach them directly:
+
+1. Click on Support Center
+2. Click Create a new case
+3. Select topic: Relay Payment Support
+
+Thank you for continuing to haul with Relay!`,
     };
 
 
@@ -436,6 +570,355 @@ Thanks for continuing to haul with Relay!`,
         }
     }
 
+// ==== TRANSFER-ON-SEND ====
+// A TRANSFERS button click arms a transfer; the transfer itself runs
+// automatically right after the agent clicks Send on the review preview.
+// The script NEVER clicks Send itself - the agent always reviews first.
+// Discarding the reply, or clicking another button, drops the armed
+// transfer. Any failed or timed-out step aborts and logs with a
+// [Transfers] prefix - never retried blindly, never sent to the
+// wrong queue. Send completion is the REVIEW YOUR REPLY preview
+// closing - a Send button can persist on the page after the send
+// (proven live Nov 24 on case 23584543611). Selectors are role +
+// visible text, mirroring the
+// existing Review-button finder (live inspection could not see raw HTML).
+var TRANSFER_CFG = { pollMs: 250, sendWaitMs: 20000, stepWaitMs: 10000, queueWaitMs: 30000 };
+    var TRANSFER_DESTINATIONS = {
+        xferTripDisputes: { search: 'relay-tripstatus-disputes@amazon.com', option: 'relay-tripstatus-disputes@amazon.com' },
+        xferDriverVerification: { search: 'Relay-driver-verification-checks@amazon.com', option: 'relay-driver-verification-checks' },
+        xferAppPortal: { search: 'relay-feedback@amazon.com', option: 'relay-feedback@amazon.com' },
+        xferContracts: { search: 'rcm-support@amazon.com', option: 'rcm-support@amazon.com' },
+        xferInsurance: { search: 'nastinsuranceparagoninbox@amazon.com', option: 'nastinsuranceparagoninbox@amazon.com' },
+        xferAssets: { search: 'relay-asset-verification-appeals@amazon.com', option: 'relay-asset-verification-appeals@amazon.com' },
+        xferSiteEscalations: { search: 'relay-site-escalations@amazon.com', option: 'relay-site-escalations@amazon.com' },
+        xferDriverAssignment: { search: 'relay-driver-assignment-support@amazon.com', option: 'relay-driver-assignment-support@amazon.com' },
+        xferSafetyRewards: { search: 'relay-safety-rewards-queue@amazon.com', option: 'relay-safety-rewards-queue@amazon.com' },
+        xferSuspensionAppeals: { search: 'relay-am@amazon.com', option: 'relay-am@amazon.com' },
+        xferCarrierVerification: { search: 'relay-account-verification@amazon.com', option: 'relay-account-verification@amazon.com' }
+    };
+var pendingTransfer = null;
+var transferWatchTimer = null;
+var transferSendClicked = false;
+var transferSawReply = false;
+
+function xferFindKatButton(label) {
+    var el = document.querySelector('kat-button[label="' + label + '"] button');
+    if (el) { return el; }
+    var all = document.querySelectorAll('kat-button button');
+    for (var i = 0; i < all.length; i++) {
+        if (all[i].textContent.trim() === label) { return all[i]; }
+    }
+    var btns = document.querySelectorAll('button');
+    for (var j = 0; j < btns.length; j++) {
+        if (btns[j].textContent.trim() === label) { return btns[j]; }
+    }
+    return null;
+}
+
+function xferFindRadio(name) {
+    var labels = document.querySelectorAll('label');
+    for (var i = 0; i < labels.length; i++) {
+        if (labels[i].textContent.trim() === name) {
+            var input = labels[i].querySelector('input[type="radio"]');
+            if (input) { return input; }
+            var forId = labels[i].getAttribute('for');
+            if (forId) {
+                var target = document.getElementById(forId);
+                if (target) { return target; }
+            }
+        }
+    }
+    var katLabels = document.querySelectorAll('kat-label');
+    for (var k = 0; k < katLabels.length; k++) {
+        if ((katLabels[k].getAttribute('text') || '').trim() === name) {
+            var kFor = katLabels[k].getAttribute('for');
+            if (kFor) {
+                var kTarget = document.getElementById(kFor);
+                if (kTarget) { return kTarget; }
+            }
+        }
+    }
+    var radios = document.querySelectorAll('[role="radio"], input[type="radio"], kat-radio');
+    for (var j = 0; j < radios.length; j++) {
+        var r = radios[j];
+        var txt = (r.getAttribute('label') || r.getAttribute('aria-label') || r.textContent || '').trim();
+        if (txt === name) { return r; }
+    }
+    return null;
+}
+
+function xferClickRadio(name) {
+    var r = xferFindRadio(name);
+    if (!r) { return false; }
+    var id = r.id || (r.getAttribute && r.getAttribute('id')) || '';
+    if (id) {
+        var lab = document.querySelector('label[for="' + id + '"]');
+        if (lab) { lab.click(); }
+    }
+    r.click();
+    return true;
+}
+
+function xferFindSearchBox() {
+    var box = document.querySelector('input[placeholder="Type here to search"]');
+    if (box) { return box; }
+    box = document.querySelector('textarea[placeholder="Type here to search"]');
+    if (box) { return box; }
+    var inputs = document.querySelectorAll('input, textarea');
+    for (var i = 0; i < inputs.length; i++) {
+        if ((inputs[i].getAttribute('placeholder') || '') === 'Type here to search') { return inputs[i]; }
+    }
+    return null;
+}
+
+function xferSetSearch(text) {
+    var box = xferFindSearchBox();
+    if (!box) { return false; }
+    try {
+        var proto = box.tagName === 'TEXTAREA' ? window.HTMLTextAreaElement.prototype : window.HTMLInputElement.prototype;
+        var setter = Object.getOwnPropertyDescriptor(proto, 'value').set;
+        setter.call(box, text);
+    } catch (e) {
+        box.value = text;
+    }
+    box.dispatchEvent(new Event('input', { bubbles: true }));
+    box.dispatchEvent(new Event('change', { bubbles: true }));
+    return true;
+}
+
+function xferFindOption(text) {
+    var opts = document.querySelectorAll('[role="option"]');
+    for (var i = 0; i < opts.length; i++) {
+        if (opts[i].textContent.trim() === text) { return opts[i]; }
+    }
+    var alts = document.querySelectorAll('kat-option, li');
+    for (var j = 0; j < alts.length; j++) {
+        if (alts[j].textContent.trim() === text) { return alts[j]; }
+    }
+    var natives = document.querySelectorAll('option');
+    for (var k = 0; k < natives.length; k++) {
+        var nv = natives[k].value || natives[k].getAttribute('value') || '';
+        if (nv === text || natives[k].textContent.trim() === text) { return natives[k]; }
+    }
+    return null;
+}
+
+function xferClickOption(el) {
+    if (!el) { return false; }
+    el.click();
+    if (el.tagName === 'OPTION') {
+        el.selected = true;
+        var sel = el.parentElement;
+        while (sel && sel.tagName !== 'SELECT') { sel = sel.parentElement; }
+        if (sel) {
+            try {
+                var setter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, 'value').set;
+                setter.call(sel, el.value);
+            } catch (e) {
+                sel.value = el.value;
+            }
+            sel.dispatchEvent(new Event('change', { bubbles: true }));
+            sel.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+    return true;
+}
+
+function xferListOptionTexts() {
+    var out = [];
+    var opts = document.querySelectorAll('[role="option"]');
+    for (var i = 0; i < opts.length && out.length < 10; i++) {
+        out.push(opts[i].textContent.trim());
+    }
+    var natives = document.querySelectorAll('option');
+    for (var j = 0; j < natives.length && out.length < 10; j++) {
+        out.push(natives[j].value || natives[j].textContent.trim());
+    }
+    return out.join(' | ');
+}
+
+function xferReadQueue() {
+    var els = document.querySelectorAll('*');
+    for (var i = 0; i < els.length; i++) {
+        if (els[i].textContent.trim() === 'Queue:') {
+            var row = els[i].parentElement;
+            if (row) {
+                var txt = row.textContent.replace('Queue:', '').trim();
+                if (txt) { return txt; }
+            }
+        }
+    }
+    return null;
+}
+
+function xferFindSendButton() {
+    return xferFindKatButton('Send');
+}
+
+function xferPreviewHeading() {
+    var heads = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+    for (var i = 0; i < heads.length; i++) {
+        if (heads[i].textContent.trim() === 'REVIEW YOUR REPLY') { return heads[i]; }
+    }
+    return null;
+}
+
+function xferSendSuccessSeen() {
+    var els = document.querySelectorAll('*');
+    for (var i = 0; i < els.length; i++) {
+        var t = els[i].textContent || '';
+        if (t.indexOf('Email was sent successfully') !== -1) { return true; }
+    }
+    return false;
+}
+
+function xferReplyOpen() {
+    return !!xferFindKatButton('Review') || !!xferPreviewHeading();
+}
+
+function xferWaitFor(check, timeoutMs, pollMs) {
+    return new Promise(function(resolve) {
+        var start = Date.now();
+        function tick() {
+            var val = null;
+            try { val = check(); } catch (e) { val = null; }
+            if (val) { resolve(val); return; }
+            if (Date.now() - start >= timeoutMs) { resolve(null); return; }
+            setTimeout(tick, pollMs);
+        }
+        tick();
+    });
+}
+
+function armTransfer(id) {
+    var dest = TRANSFER_DESTINATIONS[id];
+    if (!dest) {
+        console.warn('[Transfers] No destination for button ' + id);
+        return;
+    }
+    pendingTransfer = { id: id, search: dest.search, option: dest.option };
+    transferSendClicked = false;
+    transferSawReply = false;
+    console.log('[Transfers] Armed - transfer to ' + dest.option + ' will run after Send');
+    xferStartWatch();
+}
+
+function disarmTransfer(reason) {
+    if (!pendingTransfer) { return; }
+    console.log('[Transfers] Disarmed (' + reason + ')');
+    pendingTransfer = null;
+    transferSendClicked = false;
+    transferSawReply = false;
+    xferStopWatch();
+}
+
+function xferStartWatch() {
+    if (transferWatchTimer) { return; }
+    transferWatchTimer = setInterval(xferWatchTick, TRANSFER_CFG.pollMs);
+}
+
+function xferStopWatch() {
+    if (transferWatchTimer) { clearInterval(transferWatchTimer); transferWatchTimer = null; }
+}
+
+function xferWatchTick() {
+    if (!pendingTransfer) { xferStopWatch(); return; }
+    if (xferReplyOpen()) { transferSawReply = true; }
+    var sendBtn = transferSendClicked ? null : xferFindSendButton();
+    if (sendBtn && !sendBtn.__xferTracked) {
+        sendBtn.__xferTracked = true;
+        sendBtn.addEventListener('click', function() {
+            if (!pendingTransfer) { return; }
+            console.log('[Transfers] Send clicked - waiting for the reply to go out');
+            transferSendClicked = true;
+            xferWaitForSendDone(pendingTransfer);
+        });
+        console.log('[Transfers] Send button found - transfer to ' + pendingTransfer.option + ' will run after Send');
+    }
+    if (!transferSendClicked && transferSawReply && !xferReplyOpen()) {
+        disarmTransfer('reply closed without sending');
+    }
+}
+
+function xferWaitForSendDone(dest) {
+    xferWaitFor(function() {
+        return xferPreviewHeading() ? null : true;
+    }, TRANSFER_CFG.sendWaitMs, TRANSFER_CFG.pollMs).then(function(done) {
+        if (!done) {
+            console.warn('[Transfers] ABORT: review preview did not close within ' + (TRANSFER_CFG.sendWaitMs / 1000) + 's - transfer NOT run. If the reply went out, transfer manually.');
+            disarmTransfer('send not confirmed');
+            return;
+        }
+        console.log('[Transfers] Reply sent - running transfer to ' + dest.option + (xferSendSuccessSeen() ? ' (success banner seen)' : ' (no success banner seen)'));
+        disarmTransfer('transfer running');
+        xferRunTransfer(dest).then(function(ok) {
+            if (ok) {
+                console.log('[Transfers] Transfer complete - case is now in ' + dest.option);
+            } else {
+                console.warn('[Transfers] Transfer did NOT complete - check the Queue value and transfer manually if needed');
+            }
+        });
+    });
+}
+
+async function xferRunTransfer(dest) {
+    console.log('[Transfers] Opening the Transfer panel');
+    var transferBtn = xferFindKatButton('Transfer');
+    if (!transferBtn) {
+        console.warn('[Transfers] ABORT: Transfer button not found');
+        return false;
+    }
+    transferBtn.click();
+    var radio = await xferWaitFor(function() { return xferFindRadio('Another queue'); }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+    if (!radio) {
+        console.warn('[Transfers] ABORT: transfer panel did not open (no Another queue radio)');
+        return false;
+    }
+    xferClickRadio('Another queue');
+    console.log('[Transfers] Another queue selected - waiting for the search box');
+    var searchBox = await xferWaitFor(function() { return xferFindSearchBox(); }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+    if (!searchBox) {
+        console.warn('[Transfers] ABORT: destination search box did not appear after selecting Another queue');
+        return false;
+    }
+    if (!xferSetSearch(dest.search)) {
+        console.warn('[Transfers] ABORT: destination search box not found');
+        return false;
+    }
+    console.log('[Transfers] Searching for ' + dest.search);
+    var option = await xferWaitFor(function() { return xferFindOption(dest.option); }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+    if (!option) {
+        console.warn('[Transfers] ABORT: no destination option matching "' + dest.option + '" (options now: ' + xferListOptionTexts() + ')');
+        return false;
+    }
+    xferClickOption(option);
+    console.log('[Transfers] Destination selected: ' + dest.option);
+    var caseBtn = await xferWaitFor(function() {
+        var b = xferFindKatButton('Transfer Case');
+        if (!b) { return null; }
+        if (b.disabled || b.hasAttribute('disabled')) { return null; }
+        return b;
+    }, TRANSFER_CFG.stepWaitMs, TRANSFER_CFG.pollMs);
+    if (!caseBtn) {
+        console.warn('[Transfers] ABORT: Transfer Case button never became enabled');
+        return false;
+    }
+    caseBtn.click();
+    console.log('[Transfers] Transfer Case clicked - waiting for the Queue to change');
+    var queue = await xferWaitFor(function() {
+        var q = xferReadQueue();
+        if (!q) { return null; }
+        return (q.indexOf(dest.option) !== -1 || q.indexOf(dest.search) !== -1) ? q : null;
+    }, TRANSFER_CFG.queueWaitMs, TRANSFER_CFG.pollMs);
+    if (!queue) {
+        console.warn('[Transfers] Transfer Case was clicked but the Queue did not show ' + dest.option + ' within ' + (TRANSFER_CFG.queueWaitMs / 1000) + 's (Queue now: ' + xferReadQueue() + '). The transfer may still have gone through if the page reloaded - check the Queue value.');
+        return false;
+    }
+    console.log('[Transfers] Queue is now: ' + queue);
+    return true;
+}
+// ==== /TRANSFER-ON-SEND ====
+
     // Create button element with styles
     const createButton = ({ id, text }) => {
         const button = document.createElement('button');
@@ -477,6 +960,12 @@ Thanks for continuing to haul with Relay!`,
             button.style.boxShadow = '0 0 0 5px #0d5e5e';
             button.style.backgroundColor = style.hoverColor;
             insertResponse(responses[id]);
+            // Transfer-on-Send: arm a transfer for TRANSFERS buttons, drop any armed transfer for other buttons.
+            if (id.indexOf('xfer') === 0) {
+                armTransfer(id);
+            } else {
+                disarmTransfer('another button clicked');
+            }
         });
 
         button.classList.add('rfa-btn');
