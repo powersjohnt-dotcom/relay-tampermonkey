@@ -67,7 +67,7 @@
             { id: 'xferDriverAssignment', text: 'Transfer to Driver Assignment' },
             { id: 'xferSafetyRewards', text: 'Transfer to Safety Rewards' },
             { id: 'xferSuspensionAppeals', text: 'Transfer to Suspension Appeals' },
-            { id: 'xferCarrierVerification', text: 'Transfer to Carrier Verification' },
+            { id: 'xferAccountVerification', text: 'Transfer to Account Verification' },
         ],
         buttonStyle: {
             backgroundColor: '#1a8a8a',
@@ -505,9 +505,9 @@ We are transferring your case to the team that handles suspension appeals so the
 You don't need to do anything else. They will pick up this same case.
 
 Thank you for continuing to haul with Relay!`,
-        xferCarrierVerification: `Dear Valued Carrier,
+        xferAccountVerification: `Dear Valued Carrier,
 
-We are transferring your case to the Carrier Verification team so they can help you with this issue.
+We are transferring your case to the Account Verification team so they can help you with this issue.
 
 You don't need to do anything else. They will pick up this same case.
 
@@ -594,7 +594,7 @@ var TRANSFER_CFG = { pollMs: 250, sendWaitMs: 20000, stepWaitMs: 10000, queueWai
         xferDriverAssignment: { search: 'relay-driver-assignment-support@amazon.com', option: 'relay-driver-assignment-support@amazon.com' },
         xferSafetyRewards: { search: 'relay-safety-rewards-queue@amazon.com', option: 'relay-safety-rewards-queue@amazon.com' },
         xferSuspensionAppeals: { search: 'relay-am@amazon.com', option: 'relay-am@amazon.com' },
-        xferCarrierVerification: { search: 'relay-account-verification@amazon.com', option: 'relay-account-verification@amazon.com' }
+        xferAccountVerification: { search: 'relay-account-verification@amazon.com', option: 'relay-account-verification@amazon.com' }
     };
 var pendingTransfer = null;
 var transferWatchTimer = null;
